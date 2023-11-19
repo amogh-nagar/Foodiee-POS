@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <>
       <div className="flex-col justify-between items-center bg-primary-600 w-fit px-4 py-6 h-screen">
-        <div className="rounded-lg bg-secondary-50 mb-4">
+        <div className="rounded-lg bg-secondary-25 mb-4">
           <img src={StoreIcon} alt="logo" className="w-16 h-16" />
         </div>
         <div className="h-[81%] no-scrollbar overflow-y-auto">
