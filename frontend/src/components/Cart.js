@@ -4,57 +4,6 @@ import { currencyMap } from "../utils/constants";
 import { BsCashStack } from "react-icons/bs";
 import { FaCcMastercard } from "react-icons/fa";
 import { IoWalletOutline } from "react-icons/io5";
-const cartItems = [
-  {
-    name: "Roasted Kitchen",
-    price: 25.5,
-    quantity: 2,
-    subtotal: 100,
-    currency: "INR",
-  },
-  {
-    name: "Roasted Kitchen",
-    price: 25.5,
-    quantity: 2,
-    subtotal: 100,
-    currency: "INR",
-  },
-  {
-    name: "Roasted Kitchen",
-    price: 25.5,
-    quantity: 2,
-    subtotal: 100,
-    currency: "INR",
-  },
-  {
-    name: "Roasted Kitchen",
-    price: 25.5,
-    quantity: 2,
-    subtotal: 100,
-    currency: "INR",
-  },
-  {
-    name: "Roasted Kitchen",
-    price: 25.5,
-    quantity: 2,
-    subtotal: 100,
-    currency: "INR",
-  },
-  {
-    name: "Roasted Kitchen",
-    price: 25.5,
-    quantity: 2,
-    subtotal: 100,
-    currency: "INR",
-  },
-  {
-    name: "Roasted Kitchen",
-    price: 25.5,
-    quantity: 2,
-    subtotal: 100,
-    currency: "INR",
-  },
-];
 var checkoutMethods = [
   {
     name: "Cash",
@@ -69,17 +18,17 @@ var checkoutMethods = [
     icon: <IoWalletOutline />,
   },
 ];
-const Cart = () => {
+const Cart = ({orderId = 123}) => {
   const [checkoutMethod, setCheckoutMethod] = useState("Cash");
-  const cart = useSelector((state) => state.cart);
+  const cartItems = useSelector((state) => state.cart);
   return (
     <>
       <div className="w-full">
-        <h3 className="text-xl">Order 34567</h3>
+        <h3 className="text-xl font-semibold">Order - {orderId}</h3>
       </div>
       <div className="w-full h-[267px] overflow-auto my-4">
         <ul className="w-full h-full overflow-auto hide-scrollbar">
-          {cartItems.map((item, index) => {
+          {cartItems && cartItems.length>0 ? cartItems.map((item, index) => {
             return (
               <li className="bg-gray-700 p-4 rounded-lg flex justify-between text-white w-full mb-3">
                 <div className="flex gap-x-3">
@@ -97,24 +46,26 @@ const Cart = () => {
                 </div>
               </li>
             );
-          })}
+          }): <div>
+            <h4 className="text-slate-300">No Cart Items Found, Punch Some Items!</h4>
+            </div>}
         </ul>
       </div>
       <div className="bg-gray-700 w-full h-full p-3 rounded-md">
         <div className="h-44">
-          <div className="text-md flex justify-between">
-            <h3>Subtotal</h3>
-            <p>23.09</p>
+          <div className="text-md flex mb-1 justify-between">
+            <h3>SubTotal</h3>
+            <p>0</p>
           </div>
           <div className="text-2xl flex justify-between">
             <h2>Total</h2>
-            <p>23.09</p>
+            <p>0</p>
           </div>
         </div>
         <div>
           <div className="h-24 w-full">
             <div className="mb-2">
-              <h3>Payment Method</h3>
+              <h3>Payment Methods</h3>
             </div>
             <div className="flex w-full justify-between items-cente">
               {checkoutMethods.map((method, index) => {
@@ -140,7 +91,7 @@ const Cart = () => {
             </div>
           </div>
           <div>
-            <button className="rounded-2xl bg-white text-primary-600 w-full h-12">
+            <button className="rounded-2xl text-lg font-bold bg-white text-primary-600 w-full h-12">
               Place Order
             </button>
           </div>

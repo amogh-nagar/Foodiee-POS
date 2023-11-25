@@ -1,23 +1,22 @@
-import React from "react";
-import { Field, Formik, Form } from "formik";
-import Input from "../UI/Input";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../store/authSlice";
+import CustomForm from "../components/Form";
 const Auth = () => {
-   const dispatch =  useDispatch();
-   const history = useHistory();
+  const dispatch = useDispatch();
+  const history = useHistory();
   const initialValues = {
     email: "",
     password: "",
   };
   const onSubmit = (values) => {
-    console.log("Form values:", values);
-    dispatch(login({
+    dispatch(
+      login({
         user: values,
         permissions: [],
         role: null,
-    }))
+      })
+    );
     history.push("/");
   };
 
@@ -55,37 +54,27 @@ const Auth = () => {
           <div className="w-full h-full flex justify-center items-center">
             <div className="bg-primary-50 w-7/12 px-6 py-8 text-gray-200 rounded-lg shadow-2xl">
               <h3 className="text-3xl font-bold my-4">Sign In</h3>
-              <Formik
+              <CustomForm
                 initialValues={initialValues}
                 onSubmit={onSubmit}
                 validate={validate}
-                validator={() => ({})}
-              >
-                <Form>
-                  <Field
-                    type="email"
-                    name="email"
-                    id="email"
-                    label="Email"
-                    placeholder="Your Email"
-                    component={Input}
-                  />
-                  <Field
-                    type="password"
-                    name="password"
-                    id="password"
-                    label="Password"
-                    placeholder="Your Password"
-                    component={Input}
-                  />
-                  <button
-                    className="bg-secondary-300 w-full mt-4 rounded-md h-11 font-bold hover:bg-secondary-500"
-                    type="submit"
-                  >
-                    Login
-                  </button>
-                </Form>
-              </Formik>
+                validator={() => {}}
+                fields={[
+                  {
+                    type: "email",
+                    name: "email",
+                    label: "Email",
+                    placeholder: "Your Email",
+                  },
+                  {
+                    type: "password",
+                    name: "password",
+                    label: "Password",
+                    placeholder: "Your Password",
+                  },
+                ]}
+                buttonText="Login"
+              />
             </div>
           </div>
         </div>
