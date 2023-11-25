@@ -1,13 +1,21 @@
 import { AiOutlineHome } from "react-icons/ai";
 import { FiSettings } from "react-icons/fi";
+import { RiBillLine } from "react-icons/ri";
 import Home from "../pages/Home";
 import Analysis from "../pages/Analysis";
+import Billing from "../pages/Billing";
 export const routesList = [
   {
     path: "/",
     text: "Home",
     icon: <AiOutlineHome className="w-10 h-10 icon" />,
     component: <Home />,
+  },
+  {
+    path: "/billing",
+    text: "Analysis",
+    icon: <RiBillLine className="w-10 h-10 icon" />,
+    component: <Billing />,
   },
   {
     path: "/analysis",

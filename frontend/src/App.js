@@ -7,7 +7,7 @@ const App = () => {
   return (
     <div className='flex'>
         <Header/>
-        <div className='bg-primary-50 w-full h-screen text-text'>
+        <div className='bg-primary-50 w-full h-screen text-text hide-scrollbar'>
         <Switch>
             {
                 routesList.map((route, index) =>{

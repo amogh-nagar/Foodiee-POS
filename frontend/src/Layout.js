@@ -7,8 +7,8 @@ import App from "./App";
 function Layout() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   return (
-    <div className="w-screen h-screen">
-      <div>
+    <div className="w-full h-screen overflow-hidden">
+      <div className="w-full h-full">
         <Switch>
           {!isAuthenticated && (
             <Route path="/auth" exact>
