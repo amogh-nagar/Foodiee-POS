@@ -1,5 +1,4 @@
 import { Field, Form, Formik } from "formik";
-import React from "react";
 import Input from "../UI/Input";
 
 const CustomForm = ({
@@ -8,7 +7,7 @@ const CustomForm = ({
   validate,
   validator,
   fields,
-  buttonText
+  buttonText,
 }) => {
   return (
     <Formik
@@ -19,6 +18,19 @@ const CustomForm = ({
     >
       <Form>
         {fields.map((field, index) => {
+          if (field.type === "checkbox") {
+            return (
+              <label key={index} className="label cursor-pointer inline-flex items-center">
+                <Field
+                  type={field.type}
+                  name={field.name}
+                  id={field.name}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                <span className="ml-2 text-gray-400">{field.label}</span>
+              </label>
+            );
+          }
           return (
             <Field
               key={index}

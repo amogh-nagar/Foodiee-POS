@@ -18,6 +18,8 @@ const authSlice = createSlice({
             state.role = action.payload.role;
         },
         logout: (state) => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("trustedDevice");
             return {
               ...state,
                 user: null,

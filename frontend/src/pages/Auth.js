@@ -2,22 +2,36 @@ import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../store/authSlice";
 import CustomForm from "../components/Form";
+import { useLoginMutation } from "../services/auth";
+import AuthImage from "../assets/AuthImage.png";
 const Auth = () => {
+  const [loginApi, { isError, isLoading, data }] = useLoginMutation();
   const dispatch = useDispatch();
   const history = useHistory();
   const initialValues = {
     email: "",
     password: "",
   };
-  const onSubmit = (values) => {
-    dispatch(
-      login({
-        user: values,
-        permissions: [],
-        role: null,
-      })
-    );
-    history.push("/");
+  const onSubmit = async (values) => {
+    try {
+      localStorage.setItem("trustedDevice", values?.staySignedIn);
+      var payload = {
+        email: values.email,
+        password: values.password,
+      };
+      const data = await loginApi(payload).unwrap();
+      localStorage.setItem("token", data?.token);
+      dispatch(
+        login({
+          user: values,
+          permissions: data?.permissions,
+          role: data?.role,
+        })
+      );
+      history.push("/");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const validate = (values) => {
@@ -46,8 +60,9 @@ const Auth = () => {
         <div
           className="w-6/12 h-full "
           style={{
-            backgroundImage:
-              'url("https://img.freepik.com/free-photo/vintage-old-rustic-cutlery-dark_1220-4886.jpg?w=1800&t=st=1700301470~exp=1700302070~hmac=55f8b086ddbebc8ff0870a8ea8e96015bd274f3bffb334763e3a6b1509e2149c")',
+            backgroundImage: `url(${AuthImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         ></div>
         <div className="w-6/12 h-full bg-primary-700">
@@ -72,8 +87,14 @@ const Auth = () => {
                     label: "Password",
                     placeholder: "Your Password",
                   },
+                  {
+                    type: "checkbox",
+                    name: "staySignedIn",
+                    label: "Stay Signed In",
+                  },
                 ]}
                 buttonText="Login"
+                isTrusted={true}
               />
             </div>
           </div>
