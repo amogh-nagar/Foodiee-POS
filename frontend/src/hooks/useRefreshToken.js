@@ -1,6 +1,5 @@
 import { useReloginMutation } from "../services/auth";
 import { login, logout } from "../store/authSlice";
-import Loader from "../UI/Loaders/Loader";
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import { useDispatch } from "react-redux";
 const useRefreshToken = () => {
