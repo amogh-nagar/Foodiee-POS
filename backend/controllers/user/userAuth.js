@@ -19,38 +19,56 @@ const MIME_TYPE_MAP = {
   "image/jpg": "jpg",
 };
 exports.loginUser = function (req, res, next) {
-  console.log('login')
-  User.findOne({ email: req.body.email }).then(function (user) {
-    if (!user) {
-      var error = new HttpError("Invalid email or password", 401);
-      return next(error);
-    }
-    if (!compareSync(req.body.password, user.password)) {
-      var error = new HttpError("Invalid email or password", 401);
-      return next(error);
-    }
-    req.login(user, { session: false }, function (err) {
-      if (err) {
-        return next(err);
-      }
-      var token = jwt.sign(
-        {
-          role: user.role,
-          id: user._id,
-          email: user.email,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
-      return res.status(200).json({
-        message: "Logged In!",
-        token: "Bearer " + token,
-        user: user,
-      });
-    });
+  return res.status(200).json({
+    message: "Logged In!",
+    user: {
+      name:"Amogh",
+      permissions: [],
+      role: {
+        entity: "Brand",
+        roleName: "Admin",
+      },
+    },
+    token: '123'
   });
+  // User.findOne({ email: req.body.email }).then(function (user) {
+  //   if (!user) {
+  //     var error = new HttpError("Invalid email or password", 401);
+  //     return next(error);
+  //   }
+  //   if (!compareSync(req.body.password, user.password)) {
+  //     var error = new HttpError("Invalid email or password", 401);
+  //     return next(error);
+  //   }
+  //   req.login(user, { session: false }, function (err) {
+  //     if (err) {
+  //       return next(err);
+  //     }
+  //     var token = jwt.sign(
+  //       {
+  //         role: user.role,
+  //         id: user._id,
+  //         email: user.email,
+  //       },
+  //       process.env.JWT_SECRET,
+  //       { expiresIn: "1h" }
+  //     );
+  //   });
+  // });
 };
-
+exports.reLoginUser = function(req,res,next){
+  return res.status(200).json({
+    message: "Logged In!",
+    user: {
+      name:"Amogh",
+      permissions: [],
+      role: {
+        entity: "Brand",
+        roleName: "Admin",
+      },
+    }
+  });
+}
 exports.registerUser = function (req, res, next) {
   User.findOne({ email: req.body.email }).then(function (user) {
     if (user) {

@@ -1,3 +1,10 @@
+import { useDispatch } from "react-redux";
+import { useGetAllBrandsSalesQuery, useGetAllOutletsSalesQuery, useGetAllTenantsSalesQuery, useGetBrandHourlySalesQuery, useGetDishSalesQuery, useGetOutletHourlySalesQuery, useGetTenantHourlySalesQuery, useGetTop3BrandsQuery, useGetTop3DishesQuery, useGetTop3OutletsQuery } from "../services/analysis";
+import { useReloginMutation } from "../services/auth";
+import { useGetAllBrandsDetailsQuery, useGetAllOutletsDetailsQuery, useGetAllTenantsDetailsQuery } from "../services/dashboard";
+import { login, logout } from "../store/authSlice";
+import { useHistory } from "react-router-dom/cjs/react-router-dom";
+
 export const currencyMap = {
     "USD": "$", 
     "EUR": "€", 
@@ -20,3 +27,108 @@ export const currencyMap = {
     "BRL": "R$", 
     "ZAR": "R", 
   };
+
+
+
+export const getRandomColors = function getRandomLightColor() {
+  const red = Math.floor(Math.random() * 155) + 100; 
+  const green = Math.floor(Math.random() * 155) + 100;
+  const blue = Math.floor(Math.random() * 155) + 100;
+  const color = `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`;
+  return color;
+};
+
+export const permissionBasedAPIs = {
+  'isVisitAnalysisPage': {
+    'tenantAdmin': [useGetBrandHourlySalesQuery, useGetTop3BrandsQuery],
+    'brandAdmin': [useGetBrandHourlySalesQuery, useGetDishSalesQuery, useGetTop3DishesQuery, useGetTop3OutletsQuery],
+    'superAdmin': [useGetTenantHourlySalesQuery],
+    'outletAdmin': [useGetOutletHourlySalesQuery, useGetDishSalesQuery, useGetTop3DishesQuery],
+  },
+  'isVisitDashboardPage': {
+    'tenantAdmin': [useGetAllBrandsDetailsQuery, useGetAllBrandsSalesQuery],
+    'brandAdmin': [useGetAllBrandsDetailsQuery, useGetAllBrandsSalesQuery],
+    'superAdmin': [useGetAllTenantsDetailsQuery, useGetAllTenantsSalesQuery],
+    'outletAdmin': [useGetAllOutletsDetailsQuery, useGetAllOutletsSalesQuery],
+  },
+  'isVisitUsersPage': {
+    'tenantAdmin': [],
+    'brandAdmin': [],
+    'superAdmin': [],
+    'outletAdmin': [],
+  },
+  'isVisitTenantsPage': {
+    'superAdmin': [],
+  },
+  'isVisitOutletsPage': {
+    'brandAdmin': [],
+  },
+  'isVisitTaxPage': {
+    'brandAdmin': [],
+  },
+  'isVisitDishesPage': {
+    'brandAdmin': [],
+  },
+  'isVisistBrandsPage': {
+    'tenantAdmin': [],
+  },
+  'isVisitBillingPage': {
+    'outletUser': [],
+  }
+}
+
+var superAdminPermissions = [
+  "isCreateTenants",
+  "isUpdateTenants",
+  "isDeleteTenants",
+  "isVisitTenantsPage",
+  "isCreatedUser",
+  "isUpdateUser",
+]
+
+var commonPermissions = [
+  "isVisitUsersPage",
+  "isVisitAnalysisPage",
+  "isVisitDashboardPage",
+  "isViewProfile"
+]
+
+var tenantAdminPermissions = [ 
+  "isCreateBrands",
+  "isUpdateBrands",
+  "isDeleteBrands",
+  "isVisistBrandsPage",
+  "isCreatedUser",
+  "isUpdateUser",
+]
+
+var brandAdminPermissions = [
+  "isCreateOutlets",
+  "isCreateDishes",
+  "isCreateTax",
+  "isUpdateOutlets",
+  "isDeleteOutlets",
+  "isVisitOutletsPage",
+  "isUpdateDishes",
+  "isDeleteDishes",
+  "isVisitDishesPage",
+  "isUpdateTax",
+  "isDeleteTax",
+  "isVisitTaxPage",
+  "isCreatedUser",
+  "isUpdateUser"
+]
+
+var outletAdminPermissions = [
+  "isVisitBillingPage",
+  "isCreatedUser",
+  "isUpdateUser"
+]
+
+
+export const rolesMappedToPermissions = {
+  'superAdmin' : superAdminPermissions.concat(commonPermissions),
+  'tenantAdmin' : tenantAdminPermissions.concat(commonPermissions),
+  'outletAdmin' : outletAdminPermissions.concat(commonPermissions),
+  'brandAdmin' : brandAdminPermissions.concat(commonPermissions)
+}

@@ -31,7 +31,7 @@ const ItemCard = ({ name, price = 0, quantity = 0, id, currency = "INR" }) => {
         >
           -
         </button>
-        <span class="dishQuantity">{quantity}</span>
+        <span className="dishQuantity">{quantity}</span>
         <button
           className={`border-2 w-7 h-7 rounded-lg ${
             quantity > 0 ? "border-primary-600 text-black hover:bg-gray-700 hover:text-white" : "border-gray-500 hover:bg-secondary-500 hover:text-black"

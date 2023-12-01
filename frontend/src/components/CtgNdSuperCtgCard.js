@@ -1,6 +1,6 @@
 import React from 'react'
 import { DiCoffeescript } from "react-icons/di";
-import { getRandomColors } from '../utils/routes';
+import { getRandomColors } from '../utils/constants';
 
 const CtgNdSuperCtgCard = ({img, name, handler}) => {
   var styleObj = {}

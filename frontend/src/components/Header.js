@@ -3,13 +3,12 @@ import StoreIcon from "../assets/bx_bxs-store-alt.svg";
 import { NavLink } from "react-router-dom";
 import { routesList } from "../utils/routes";
 import { CiLogout } from "react-icons/ci";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../store/authSlice";
 import { FaRegUser } from "react-icons/fa";
-import { useHistory } from "react-router-dom";
 const Header = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const permissions = useSelector((state) => state.auth.permissions);
   const logoutHandler = () => {
     dispatch(logout());
   };
@@ -23,24 +22,29 @@ const Header = () => {
           <ul className="hide-scrollbar">
             {routesList.map((item, index) => {
               return !item.onlyRoute ? (
-                <li key={index} className="mb-5">
-                  <NavLink exact to={item.path} activeClassName="active-class">
-                    <div className="outer-div w-16 h-16 flex justify-center items-center rounded-lg transition-all">
-                      {item.icon}
-                    </div>
-                  </NavLink>
-                </li>
+                !item.permissions.length ||
+                item.permissions.every(
+                  (permission) => permissions?.indexOf(permission) !== -1
+                ) ? (
+                  <li key={index} className="mb-5">
+                    <NavLink
+                      exact
+                      to={item.path}
+                      activeClassName="active-class"
+                    >
+                      <div className="outer-div w-16 h-16 flex justify-center items-center rounded-lg transition-all">
+                        {item.icon}
+                      </div>
+                    </NavLink>
+                  </li>
+                ) : null
               ) : null;
             })}
           </ul>
         </div>
 
         <div>
-          <NavLink
-            exact
-            to="/profile"
-            activeClassName="active-class"
-          >
+          <NavLink exact to="/profile" activeClassName="active-class">
             <div className="w-16 mb-3 h-16 flex text-secondary-300 justify-center items-center rounded-lg transition-all hover:bg-secondary-300 hover:text-white">
               <FaRegUser className="w-10 h-10" />
             </div>

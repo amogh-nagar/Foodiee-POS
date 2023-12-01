@@ -28,11 +28,11 @@ var fs = require("fs");
 var bodyParser = require("body-parser");
 const { receiveMessage } = require("./aws-services/email-service/aws-sqs");
 const { receives3Message } = require("./aws-services/s3-service/aws-sqs");
-var port = process.env.PORT || 3000;
-require("./aws-services/email-service/aws-consumer");
-require("./aws-services/s3-service/aws-consumer");
-app.use(passport.initialize());
-require("./config/passport");
+var port = process.env.PORT || 3030;
+// require("./aws-services/email-service/aws-consumer");
+// require("./aws-services/s3-service/aws-consumer");
+// app.use(passport.initialize());
+// require("./config/passport");
 
 app.use(fileUpload());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
@@ -50,11 +50,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/superAdmin", superAdminRoutes);
-app.use("/brand", brandRoutes);
-app.use("/outlet", outletRoutes);
-app.use("/report", reportRoutes);
-app.use("/user", userRoutes);
+app.use("/api/superAdmin", superAdminRoutes);
+app.use("/api/brand", brandRoutes);
+app.use("/api/outlet", outletRoutes);
+app.use("/api/report", reportRoutes);
+app.use("/api/user", userRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route.", 404);
@@ -70,7 +70,6 @@ app.use((error, req, res, next) => {
   if (res.headerSent) {
     return next(error);
   }
-  console.log(error);
   res.status(error.code || 500);
   res.json({
     message: error.message || "An unknown error occurred!",
@@ -99,82 +98,84 @@ const questionsforsignup = [
     message: "Confirm password",
   },
 ];
-mongoose
-  .connect(url)
-  .then(function () {
-    console.log(`Database Connected to ${url}`);
-    var server = app.listen(port, function () {
-      console.log("Server is running on port " + port);
+// mongoose
+//   .connect(url)
+//   .then(function () {
+//     console.log(`Database Connected to ${url}`);
+//     var server = app.listen(port, function () {
+//       console.log("Server is running on port " + port);
 
-      const order = Consumer.create({
-        queueUrl: process.env.SQS_QUEUE_ORDER_URL,
-        handleMessage: (message) => {
-          console.log("consumer sqs message")
-          receiveMessageOrder(message);
-        },
-        sqs: sqs,
-      });
-      order.start();
-      order.on("error", (err) => {
-        console.error(err.message);
-      });
-      order.on("processing_error", (err) => {
-        console.error(err.message);
-      });
-      order.on("timeout_error", (err) => {
-        console.log(err.message);
-      });
-      console.log("Order Consumer service is running");
+//       // const order = Consumer.create({
+//       //   queueUrl: process.env.SQS_QUEUE_ORDER_URL,
+//       //   handleMessage: (message) => {
+//       //     console.log("consumer sqs message")
+//       //     receiveMessageOrder(message);
+//       //   },
+//       //   sqs: sqs,
+//       // });
+//       // order.start();
+//       // order.on("error", (err) => {
+//       //   console.error(err.message);
+//       // });
+//       // order.on("processing_error", (err) => {
+//       //   console.error(err.message);
+//       // });
+//       // order.on("timeout_error", (err) => {
+//       //   console.log(err.message);
+//       // });
+//       // console.log("Order Consumer service is running");
 
-      const email = Consumer.create({
-        queueUrl: process.env.SENDGRID_SQS_QUEUE_EMAIL_URL,
-        handleMessage: (message) => {
-          receiveMessage(message);
-        },
-        sqs: sqs,
-      });
-      email.start();
-      email.on("error", (err) => {
-        console.error(err.message);
-      });
-      email.on("processing_error", (err) => {
-        console.error(err.message);
-      });
-      email.on("timeout_error", (err) => {
-        console.log(err.message);
-      });
-      console.log("Email Consumer service is running");
+//       // const email = Consumer.create({
+//       //   queueUrl: process.env.SENDGRID_SQS_QUEUE_EMAIL_URL,
+//       //   handleMessage: (message) => {
+//       //     receiveMessage(message);
+//       //   },
+//       //   sqs: sqs,
+//       // });
+//       // email.start();
+//       // email.on("error", (err) => {
+//       //   console.error(err.message);
+//       // });
+//       // email.on("processing_error", (err) => {
+//       //   console.error(err.message);
+//       // });
+//       // email.on("timeout_error", (err) => {
+//       //   console.log(err.message);
+//       // });
+//       // console.log("Email Consumer service is running");
 
-      const s3app = Consumer.create({
-        queueUrl: process.env.SENDGRID_SQS_QUEUE_S3_URL,
-        handleMessage: (message) => {
-          receives3Message(message);
-        },
-        sqs: sqs,
-      });
-      s3app.start();
-      s3app.on("error", (err) => {
-        console.error(err.message);
-      });
-      s3app.on("processing_error", (err) => {
-        console.error(err.message);
-      });
-      s3app.on("timeout_error", (err) => {
-        console.log(err.message);
-      });
+//       // const s3app = Consumer.create({
+//       //   queueUrl: process.env.SENDGRID_SQS_QUEUE_S3_URL,
+//       //   handleMessage: (message) => {
+//       //     receives3Message(message);
+//       //   },
+//       //   sqs: sqs,
+//       // });
+//       // s3app.start();
+//       // s3app.on("error", (err) => {
+//       //   console.error(err.message);
+//       // });
+//       // s3app.on("processing_error", (err) => {
+//       //   console.error(err.message);
+//       // });
+//       // s3app.on("timeout_error", (err) => {
+//       //   console.log(err.message);
+//       // });
 
-      console.log("S3 Consumer service is running");
+//       // console.log("S3 Consumer service is running");
      
-    });
-    var io = require("./socket").init(server);
-    io.on("connection", (socket) => {
-      console.log("Socket.io establised");
-    });
-  })
-  .catch(function (err) {
-    cb(err);
+//     });
+//     // var io = require("./socket").init(server);
+//     // io.on("connection", (socket) => {
+//     //   console.log("Socket.io establised");
+//     // });
+//   })
+//   .catch(function (err) {
+//     cb(err);
+//   });
+  app.listen(port, function () {
+    console.log("Server listening on port " + port)
   });
-
 // async.series(
 //   [
 //     function (cb) {

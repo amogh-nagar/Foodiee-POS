@@ -3,9 +3,10 @@ const {
   loginUser,
   registerUser,
   logoutUser,
+  reLoginUser,
 } = require("../controllers/user/userAuth");
 var router = express.Router();
-const { check } = require("express-validator");
+const { check, header } = require("express-validator");
 var passport = require("passport");
 const {
   userProfile,
@@ -22,6 +23,13 @@ router.post(
   ],
   loginUser
 );
+
+router.post("/reLogin", [
+  header("Authorization", "Authroization header is required")
+    .exists()
+    .notEmpty()
+    .matches(/^Bearer\s[\w-\.]+$/),
+], reLoginUser);
 
 router.post(
   "/register",

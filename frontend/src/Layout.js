@@ -1,48 +1,23 @@
-import { useDispatch, useSelector } from "react-redux";
-import { Switch, Route, Redirect, useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Switch, Route, Redirect } from "react-router-dom";
 import Auth from "./pages/Auth";
 import App from "./App";
 import { useEffect } from "react";
-import { useReloginMutation } from "./services/auth";
-import { login, logout } from "./store/authSlice";
+import useRefreshToken from "./hooks/useRefreshToken";
 import Loader from "./UI/Loaders/Loader";
 function Layout() {
-  const history = useHistory();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const dispatch = useDispatch();
-  const [reloginApi, { isError, isLoading, data, isSuccess }] =
-    useReloginMutation();
+  const refreshToken = useRefreshToken()
   useEffect(() => {
-    async function reAttempLogin() {
-      const trustedDevice =
-        localStorage.getItem("trustedDevice") === "true" ? true : false;
-      const token = localStorage.getItem("token");
-      if (trustedDevice && token) {
-        try {
-          const response = await reloginApi().unwrap();
-          dispatch(
-            login({
-              user: response.user,
-              permissions: response?.permissions,
-              role: response?.role,
-            })
-          );
-        } catch (err) {
-          dispatch(logout());
-          history.push("/auth");
-        }
-      }
+    try{
+      refreshToken.reAttemptLogin();
+    } catch(e){
+      console.error(e);
     }
-    reAttempLogin();
-  }, [dispatch, reloginApi, history]);
-  useEffect(() => {
-    if (isSuccess && isAuthenticated) {
-      history.push("/");
-    } else if (isError) {
-      history.push("/auth");
-    }
-  }, [isSuccess, isError, isAuthenticated, history]);
-  if (isLoading) {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  console.log("isAuthenticated", isAuthenticated)
+  if (refreshToken.reLogin?.isLoading) {
     return <Loader />;
   }
   return (

@@ -14,7 +14,7 @@ const authSlice = createSlice({
             }
             state.isAuthenticated = true;
             state.user = action.payload.user;
-            state.permissions = action.payload.permissions;
+            state.permissions = action.payload.permissions ? action.payload.permissions : [];
             state.role = action.payload.role;
         },
         logout: (state) => {

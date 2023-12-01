@@ -4,8 +4,9 @@ import { login } from "../store/authSlice";
 import CustomForm from "../components/Form";
 import { useLoginMutation } from "../services/auth";
 import AuthImage from "../assets/AuthImage.png";
+import Loader from "../UI/Loaders/Loader";
 const Auth = () => {
-  const [loginApi, { isError, isLoading, data }] = useLoginMutation();
+  const [loginApi, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
   const history = useHistory();
   const initialValues = {
@@ -54,6 +55,9 @@ const Auth = () => {
 
     return errors;
   };
+  if(isLoading){
+    return <Loader />;
+  }
   return (
     <div className="font-sans">
       <div className="h-screen flex items-center justify-center bg-cover bg-center">
