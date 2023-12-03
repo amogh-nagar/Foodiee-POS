@@ -12,42 +12,7 @@ const {
   userProfile,
   updateUserProfile,
 } = require("../controllers/user/userProfile");
-
-router.post(
-  "/login",
-  [
-    check("email").isEmail().withMessage("Please enter a valid email."),
-    check("password")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters long."),
-  ],
-  loginUser
-);
-
-router.post("/reLogin", [
-  header("Authorization", "Authroization header is required")
-    .exists()
-    .notEmpty()
-    .matches(/^Bearer\s[\w-\.]+$/),
-], reLoginUser);
-
-router.post(
-  "/register",
-  [
-    check("email").isEmail().withMessage("Please enter a valid email."),
-    check("password")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters long."),
-  ],
-  registerUser
-);
-
-router.delete(
-  "/logout",
-  passport.authenticate("jwt", { session: false }),
-  logoutUser
-);
-
+var checkPermission = require("../middleware/check-permission");
 router.get(
   "/profile",
   passport.authenticate("jwt", { session: false }),
@@ -58,6 +23,52 @@ router.get(
   "/updateProfile",
   passport.authenticate("jwt", { session: false }),
   updateUserProfile
+);
+
+router.post(
+  "/createUser",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isCreateUser"),
+  [
+    check("email").isEmail().withMessage("Please enter a valid email."),
+    check("password")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters long."),
+  ],
+  createUser
+);
+router.patch(
+  "/updateUser",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isUpdateUser"),
+  updateUser
+);
+
+router.get(
+  "/getUsers",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isReadBrandUser"),
+  getUser
+);
+
+router.get(
+  "/getRoles",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isCreateUser"),
+  getUser
+);
+
+router.post(
+  "/createRole",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isCreateUser"),
+);
+
+router.get(
+  "/users/:role",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isCreateUser"),
+  getUsersOfARole
 );
 
 module.exports = router;

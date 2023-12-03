@@ -19,11 +19,7 @@ const { registerSuperAdmin } = require("./helper/superAdminCLI");
 var url = "mongodb://0.0.0.0:27017/foodOrdering";
 const passport = require("passport");
 const HttpError = require("./models/http-error");
-const superAdminRoutes = require("./routes/superAdmin");
-const brandRoutes = require("./routes/brandUser");
-const outletRoutes = require("./routes/outletUser");
-const reportRoutes = require("./routes/report");
-const userRoutes = require("./routes/user");
+const authRoutes = require("./routes/auth");
 var fs = require("fs");
 var bodyParser = require("body-parser");
 const { receiveMessage } = require("./aws-services/email-service/aws-sqs");
@@ -50,11 +46,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/superAdmin", superAdminRoutes);
-app.use("/api/brand", brandRoutes);
-app.use("/api/outlet", outletRoutes);
-app.use("/api/report", reportRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route.", 404);

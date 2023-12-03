@@ -7,7 +7,7 @@ var Role = new Schema({
     permissions: [{
         type: String,
     }],
-    
+    parentRole: { type: String, required: true}
 })
 
 module.exports = mongoose.Model("Role", Role);

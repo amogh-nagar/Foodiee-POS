@@ -8,10 +8,10 @@ var user = new Schema({
   password: { type: String, required: true },
   image: { type: String },
   status: { type: String, default: "active" },
-  role: {
+  roles: [{
     entity: { type: String },
     roleName: { type: String, required: true },
-  },
+  }],
   entityDetails: [
     {
       entityId: { type: String, required: true },
