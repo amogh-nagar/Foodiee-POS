@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import CtgNdSuperCtgCard from "../components/CtgNdSuperCtgCard";
-import ItemCard from "../components/ItemCard";
+import CtgNdSuperCtgCard from "./categories/CtgNdSuperCtgCardBilling";
+import ItemCard from "./dish/dishBillingCard";
 const superCategories = [
-//   {
-//     name: "Breakfast",
-//   },
+  {
+    name: "Breakfast",
+  },
 ];
 var categories = [
-//   {
-//     name: "Samosa",
-//   },
+  {
+    name: "Samosa",
+  },
 ];
 var dishes = [];
 const PunchItems = ({}) => {
@@ -32,7 +32,7 @@ const PunchItems = ({}) => {
                       }}
                       className={`font-sans w-20 h-10 rounded-lg ${
                         activeSuperCtgIndex === index
-                          ? "border-b-secondary-500 bg-gray-600 text-secondary-400"
+                          ? "border-b-secondary-500 bg-gray-600 text-secondary-400 border-b-2"
                           : "text-white"
                       }`}
                     >

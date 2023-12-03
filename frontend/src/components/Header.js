@@ -18,7 +18,7 @@ const Header = () => {
         <div className="rounded-lg bg-secondary-25 mb-4">
           <img src={StoreIcon} alt="logo" className="w-16 h-16" />
         </div>
-        <div className="h-[70%] no-scrollbar overflow-y-auto">
+        <div className="h-[70%] no-scrollbar hide-scrollbar overflow-y-auto">
           <ul className="hide-scrollbar">
             {routesList.map((item, index) => {
               return !item.onlyRoute ? (
@@ -27,15 +27,23 @@ const Header = () => {
                   (permission) => permissions?.indexOf(permission) !== -1
                 ) ? (
                   <li key={index} className="mb-5">
-                    <NavLink
-                      exact
-                      to={item.path}
-                      activeClassName="active-class"
-                    >
-                      <div className="outer-div w-16 h-16 flex justify-center items-center rounded-lg transition-all">
-                        {item.icon}
-                      </div>
-                    </NavLink>
+                    {item.exact ? (
+                      <NavLink
+                        exact
+                        to={item.path}
+                        activeClassName="active-class"
+                      >
+                        <div className="outer-div w-16 h-16 flex justify-center items-center rounded-lg transition-all">
+                          {item.icon}
+                        </div>
+                      </NavLink>
+                    ) : (
+                      <NavLink to={item.path} activeClassName="active-class">
+                        <div className="outer-div w-16 h-16 flex justify-center items-center rounded-lg transition-all">
+                          {item.icon}
+                        </div>
+                      </NavLink>
+                    )}
                   </li>
                 ) : null
               ) : null;

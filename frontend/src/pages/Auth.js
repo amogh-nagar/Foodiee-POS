@@ -1,7 +1,7 @@
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../store/authSlice";
-import CustomForm from "../components/Form";
+import CustomForm from "../components/forms/Form";
 import { useLoginMutation } from "../services/auth";
 import AuthImage from "../assets/AuthImage.png";
 import Loader from "../UI/Loaders/Loader";
@@ -25,8 +25,8 @@ const Auth = () => {
       dispatch(
         login({
           user: values,
-          permissions: data?.permissions,
-          role: data?.role,
+          permissions: data?.user?.permissions,
+          role: data?.user?.role,
         })
       );
       history.push("/");

@@ -1,5 +1,5 @@
 import { Field, Form, Formik } from "formik";
-import Input from "../UI/Input";
+import Input from "../../UI/Input";
 
 const CustomForm = ({
   initialValues,
@@ -8,6 +8,7 @@ const CustomForm = ({
   validator,
   fields,
   buttonText,
+  btnClass
 }) => {
   return (
     <Formik
@@ -44,7 +45,7 @@ const CustomForm = ({
           );
         })}
         <button
-          className="bg-secondary-300 w-full mt-4 rounded-md h-11 font-bold hover:bg-secondary-500"
+          className={`${btnClass ? btnClass : 'w-full h-11'} bg-secondary-300 mt-4 rounded-md font-bold hover:bg-secondary-500`}
           type="submit"
         >
           {buttonText}

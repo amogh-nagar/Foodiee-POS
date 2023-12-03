@@ -1,8 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-export const brandApi = createApi({
-    reducerPath: "brandApi",
+export const deleteApi = createApi({
+    reducerPath: "deleteApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: process.env.REACT_APP_BACKEND_URL + "/api/brands",
+        baseUrl: process.env.REACT_APP_BACKEND_URL + "/api/dish",
         prepareHeaders: function(headers, {getState}){
             const token = localStorage.getItem("token");
             if (token) {
@@ -12,39 +12,38 @@ export const brandApi = createApi({
         }
     }),
     endpoints: (builder) => ({
-        //get all brands 
-        getAllBrands: builder.query({
-            query: (tenantId) => '/getAllBrands/' + tenantId,
+         //get taxes
+        getTaxes: builder.query({
+            query: (brandId) => '/taxes/' + brandId,
         }),
-        //get all brands 
-        getBrand: builder.query({
-            query: (brandId) => '/getBrand/' + brandId,
+        //get tax
+        getTax: builder.query({
+            query: (taxId) => '/taxes/' + taxId,
         }),
-        //create Brand
-        createBrand: builder.mutation({
+        createTax:  builder.mutation({
             query: (data) => ({
-                url: "createBrand",
+                url: "createTax",
                 method: "POST",
                 body: data,
             }),
         }),
-        //update brand
-        updateBrand: builder.mutation({
+        //update tax
+        updateTax: builder.mutation({
             query: (data) => ({
-                url: "updateBrand",
+                url: "updateTax",
                 method: "PATCH",
                 body: data,
             }),
         }),
-        //delete brand
-        deleteBrand: builder.mutation({
+        //delete tax
+        deleteTax: builder.mutation({
             query: (data) => ({
-                url: "deleteBrand",
+                url: "deleteTax",
                 method: "DELETE",
                 body: data,
             }),
-        })
+        }),
     })
 })
 
-export const {useGetAllBrandsQuery, useCreateBrandMutation} = brandApi
+export const {useCreateTaxMutation, useDeleteTaxMutation, useGetTaxQuery, useGetTaxesQuery, useUpdateTaxMutation} = deleteApi

@@ -71,7 +71,7 @@ export const analysisApi = createApi({
             query: (obj) => {
                 const params = new URLSearchParams();
                 obj.brandsIds.forEach(value => params.append(obj.entityType, value));
-                return `/getTop3Dishes?${params}`; 
+                return `/getTop3Brands?${params}`; 
             }
         }),
         //get top 3 outlets for a range of dates
@@ -79,7 +79,7 @@ export const analysisApi = createApi({
             query: (obj) => {
                 const params = new URLSearchParams();
                 obj.outletIds.forEach(value => params.append(obj.entityType, value));
-                return `/getTop3Dishes?${params}`; 
+                return `/getTop3Outlets?${params}`; 
             }
         }),
         //get top 3 dishes for a range of dates

@@ -38,7 +38,22 @@ export const getRandomColors = function getRandomLightColor() {
   return color;
 };
 
-export const permissionBasedAPIs = {
+export const getColor = function(img){
+  let styleObj = {};
+  if (img) {
+    styleObj.backgroundImage =
+      "linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(" + img + ")";
+    styleObj.backgroundSize = "cover";
+    styleObj.color = "white";
+    styleObj.backgroundPosition = "center";
+  } else {
+    styleObj.backgroundImage =
+      "linear-gradient(" + getRandomColors() + "," + getRandomColors() + ")";
+  }
+  return styleObj;
+}
+
+export const permissionToRoleBasedAPIs = {
   'isVisitAnalysisPage': {
     'tenantAdmin': [useGetBrandHourlySalesQuery, useGetTop3BrandsQuery],
     'brandAdmin': [useGetBrandHourlySalesQuery, useGetDishSalesQuery, useGetTop3DishesQuery, useGetTop3OutletsQuery],
@@ -63,18 +78,16 @@ export const permissionBasedAPIs = {
   'isVisitOutletsPage': {
     'brandAdmin': [],
   },
-  'isVisitTaxPage': {
-    'brandAdmin': [],
-  },
   'isVisitDishesPage': {
     'brandAdmin': [],
   },
-  'isVisistBrandsPage': {
+  'isVisitBrandsPage': {
     'tenantAdmin': [],
   },
-  'isVisitBillingPage': {
-    'outletUser': [],
-  }
+}
+
+export const permissionOnlyAPIS = {
+  'isVisitBillingPage': []
 }
 
 var superAdminPermissions = [
@@ -97,7 +110,7 @@ var tenantAdminPermissions = [
   "isCreateBrands",
   "isUpdateBrands",
   "isDeleteBrands",
-  "isVisistBrandsPage",
+  "isVisitBrandsPage",
   "isCreatedUser",
   "isUpdateUser",
 ]
@@ -114,7 +127,7 @@ var brandAdminPermissions = [
   "isVisitDishesPage",
   "isUpdateTax",
   "isDeleteTax",
-  "isVisitTaxPage",
+  "isVisitTaxesPage",
   "isCreatedUser",
   "isUpdateUser"
 ]

@@ -1,8 +1,8 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { addToCart, removeFromCart } from "../store/cartSlice";
-import { currencyMap } from "../utils/constants";
-const ItemCard = ({ name, price = 0, quantity = 0, id, currency = "INR" }) => {
+import { addToCart, removeFromCart } from "../../store/cartSlice";
+import { currencyMap } from "../../utils/constants";
+const DishBillingCard = ({ name, price = 0, quantity = 0, id, currency = "INR" }) => {
   const dispatch = useDispatch();
   var addItem = () => {
     dispatch(addToCart({ name, price, quantity, id }));
@@ -45,4 +45,4 @@ const ItemCard = ({ name, price = 0, quantity = 0, id, currency = "INR" }) => {
   );
 };
 
-export default ItemCard;
+export default DishBillingCard;

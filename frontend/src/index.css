@@ -36,3 +36,13 @@ code {
   -ms-overflow-style: none; 
   scrollbar-width: none;
 }
+
+.active-dish-btn{
+  border-bottom: 1px solid #f0563c;
+  color: #d98677;
+}
+
+.customField{
+  display: inline-block;
+  background-color: red;
+}

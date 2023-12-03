@@ -29,6 +29,20 @@ export const profileApi = createApi({
                 body: data,
             }),
         }),
+        updateUser: builder.mutation({
+            query: (data) => ({
+                url: "updateUser",
+                method: "PATCH",
+                body: data,
+            }),
+        }),
+        deleteUser: builder.mutation({
+            query: (data) => ({
+                url: "deleteUser",
+                method: "DELETE",
+                body: data,
+            }),
+        }),
         getRoles: builder.query({
             query: (obj) => {
                 const params = new URLSearchParams();
@@ -45,9 +59,23 @@ export const profileApi = createApi({
                 method: "POST",
                 body: data,
             }),
-        })
+        }),
+        updateRole: builder.mutation({
+            query: (data) => ({
+                url: "updateRole",
+                method: "PATCH",
+                body: data,
+            }),
+        }),
+        deleteRole: builder.mutation({
+            query: (data) => ({
+                url: "deleteRole",
+                method: "DELETE",
+                body: data,
+            }),
+        }),
     })
 })
 
 
-export const {useCreateUserMutation, useGetUsersQuery, useCreateRoleMutation, useGetRolesQuery} = profileApi
+export const {useCreateUserMutation, useGetUsersQuery, useCreateRoleMutation, useGetRolesQuery, useDeleteRoleMutation, useDeleteUserMutation, useUpdateRoleMutation, useUpdateUserMutation} = profileApi

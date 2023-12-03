@@ -18,8 +18,12 @@ const App = () => {
                 (permission) => permissions?.indexOf(permission) !== -1
               )
             )
-              return (
+              return route.exact ? (
                 <Route key={index} path={route.path} exact>
+                  {route.component}
+                </Route>
+              ) : (
+                <Route key={index} path={route.path}>
                   {route.component}
                 </Route>
               );

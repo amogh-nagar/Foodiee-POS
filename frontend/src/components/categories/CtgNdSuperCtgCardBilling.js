@@ -1,8 +1,8 @@
 import React from 'react'
 import { DiCoffeescript } from "react-icons/di";
-import { getRandomColors } from '../utils/constants';
+import { getRandomColors } from '../../utils/constants';
 
-const CtgNdSuperCtgCard = ({img, name, handler}) => {
+const CtgNdSuperCtgCardBilling = ({img, name, handler}) => {
   var styleObj = {}
   if(img) {
     styleObj.backgroundImage = "linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url(" + img + ')';
@@ -25,4 +25,4 @@ const CtgNdSuperCtgCard = ({img, name, handler}) => {
   )
 }
 
-export default CtgNdSuperCtgCard
+export default CtgNdSuperCtgCardBilling

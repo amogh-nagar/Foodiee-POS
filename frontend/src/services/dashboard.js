@@ -18,11 +18,11 @@ export const dashboardApi = createApi({
         }),
         //get all brands sales, active/inactive ratio
         getAllBrandsDetails: builder.query({
-            query: (userId) => '/getAllBrandsDetails/' + userId,
+            query: (tenantId) => '/getAllBrandsDetails/' + tenantId,
         }),
         //get all outlets sales, active/inactive ratio
         getAllOutletsDetails: builder.query({
-            query: (userId) => '/getAllOutletsDetails/' + userId,
+            query: (brandId) => '/getAllOutletsDetails/' + brandId,
         }),
     })
 })

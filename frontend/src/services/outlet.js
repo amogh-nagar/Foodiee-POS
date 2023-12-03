@@ -14,7 +14,11 @@ export const outletApi = createApi({
     endpoints: (builder) => ({
         //get all outlets 
         getAllOutlets: builder.query({
-            query: (userId) => '/getAllOutlets/' + userId,
+            query: (brandId) => '/getAllOutlets/' + brandId,
+        }),
+        //get outlet 
+        getOutlet: builder.query({
+            query: (outletId) => '/getAllOutlets/' + outletId,
         }),
         //create Outlet
         createOutlet: builder.mutation({
@@ -23,8 +27,24 @@ export const outletApi = createApi({
                 method: "POST",
                 body: data,
             }),
+        }),
+        //update brand
+        updateOutlet: builder.mutation({
+            query: (data) => ({
+                url: "updateOutlet",
+                method: "PATCH",
+                body: data,
+            }),
+        }),
+        //delete brand
+        deleteOutlet: builder.mutation({
+            query: (data) => ({
+                url: "deleteOutlet",
+                method: "DELETE",
+                body: data,
+            }),
         })
     })
 })
 
-export const {useCreateOutletMutation, useGetAllOutletsQuery} = outletApi
+export const {useCreateOutletMutation, useDeleteOutletMutation, useGetAllOutletsQuery, useGetOutletQuery, useUpdateOutletMutation} = outletApi

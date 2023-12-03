@@ -16,6 +16,10 @@ export const tenantApi = createApi({
         getAllTenants: builder.query({
             query: (userId) => '/getAllTenants/' + userId,
         }),
+        //get tenants
+        getTenant: builder.query({
+            query: (tenantId) => '/getAllTenants/' + tenantId,
+        }),
         //create Tenant
         createTenant: builder.mutation({
             query: (data) => ({
@@ -23,8 +27,24 @@ export const tenantApi = createApi({
                 method: "POST",
                 body: data,
             }),
+        }),
+        //update brand
+        updateTenant: builder.mutation({
+            query: (data) => ({
+                url: "updateTenant",
+                method: "PATCH",
+                body: data,
+            }),
+        }),
+        //delete brand
+        deleteTenant: builder.mutation({
+            query: (data) => ({
+                url: "deleteTenant",
+                method: "DELETE",
+                body: data,
+            }),
         })
     })
 })
 
-export const {useCreateTenantMutation, useGetAllTenantsQuery} = tenantApi
+export const {useCreateTenantMutation, useDeleteTenantMutation, useGetAllTenantsQuery, useGetTenantQuery, useUpdateTenantMutation} = tenantApi
