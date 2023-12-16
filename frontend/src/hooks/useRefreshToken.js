@@ -17,8 +17,8 @@ const useRefreshToken = () => {
         dispatch(
           login({
             user: response.user,
-            permissions: response?.permissions,
-            role: response?.role,
+            permissions: response?.user?.permissions,
+            role: response?.user?.role,
           })
         );
         history.push("/");

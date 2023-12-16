@@ -74,6 +74,14 @@ export const analysisApi = createApi({
                 return `/getTop3Brands?${params}`; 
             }
         }),
+         //get top 3 tenants for a range of dates
+        getTop3Tenants: builder.query({
+            query: (obj) => {
+                const params = new URLSearchParams();
+                obj.tenantIds.forEach(value => params.append(obj.entityType, value));
+                return `/getTop3Tenants?${params}`; 
+            }
+        }),
         //get top 3 outlets for a range of dates
         getTop3Outlets: builder.query({
             query: (obj) => {

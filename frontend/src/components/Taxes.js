@@ -21,7 +21,7 @@ const Taxes = () => {
   return (
     <div className="py-2 px-5">
       <div className="bg-primary-700 w-full h-[38rem] flex rounded-lg flex-col">
-        <div className="w-full px-5 py-2 border-b-2 border-b-secondary-500 h-[17rem]">
+        <div className="w-full px-5 py-2 border-b-2 border-b-secondary-500 h-max">
           <CustomForm
             initialValues={initialValues}
             onSubmit={onSubmit}

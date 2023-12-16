@@ -46,3 +46,22 @@ code {
   display: inline-block;
   background-color: red;
 }
+
+.CalendarDay__selected, .CalendarDay__selected:active, .CalendarDay__selected:hover, .CalendarDay__selected_span, .CalendarDay__hovered_span, .CalendarDay__hovered_span:hover{
+  background-color: #e66c57 !important;
+  color:white !important;
+  border: 1px solid #e66c57 !important;
+}
+.DateInput_input__focused{
+  border-bottom: 2px solid #e66c57 !important;
+}
+.DateInput_input, .DateRangePickerInput__withBorder{
+  background-color: rgb(105 78 73) !important;
+  border: 1px solid rgb(105 78 73) !important;
+}
+.DateInput_input::placeholder, .DateInput_input__focused::placeholder, .DateInput_input, .DateRangePickerInput_arrow{
+  color:white !important;
+}
+.DateRangePickerInput_arrow_svg{
+  fill: white !important;
+}
