@@ -61,12 +61,13 @@ exports.reLoginUser = function(req,res,next){
     message: "Logged In!",
     user: {
       name:"Amogh",
-      permissions: [],
+      permissions: ['isVisitDashboardPage', 'isVisitBillingPage', 'isVisitAnalysisPage', 'isVisitTenantsPage', 'isVisitBrandsPage', 'isVisitDishesPage', 'isVisitOutletsPage', 'isVisitUsersPage'],
       role: {
         entity: "Brand",
         roleName: "Admin",
       },
-    }
+    },
+    token: '123'
   });
 }
 exports.registerUser = function (req, res, next) {
