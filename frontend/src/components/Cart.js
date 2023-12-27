@@ -26,7 +26,7 @@ const Cart = ({ orderId = 123 }) => {
       <div className="w-full h-5">
         <h3 className="text-xl font-semibold">Order - {orderId}</h3>
       </div>
-      <div className="flex flex-col justify-between items-center h-[93%]">
+      <div className="flex flex-col justify-between items-center h-[90%]">
         <div className="w-full overflow-auto my-4">
           <ul className="w-full h-full overflow-auto hide-scrollbar">
             {cartItems && cartItems.length > 0 ? cartItems.map((item, index) => {
@@ -52,7 +52,7 @@ const Cart = ({ orderId = 123 }) => {
             </div>}
           </ul>
         </div>
-        <div className="bg-gray-700 w-full p-3 rounded-md">
+        <div className="bg-gray-700 w-full p-8 rounded-md">
           <div className="h-44">
             <div className="text-md flex mb-1 justify-between">
               <h3>SubTotal</h3>
