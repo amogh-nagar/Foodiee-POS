@@ -4,8 +4,8 @@ import CategoryCard from "./categories/CategoryCard";
 import { IoMdAdd } from "react-icons/io";
 const Categories = () => {
   return (
-    <div className="py-2 px-5">
-      <div className="bg-primary-700 w-full h-[38rem] flex rounded-lg">
+    <div className="py-2 px-5 h-full">
+      <div className="bg-primary-700 w-full h-full flex rounded-lg">
         <div className="h-full w-2/6 border-r-2 border-r-secondary-300 p-2">
           <div className="w-full rounded-md items-center justify-between flex h-[10%]">
             <input
@@ -21,7 +21,7 @@ const Categories = () => {
           </div>
         </div>
         <div className="h-full w-4/6 p-2">
-          <div className="w-full rounded-md items-center justify-between flex justify-end h-[10%]">
+          <div className="w-full rounded-md items-center flex justify-between h-[10%]">
             <button className="flex gap-x-1 items-center bg-secondary-500 p-3 rounded-lg">
               <IoMdAdd />
             </button>

@@ -25,9 +25,12 @@ code {
 .icon{
   color: #EA7C69;
 }
-.hide-scrollbar{
-  overflow: auto;
+.nonScrollable-div{
+  overflow: hidden !important;
 }
+/* .hide-scrollbar{
+  overflow: auto;
+} */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }

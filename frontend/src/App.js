@@ -9,7 +9,7 @@ const App = () => {
   return (
     <div className="flex">
       <Header />
-      <div className="bg-primary-50 w-full h-screen text-text hide-scrollbar">
+      <div className="bg-primary-50 w-full h-screen text-text hide-scrollbar overflow-auto">
         <Switch>
           {routesList.map((route, index) => {
             if (

@@ -19,8 +19,8 @@ const Taxes = () => {
     return errors;
   };
   return (
-    <div className="py-2 px-5">
-      <div className="bg-primary-700 w-full h-[38rem] flex rounded-lg flex-col">
+    <div className="py-2 px-5 h-full">
+      <div className="bg-primary-700 w-full h-full flex rounded-lg flex-col">
         <div className="w-full px-5 py-2 border-b-2 border-b-secondary-500 h-max">
           <CustomForm
             initialValues={initialValues}
@@ -46,7 +46,7 @@ const Taxes = () => {
             isTrusted={true}
           />
         </div>
-        <div className="px-5 py-2 w-full overflow-y-auto hide-scrollbar flex flex-col gap-y-3">
+        <div className="px-5 py-6 w-full overflow-y-auto hide-scrollbar flex flex-col gap-y-3">
             <TaxCard/>
             <TaxCard/>
             <TaxCard/>

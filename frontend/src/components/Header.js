@@ -18,8 +18,9 @@ const Header = () => {
         <div className="rounded-lg bg-secondary-25 mb-4">
           <img src={StoreIcon} alt="logo" className="w-16 h-16" />
         </div>
-        <div className="h-[70%] no-scrollbar hide-scrollbar overflow-y-auto">
-          <ul className="hide-scrollbar">
+        <div className="h-[93%] flex flex-col justify-between items-center">
+        <div className="h-[77%] no-scrollbar hide-scrollbar overflow-y-auto">
+          <ul className="hide-scrollbar overflow-y-auto">
             {routesList.map((item, index) => {
               return !item.onlyRoute ? (
                 !item.permissions.length ||
@@ -62,6 +63,7 @@ const Header = () => {
               <CiLogout className="w-10 h-10" />
             </div>
           </button>
+        </div>
         </div>
       </div>
     </>

@@ -32,6 +32,15 @@ const User = () => {
             <UserCard/>
             <UserCard/>
             <UserCard/>
+            <UserCard/>
+            <UserCard/>
+            <UserCard/>
+            <UserCard/>
+            <UserCard/>
+            <UserCard/>
+            <UserCard/>
+            <UserCard/>
+            <UserCard/>
           </tbody>
         </table>
       </div>
