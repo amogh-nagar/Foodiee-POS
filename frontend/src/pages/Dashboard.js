@@ -195,7 +195,7 @@ const Dashboard = () => {
           }}
         />
       </div>
-      <div className="mx-8 my-10 bg-primary-700 p-5 rounded-xl border-secondary-600 border-2">
+      {/* <div className="mx-8 my-10 bg-primary-700 p-5 rounded-xl border-secondary-600 border-2">
         <Line
           data={EntityHourlyWiseBifurcation}
           options={{
@@ -214,7 +214,7 @@ const Dashboard = () => {
             },
           }}
         />
-      </div>
+      </div> */}
     </div>
   );
 };

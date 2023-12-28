@@ -68,3 +68,8 @@ code {
 .DateRangePickerInput_arrow_svg{
   fill: white !important;
 }
+
+.disableEntity{
+  pointer-events: none;
+    opacity: 0.4;
+}
