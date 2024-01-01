@@ -1,0 +1,22 @@
+.inner-div {
+    position: relative;
+    z-index: 1; 
+}
+.inner-div p {
+    text-wrap: wrap;
+    word-break:break-all;
+}
+.inner-div::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-wrap: wrap;
+    background: inherit; 
+    backdrop-filter: blur( 7px );
+    -webkit-backdrop-filter: blur( 7px );
+    z-index: -1; 
+    border-radius: 0.5em;
+}

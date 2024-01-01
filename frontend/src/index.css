@@ -28,9 +28,6 @@ code {
 .nonScrollable-div{
   overflow: hidden !important;
 }
-/* .hide-scrollbar{
-  overflow: auto;
-} */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -70,6 +67,6 @@ code {
 }
 
 .disableEntity{
-  pointer-events: none;
+    pointer-events: none;
     opacity: 0.4;
 }
