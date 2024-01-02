@@ -7,14 +7,12 @@ module.exports =
       return next(new HttpError("You must be logged in", 401));
     }
 
-    var hasPermission = true;
+    var hasPermission = false;
     permissions.forEach(function (permission) {
-      if (!req.user.permissions.includes(permission)) {
-        hasPermission = false;
+      if (req.user.permissions.includes(permission)) {
+        hasPermission = true;
       }
     });
-    console.log
-    console.log(hasPermission)
     if (!hasPermission) {
       return next(
         new HttpError("You are not authorized to access this route", 401)

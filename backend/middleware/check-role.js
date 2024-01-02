@@ -1,6 +1,6 @@
 const HttpError = require("../models/http-error");
 
-var ROLES = ["Brand", "Outlet", "admin"];
+// var ROLES = ["Brand", "Outlet", "admin"];
 module.exports =
   (...roles) =>
   (req, res, next) => {
@@ -11,7 +11,6 @@ module.exports =
     const hasRole = roles.find(
       (role) => (req.user.role.entity + req.user.role.roleName) === role
     );
-    console.log(hasRole)
     if (!hasRole) {
       return next(
         new HttpError("You are not authorized to access this route", 401)

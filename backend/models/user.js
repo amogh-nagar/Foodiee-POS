@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var user = new Schema({
-  isdeleted: { type: Boolean, default: false },
+  isDeleted: { type: Boolean, default: false },
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
@@ -14,7 +14,7 @@ var user = new Schema({
   }],
   entityDetails: [
     {
-      entityId: { type: String, required: true },
+      entityId: { type: mongoose.Types.ObjectId, required: true },
       entityName: { type: String, required: true },
       entityImage: { type: String, default: "" },
     },

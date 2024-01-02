@@ -4,10 +4,10 @@ var outlet = new mongoose.Schema({
   address: { type: String, required: true },
   image: { type: String },
   brandDetails: {
-    id: { type: String, required: true },
+    id: { type: mongoose.Types.ObjectId, required: true },
     name: { type: String, required: true },
   },
-  isdeleted: { type: Boolean, default: false },
-  status: { type: String, default: "active" },
+  isDeleted: { type: Boolean, default: false },
+  isActive: { type: String, default: true },
 });
 module.exports = mongoose.model("Outlet", outlet);

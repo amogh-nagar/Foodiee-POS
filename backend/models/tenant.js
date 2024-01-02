@@ -3,8 +3,8 @@ var tenant = new mongoose.Schema({
   name: { type: String, required: true },
   image: { type: String },
   description: { type: String },
-  superAdminId: { type: String, required: true },
-  isdeleted: { type: Boolean, default: false },
-  status: { type: String, default: "active" },
+  superAdminId: { type: mongoose.Types.ObjectId, required: true },
+  isDeleted: { type: Boolean, default: false },
+  isActive: { type: String, default: true },
 });
 module.exports = mongoose.model("Tenant", tenant);

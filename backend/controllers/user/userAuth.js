@@ -12,6 +12,7 @@ const redis = require("redis");
 // const client = redis.createClient();
 
 const sendGridMail = require("@sendgrid/mail");
+const { handleError } = require("../../common");
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -19,56 +20,60 @@ const MIME_TYPE_MAP = {
   "image/jpg": "jpg",
 };
 exports.loginUser = function (req, res, next) {
-  return res.status(200).json({
-    message: "Logged In!",
-    user: {
-      name:"Amogh",
-      permissions: ['isVisitDashboardPage', 'isVisitBillingPage', 'isVisitAnalysisPage', 'isVisitTenantsPage', 'isVisitBrandsPage', 'isVisitDishesPage', 'isVisitOutletsPage', 'isVisitUsersPage'],
-      role: {
-        entity: "Brand",
-        roleName: "Admin",
-      },
-    },
-    token: '123'
+  User.findOne({ email: req.body.email }).then(function (user) {
+    if (!user) {
+      var error = new HttpError("Invalid email or password", 401);
+      return next(error);
+    }
+    if (!compareSync(req.body.password, user.password)) {
+      var error = new HttpError("Invalid email or password", 401);
+      return next(error);
+    }
+    req.login(user, { session: false }, function (err) {
+      if (err) {
+        return next(err);
+      }
+      let payload = {
+        role: user.role,
+        name: user.name,
+        permissions: user.permissions,
+      } 
+      var token = jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+      return res.status(200).json({
+        message: "Logged In!",
+        user: payload,
+        token: token
+      });
+    });
   });
-  // User.findOne({ email: req.body.email }).then(function (user) {
-  //   if (!user) {
-  //     var error = new HttpError("Invalid email or password", 401);
-  //     return next(error);
-  //   }
-  //   if (!compareSync(req.body.password, user.password)) {
-  //     var error = new HttpError("Invalid email or password", 401);
-  //     return next(error);
-  //   }
-  //   req.login(user, { session: false }, function (err) {
-  //     if (err) {
-  //       return next(err);
-  //     }
-  //     var token = jwt.sign(
-  //       {
-  //         role: user.role,
-  //         id: user._id,
-  //         email: user.email,
-  //       },
-  //       process.env.JWT_SECRET,
-  //       { expiresIn: "1h" }
-  //     );
-  //   });
-  // });
 };
 exports.reLoginUser = function(req,res,next){
-  return res.status(200).json({
-    message: "Logged In!",
-    user: {
-      name:"Amogh",
-      permissions: ['isVisitDashboardPage', 'isVisitBillingPage', 'isVisitAnalysisPage', 'isVisitTenantsPage', 'isVisitBrandsPage', 'isVisitDishesPage', 'isVisitOutletsPage', 'isVisitUsersPage'],
-      role: {
-        entity: "Brand",
-        roleName: "Admin",
-      },
-    },
-    token: '123'
-  });
+  let token = req.body.token;
+  try{
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return res.status(200).json({
+      message: "Logged In!",
+      user: decoded,
+      token: token
+    });
+  } catch (err) {
+    if (err instanceof jwt.TokenExpiredError) {
+      const payload = jwt.decode(token);
+      token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '1h'
+      });
+      return res.status(200).json({
+        message: "ReLogged In!",
+        user: payload,
+        token: token
+      });
+    } else
+      handleError(res, err);
+  }
 }
 exports.registerUser = function (req, res, next) {
   User.findOne({ email: req.body.email }).then(function (user) {

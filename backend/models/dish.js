@@ -6,18 +6,18 @@ var dish = new mongoose.Schema(
     description: { type: String },
     price: { type: Number, required: true },
     category: {
-      id: { type: String, required: true },
+      id: { type: mongoose.Types.ObjectId, required: true },
       name: { type: String, required: true },
     },
     superCategory: {
-      id: { type: String, required: true },
+      id: { type: mongoose.Types.ObjectId, required: true },
       name: { type: String, required: true },
     },
-    brandId: { type: String, required: true },
-    isdeleted: { type: Boolean, default: false },
+    brandId: { type: mongoose.Types.ObjectId, required: true },
+    isDeleted: { type: Boolean, default: false },
     taxes: [
       {
-        id:{type:String,required:true},
+        id:{type:mongoose.Types.ObjectId,required:true},
         name: { type: String, required: true },
         percentAmount: { type: Number, required: true },
       },

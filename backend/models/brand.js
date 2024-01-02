@@ -3,8 +3,10 @@ var brand = new mongoose.Schema({
   name: { type: String, required: true },
   image: { type: String },
   description: { type: String },
-  tenantAdminId: { type: String, required: true },
-  isdeleted: { type: Boolean, default: false },
-  status: { type: String, default: "active" },
+  tenantId: { type: mongoose.Types.ObjectId, required: true },
+  isDeleted: { type: Boolean, default: false },
+  isActive: { type: Boolean, default: true },
+}, {
+  timestamps:true
 });
 module.exports = mongoose.model("Brand", brand);

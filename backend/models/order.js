@@ -1,14 +1,16 @@
 var mongoose = require("mongoose");
 var order = new mongoose.Schema(
   {
-    customerName: { type: String, required: true },
-    customerEmail: { type: String, required: true },
-    customerContact: { type: Number, required: true },
-    type: { type: String, required: true, default: "Dine In" },
+    customerDetails : {
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+      contact: { type: Number, required: true },
+    },
+    tab: { type: mongoose.Types.ObjectId, required: true},
     dishes: [
       {
-        dishId: {
-          _id:{ type:String, required: true },
+        dishDetails: {
+          id:{ type:mongoose.Types.ObjectId, required: true },
           name: { type: String, required: true },
           price: { type: Number, required: true },
           image:{type:String}
@@ -18,20 +20,20 @@ var order = new mongoose.Schema(
     ],
     totalTax:{type:Number,default:0},
     status: { type: String, required: true, default: "pending" },
-    isdeleted: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
     date: { type: Date, default: Date.now },
     price: { type: Number, default: 0 },
     priority: { type: Number, default: 0 },
     outletDetails: {
-      id: { type: String, required: true },
+      id: { type: mongoose.Types.ObjectId, required: true },
       name: { type: String, required: true },
     },
     brandDetails: {
-      id: { type: String, required: true },
+      id: { type: mongoose.Types.ObjectId, required: true },
       name: { type: String, required: true },
     },
     tenantDetails: {
-      id: { type: String, required: true },
+      id: { type: mongoose.Types.ObjectId, required: true },
       name: { type: String, required: true },
     },
   },

@@ -3,9 +3,8 @@ var dishSuperCategory = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String },
-    region: { type: String },
-    brandId:{type:String,required:true},
-    isdeleted: { type: Boolean, default: false },
+    brandId:{type:mongoose.Types.ObjectId,required:true},
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

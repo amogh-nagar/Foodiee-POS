@@ -5,7 +5,7 @@ var tax = new mongoose.Schema({
     to: { type: Number, required: true },
     from: { type: Number, required: true },
   },
-  brandId:{type:String,required:true}
+  brandId:{type:mongoose.Types.ObjectId,required:true}
 });
 
 module.exports = mongoose.model("Tax", tax);
