@@ -1,5 +1,4 @@
 require("dotenv").config();
-var sqs = require("../sqs");
 var s3 = require("../aws");
 exports.deleteImageFromS3 = function (data) {
   if (!data.fileName || data.fileName.length == 0) return;

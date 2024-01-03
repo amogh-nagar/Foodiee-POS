@@ -18,19 +18,11 @@ function deleteMessage(data) {
 }
 
 function receiveMessage(message) {
-  const params = {
-    QueueUrl: process.env.SENDGRID_SQS_QUEUE_EMAIL_URL,
-    AttributeNames: ["SentTimestamp"],
-    MaxNumberOfMessages: 10,
-    MessageAttributeNames: ["All"],
-    VisibilityTimeout: 10,
-    WaitTimeSeconds: 0,
-  };
   const details = JSON.parse(message.Body);
   sendGridMail
     .send({
       to: details.email,
-      from: "amoghnagar1111@gmail.com",
+      from: process.env.SENDGRID_EMAIL,
       subject: details.subject,
       text: details.text,
       html: details.html,

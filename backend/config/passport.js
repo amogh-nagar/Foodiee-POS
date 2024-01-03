@@ -5,8 +5,8 @@ const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 const User = require("../models/user");
 const HttpError = require("../models/http-error");
-// const redis = require("redis");
-// const client = redis.createClient();
+const redis = require("redis");
+const client = redis.createClient();
 passport.use(
   new JWTStrategy(
     {

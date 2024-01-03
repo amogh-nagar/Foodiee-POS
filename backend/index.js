@@ -1,34 +1,24 @@
 require("dotenv").config();
 var express = require("express");
-var async = require("async");
 var app = express();
 var mongoose = require("mongoose");
-const { prompt } = require("inquirer");
-const figlet = require("figlet");
 const redis = require("redis");
 const client = redis.createClient();
-const { Consumer } = require("sqs-consumer");
-const { receiveMessageOrder } = require("./aws-services/order-service/aws-sqs");
-var sqs = require("./aws-services/sqs");
 const path = require("path");
 const fileUpload = require("express-fileupload");
-const inquirer = require("inquirer");
-const gradient = require("gradient-string");
 var mongoose = require("mongoose");
-const { registerSuperAdmin } = require("./helper/superAdminCLI");
 var url = "mongodb://0.0.0.0:27017/foodOrdering";
 const passport = require("passport");
 const HttpError = require("./models/http-error");
 const authRoutes = require("./routes/auth");
 var fs = require("fs");
 var bodyParser = require("body-parser");
-const { receiveMessage } = require("./aws-services/email-service/aws-sqs");
-const { receives3Message } = require("./aws-services/s3-service/aws-sqs");
 var port = process.env.PORT || 3030;
-// require("./aws-services/email-service/aws-consumer");
-// require("./aws-services/s3-service/aws-consumer");
-// app.use(passport.initialize());
-// require("./config/passport");
+const emailConsumer = require("./aws-services/email-service/aws-consumer");
+const orderConsmer = require("./aws-services/order-service/aws-consumer");
+const s3Consumer = require("./aws-services/s3-service/aws-consumer");
+app.use(passport.initialize());
+require("./config/passport");
 
 app.use(fileUpload());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
@@ -48,7 +38,7 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 
-app.use((req, res, next) => {
+app.use(() => {
   const error = new HttpError("Could not find this route.", 404);
   throw error;
 });
@@ -68,106 +58,58 @@ app.use((error, req, res, next) => {
     statusCode: error.code || 500,
   });
 });
-const questionsforsignup = [
-  {
-    type: "input",
-    name: "name",
-    message: "Enter your Name",
-  },
-  {
-    type: "input",
-    name: "email",
-    message: "Enter your Email",
-  },
-  {
-    type: "input",
-    name: "password",
-    message: "Enter your Password",
-  },
-  {
-    type: "input",
-    name: "cnfrmpassword",
-    message: "Confirm password",
-  },
-];
-// mongoose
-//   .connect(url)
-//   .then(function () {
-//     console.log(`Database Connected to ${url}`);
-//     var server = app.listen(port, function () {
-//       console.log("Server is running on port " + port);
-
-//       // const order = Consumer.create({
-//       //   queueUrl: process.env.SQS_QUEUE_ORDER_URL,
-//       //   handleMessage: (message) => {
-//       //     console.log("consumer sqs message")
-//       //     receiveMessageOrder(message);
-//       //   },
-//       //   sqs: sqs,
-//       // });
-//       // order.start();
-//       // order.on("error", (err) => {
-//       //   console.error(err.message);
-//       // });
-//       // order.on("processing_error", (err) => {
-//       //   console.error(err.message);
-//       // });
-//       // order.on("timeout_error", (err) => {
-//       //   console.log(err.message);
-//       // });
-//       // console.log("Order Consumer service is running");
-
-//       // const email = Consumer.create({
-//       //   queueUrl: process.env.SENDGRID_SQS_QUEUE_EMAIL_URL,
-//       //   handleMessage: (message) => {
-//       //     receiveMessage(message);
-//       //   },
-//       //   sqs: sqs,
-//       // });
-//       // email.start();
-//       // email.on("error", (err) => {
-//       //   console.error(err.message);
-//       // });
-//       // email.on("processing_error", (err) => {
-//       //   console.error(err.message);
-//       // });
-//       // email.on("timeout_error", (err) => {
-//       //   console.log(err.message);
-//       // });
-//       // console.log("Email Consumer service is running");
-
-//       // const s3app = Consumer.create({
-//       //   queueUrl: process.env.SENDGRID_SQS_QUEUE_S3_URL,
-//       //   handleMessage: (message) => {
-//       //     receives3Message(message);
-//       //   },
-//       //   sqs: sqs,
-//       // });
-//       // s3app.start();
-//       // s3app.on("error", (err) => {
-//       //   console.error(err.message);
-//       // });
-//       // s3app.on("processing_error", (err) => {
-//       //   console.error(err.message);
-//       // });
-//       // s3app.on("timeout_error", (err) => {
-//       //   console.log(err.message);
-//       // });
-
-//       // console.log("S3 Consumer service is running");
-     
-//     });
-//     // var io = require("./socket").init(server);
-//     // io.on("connection", (socket) => {
-//     //   console.log("Socket.io establised");
-//     // });
-//   })
-//   .catch(function (err) {
-//     cb(err);
-//   });
-  app.listen(port, function () {
-    console.log("Server listening on port " + port)
+mongoose
+  .connect(url)
+  .then(function () {
+    console.log(`Database Connected to ${url}`);
+    var server = app.listen(port, function () {
+      console.log("Server is running on port " + port);
+      emailConsumer();
+      orderConsmer();
+      s3Consumer();
+    });
+    var io = require("./socket").init(server);
+    io.on("connection", () => {
+      console.log("Socket.io establised");
+    });
+  })
+  .catch(function (err) {
+    cb(err);
   });
+
+client.on("connect", function () {
+  console.log("Redis Connected!");
+});
+client.on("error", function (err) {
+  console.log("Error " + err);
+});
+
+// const { prompt } = require("inquirer");
+// const inquirer = require("inquirer");
+// const figlet = require("figlet");
+// const gradient = require("gradient-string");
+// const questionsforsignup = [
+//   {
+//     type: "input",
+//     name: "name",
+//     message: "Enter your Name",
+//   },
+//   {
+//     type: "input",
+//     name: "email",
+//     message: "Enter your Email",
+//   },
+//   {
+//     type: "input",
+//     name: "password",
+//     message: "Enter your Password",
+//   },
+//   {
+//     type: "input",
+//     name: "cnfrmpassword",
+//     message: "Confirm password",
+//   },
+// ];
 // async.series(
 //   [
 //     function (cb) {
@@ -199,9 +141,3 @@ const questionsforsignup = [
 //   }
 // );
 
-client.on("connect", function () {
-  console.log("Redis Connected!");
-});
-client.on("error", function (err) {
-  console.log("Error " + err);
-});

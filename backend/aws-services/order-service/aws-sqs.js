@@ -40,7 +40,6 @@ function receiveMessage(message) {
     .then(function (newOrder) {
       var orderDetails = [];
       orderDetails.push(`Quantity - DishName @ DishPrice `);
-
       newOrder.dishes.forEach(function (order) {
         orderDetails.push(
           `${order.quantity} - ${order.dishId.name} @ ${order.dishId.price} each`
@@ -66,7 +65,6 @@ function receiveMessage(message) {
         order: newOrder,
         outlet: details.outlet,
       });
-
       deleteMessage(message);
     })
     .catch(function (err) {
