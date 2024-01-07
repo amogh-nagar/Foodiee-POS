@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../store/authSlice";
 import CustomForm from "../components/forms/Form";
 import { useLoginMutation } from "../services/auth";
-import AuthImage from "../assets/AuthImage.png";
+import AuthImage from "../assets/AuthImage.jpg";
 import Loader from "../UI/Loaders/Loader";
 const Auth = () => {
   const [loginApi, { isLoading }] = useLoginMutation();

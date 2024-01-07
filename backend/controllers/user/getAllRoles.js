@@ -1,18 +1,12 @@
-var User = require("../../../models/user");
-var Brand = require("../../../models/brand");
+var User = require("../../models/user");
+var Brand = require("../../models/brand");
 const { v4: uuidv4 } = require("uuid");
 const sendGridMail = require("@sendgrid/mail");
 const { hashSync } = require("bcrypt");
-const HttpError = require("../../../models/http-error");
+const HttpError = require("../../models/http-error");
 const redis = require("redis");
 var mongoose = require("mongoose");
-const client = redis.createClient();
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
-const MIME_TYPE_MAP = {
-  "image/png": "png",
-  "image/jpeg": "jpeg",
-  "image/jpg": "jpg",
-};
 var itemsPerPage = 9;
 var async = require("async");
 exports.getRolesOfABrand = function (req, res, next) {
@@ -124,8 +118,6 @@ exports.getAllBrandsOfAdmin = function (req, res, next) {
   //   }
   // );
 };
-
-
 
 exports.getBrand = function (req, res, next) {
   Brand.findOne({ _id: mongoose.Types.ObjectId(req.params.brandId) })

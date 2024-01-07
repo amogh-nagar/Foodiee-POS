@@ -1,12 +1,12 @@
-var User = require("../../../models/user");
-var Brand = require("../../../models/brand");
-var s3 = require("../../../aws-services/aws");
+var User = require("../../models/user");
+var Brand = require("../../models/brand");
+var s3 = require("../../aws-services/aws");
 const { v4: uuidv4 } = require("uuid");
 const sendGridMail = require("@sendgrid/mail");
 const { hashSync } = require("bcrypt");
 var mongoose = require("mongoose");
-const HttpError = require("../../../models/http-error");
-const { addToQueue } = require("../../../aws-services/email-service/aws-sqs");
+const HttpError = require("../../models/http-error");
+const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
 const redis = require("redis");
 // const client = redis.createClient();
 const {

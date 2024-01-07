@@ -27,9 +27,11 @@ function receiveMessage(message) {
       text: details.text,
       html: details.html,
     })
-    .then(function () {})
+    .then(function () {
+      console.log("Succesfully sent message to " + details.email)
+    })
     .catch(function (err) {
-      console.log(err);
+      console.log("Error occurred", err)
       deleteMessage(message);
     });
 }

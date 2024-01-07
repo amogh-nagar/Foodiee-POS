@@ -20,7 +20,6 @@ function deleteMessage(data) {
 }
 
 function receiveMessage(message) {
-  console.log("Message received");
   const details = JSON.parse(message.Body);
   var newOrder = new Order({
     customerName: details.order.customerName,

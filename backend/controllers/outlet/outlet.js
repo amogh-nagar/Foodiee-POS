@@ -1,19 +1,19 @@
-var Outlet = require("../../../models/outlet");
-var User = require("../../../models/user");
-var Dish = require("../../../models/dish");
-var Brand = require("../../../models/brand");
-var s3 = require("../../../aws-services/aws");
+var Outlet = require("../../models/outlet");
+var User = require("../../models/user");
+var Dish = require("../../models/dish");
+var Brand = require("../../models/brand");
+var s3 = require("../../aws-services/aws");
 const { v4: uuidv4 } = require("uuid");
 const sendGridMail = require("@sendgrid/mail");
 const { hashSync } = require("bcrypt");
-const HttpError = require("../../../models/http-error");
+const HttpError = require("../../models/http-error");
 const redis = require("redis");
 // const client = redis.createClient();
 const {
   deleteImageFromS3,
   addImageToS3,
 } = require("../../../aws-services/s3-service/aws-s3");
-const { addToQueue } = require("../../../aws-services/email-service/aws-sqs");
+const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 const MIME_TYPE_MAP = {
   "image/png": "png",

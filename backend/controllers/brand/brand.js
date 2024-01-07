@@ -3,9 +3,9 @@ const {
   deleteImageFromS3,
 } = require("../../../aws-services/s3-service/aws-s3");
 var mongoose = require("mongoose");
-var Brand = require("../../../models/brand");
-var User = require("../../../models/user");
-const HttpError = require("../../../models/http-error");
+var Brand = require("../../models/brand");
+var User = require("../../models/user");
+const HttpError = require("../../models/http-error");
 const MIME_TYPE_MAP = {
   "image/png": "png",
   "image/jpeg": "jpeg",
@@ -106,7 +106,6 @@ exports.createBrand = function (req, res, next) {
       }
       fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
     }
-    var p = [];
     addImageToS3(req, {
       fileName: fileName,
       data: req.files ? req.files.image.data : "",
@@ -220,7 +219,7 @@ exports.updateBrand = function (req, res, next) {
               });
           },
           function (cb) {
-            var oldusers=[]
+            var oldusers = [];
             User.find({
               "role.roleName": { $ne: "superAdmin" },
               "entityDetails.entityId": req.query.brandId,

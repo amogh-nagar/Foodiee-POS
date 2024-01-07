@@ -1,8 +1,8 @@
-var Dish = require("../../../models/dish");
-var Brand = require("../../../models/brand");
-var Outlet = require("../../../models/outlet");
-const HttpError = require("../../../models/http-error");
-var io = require("../../../socket");
+var Dish = require("../../models/dish");
+var Brand = require("../../models/brand");
+var Outlet = require("../../models/outlet");
+const HttpError = require("../../models/http-error");
+var io = require("../../socket");
 const sendGridMail = require("@sendgrid/mail");
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 const redis = require("redis");

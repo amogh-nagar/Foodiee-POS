@@ -1,17 +1,12 @@
 var express = require("express");
-const {
-  loginUser,
-  registerUser,
-  logoutUser,
-  reLoginUser,
-} = require("../controllers/user/userAuth");
 var router = express.Router();
 const { check, header } = require("express-validator");
 var passport = require("passport");
 const {
   userProfile,
-  updateUserProfile,
-} = require("../controllers/user/userProfile");
+  updateUser,
+  createUser,
+} = require("../controllers/user/user");
 var checkPermission = require("../middleware/check-permission");
 router.get(
   "/profile",
@@ -20,9 +15,9 @@ router.get(
 );
 
 router.get(
-  "/updateProfile",
+  "/updateUser",
   passport.authenticate("jwt", { session: false }),
-  updateUserProfile
+  updateUser
 );
 
 router.post(

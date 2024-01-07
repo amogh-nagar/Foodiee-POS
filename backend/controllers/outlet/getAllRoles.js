@@ -1,12 +1,12 @@
-var User = require("../../../models/user");
-var Brand = require("../../../models/brand");
-var Outlet = require("../../../models/outlet");
-var s3 = require("../../../aws-services/aws");
+var User = require("../../models/user");
+var Brand = require("../../models/brand");
+var Outlet = require("../../models/outlet");
+var s3 = require("../../aws-services/aws");
 const { v4: uuidv4 } = require("uuid");
 const sendGridMail = require("@sendgrid/mail");
 const { hashSync } = require("bcrypt");
-const HttpError = require("../../../models/http-error");
-const { addToQueue } = require("../../../aws-services/email-service/aws-sqs");
+const HttpError = require("../../models/http-error");
+const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
 const redis = require("redis");
 var mongoose = require("mongoose");
 var async = require("async");
@@ -16,11 +16,6 @@ const {
   addImageToS3,
 } = require("../../../aws-services/s3-service/aws-s3");
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
-const MIME_TYPE_MAP = {
-  "image/png": "png",
-  "image/jpeg": "jpeg",
-  "image/jpg": "jpg",
-};
 var itemsPerPage = 9;
 exports.getRolesOfAOutlet = function (req, res, next) {
   if (req.query.page) req.query.page = +req.query.page;

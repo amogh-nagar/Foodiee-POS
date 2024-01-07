@@ -1,6 +1,6 @@
-var Dish = require("../../../models/dish");
-var Tax = require("../../../models/tax");
-const HttpError = require("../../../models/http-error");
+var Dish = require("../../models/dish");
+var Tax = require("../../models/tax");
+const HttpError = require("../../models/http-error");
 const MIME_TYPE_MAP = {
   "image/png": "png",
   "image/jpeg": "jpeg",
@@ -8,8 +8,8 @@ const MIME_TYPE_MAP = {
 };
 var mongoose = require("mongoose");
 var { v4: uuidv4 } = require("uuid");
-var DishSuperCategory = require("../../../models/dishSuperCategory");
-var DishCategory = require("../../../models/dishCategory");
+var DishSuperCategory = require("../../models/dishSuperCategory");
+var DishCategory = require("../../models/dishCategory");
 const {
   deleteImageFromS3,
   addImageToS3,
@@ -69,7 +69,6 @@ exports.getDishes = function (req, res, next) {
     }
   );
 };
-
 exports.getCategories = function (req, res, next) {
   DishCategory.aggregate(
     [
@@ -113,7 +112,6 @@ exports.getDish = function (req, res, next) {
       next(err);
     });
 };
-
 exports.createDish = function (req, res, next) {
   var { name, price, description } = req.body;
   var fileName = "";
@@ -160,7 +158,6 @@ exports.createDish = function (req, res, next) {
       next(err);
     });
 };
-
 exports.updateDish = function (req, res, next) {
   Dish.findOne({ _id: mongoose.Types.ObjectId(req.query.dishId) }).then(
     function (founddish) {
@@ -223,7 +220,6 @@ exports.updateDish = function (req, res, next) {
     }
   );
 };
-
 exports.createSuperCategory = function (req, res, next) {
   console.log(req.body);
   var newSuperCategory = new DishSuperCategory({
@@ -244,7 +240,6 @@ exports.createSuperCategory = function (req, res, next) {
       next(err);
     });
 };
-
 exports.createCategory = function (req, res, next) {
   DishSuperCategory.find({ id: req.body.superCategoryId }).then(function (
     superCategory
@@ -272,7 +267,6 @@ exports.createCategory = function (req, res, next) {
       });
   });
 };
-
 exports.createTax = function (req, res, next) {
   console.log(req.body)
   var tax = new Tax({
@@ -296,7 +290,6 @@ exports.createTax = function (req, res, next) {
       next(err);
     });
 };
-
 exports.updateTax = function (req, res, next) {
   Tax.findOne({ name: req.body.oldName }).then(function (oldTax) {
     if (!oldTax) {

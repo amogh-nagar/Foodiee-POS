@@ -3,7 +3,8 @@ var express = require("express");
 var app = express();
 var mongoose = require("mongoose");
 const redis = require("redis");
-const client = redis.createClient();
+const publisher = redis.createClient();
+const subscriber = redis.createClient();
 const path = require("path");
 const fileUpload = require("express-fileupload");
 var mongoose = require("mongoose");
@@ -16,15 +17,14 @@ var bodyParser = require("body-parser");
 var port = process.env.PORT || 3030;
 const emailConsumer = require("./aws-services/email-service/aws-consumer");
 const orderConsmer = require("./aws-services/order-service/aws-consumer");
-const s3Consumer = require("./aws-services/s3-service/aws-consumer");
+const { redis_channels } = require("./common");
 app.use(passport.initialize());
+app.use(express.json());
+app.use(express.urlencoded())
 require("./config/passport");
-
+app.use("/api", require("./routes"));
 app.use(fileUpload());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -66,7 +66,6 @@ mongoose
       console.log("Server is running on port " + port);
       emailConsumer();
       orderConsmer();
-      s3Consumer();
     });
     var io = require("./socket").init(server);
     io.on("connection", () => {
@@ -77,11 +76,32 @@ mongoose
     cb(err);
   });
 
-client.on("connect", function () {
-  console.log("Redis Connected!");
+Object.values(redis_channels).forEach((channel) => {
+  subscriber.subscribe(channel);
 });
-client.on("error", function (err) {
-  console.log("Error " + err);
+
+subscriber.on("message", (channel, message) => {
+  console.log("Received data :" + message + ", channel is" + channel);
+  try{
+    message = JSON.parse(message);
+    if(channel == redis_channels.user_update){
+      subscriber.hset("users", message.id, JSON.stringify(message));
+    }
+  } catch(err){
+    console.log("Error occurred", err);
+  }
+});
+publisher.on("connect", function () {
+  console.log("Redis Publisher Connected!");
+});
+publisher.on("error", function (err) {
+  console.log("Error in Publisher" + err);
+});
+subscriber.on("connect", function () {
+  console.log("Redis Subscribe Connected!");
+});
+subscriber.on("error", function (err) {
+  console.log("Error in Subsciber " + err);
 });
 
 // const { prompt } = require("inquirer");
@@ -140,4 +160,3 @@ client.on("error", function (err) {
 //     }
 //   }
 // );
-

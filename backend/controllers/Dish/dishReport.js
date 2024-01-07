@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
-var Outlet = require("../../../models/outlet");
-var Order = require("../../../models/order");
+var Outlet = require("../../models/outlet");
+var Order = require("../../models/order");
 exports.getAllItemsWithDateReport = function (req, res, next) {
   Order.aggregate(
     [

@@ -4,7 +4,7 @@ var dish = new mongoose.Schema(
     name: { type: String, required: true },
     image: { type: String },
     description: { type: String },
-    price: { type: Number, required: true },
+    rate: { type: Number, required: true },
     category: {
       id: { type: mongoose.Types.ObjectId, required: true },
       name: { type: String, required: true },

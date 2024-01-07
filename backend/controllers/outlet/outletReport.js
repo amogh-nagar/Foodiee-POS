@@ -1,5 +1,5 @@
-var Outlet = require("../../../models/outlet");
-var Order = require("../../../models/order");
+var Outlet = require("../../models/outlet");
+var Order = require("../../models/order");
 exports.getOutletsTotalReportWithoutDates = function (req, res, next) {
   Order.aggregate(
     [

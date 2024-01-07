@@ -12,10 +12,11 @@ var order = new mongoose.Schema(
         dishDetails: {
           id:{ type:mongoose.Types.ObjectId, required: true },
           name: { type: String, required: true },
-          price: { type: Number, required: true },
+          rate: { type: Number, required: true },
           image:{type:String}
         },
-        quantity: { type: Number, required: true, default: 1 },
+        price: { type: Number, required: true },
+        quantity: { type: Number, required: true },
       },
     ],
     totalTax:{type:Number,default:0},

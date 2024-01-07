@@ -1,12 +1,12 @@
-var Order = require("../../../models/order");
-var Outlet = require("../../../models/outlet");
-const { addToQueue } = require("../../../aws-services/email-service/aws-sqs");
+var Order = require("../../models/order");
+var Outlet = require("../../models/outlet");
+const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
 const {
   addToQueueOrder,
-} = require("../../../aws-services/order-service/aws-sqs");
+} = require("../../aws-services/order-service/aws-sqs");
 const redis = require("redis");
 // const client = redis.createClient();
-const HttpError = require("../../../models/http-error");
+const HttpError = require("../../models/http-error");
 var itemsPerPage = 9;
 var async = require("async");
 var mongoose = require("mongoose");
