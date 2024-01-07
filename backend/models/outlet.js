@@ -7,6 +7,10 @@ var outlet = new mongoose.Schema({
     id: { type: mongoose.Types.ObjectId, required: true },
     name: { type: String, required: true },
   },
+  tenantDetails: {
+    id: { type: mongoose.Types.ObjectId, required: true },
+    name: { type: String, required: true },
+  },
   isDeleted: { type: Boolean, default: false },
   isActive: { type: String, default: true },
 });

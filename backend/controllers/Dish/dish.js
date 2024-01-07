@@ -1,11 +1,5 @@
 var Dish = require("../../models/dish");
-var Tax = require("../../models/tax");
 const HttpError = require("../../models/http-error");
-const MIME_TYPE_MAP = {
-  "image/png": "png",
-  "image/jpeg": "jpeg",
-  "image/jpg": "jpg",
-};
 var mongoose = require("mongoose");
 var { v4: uuidv4 } = require("uuid");
 var DishSuperCategory = require("../../models/dishSuperCategory");
@@ -16,30 +10,25 @@ const {
 } = require("../../../aws-services/s3-service/aws-s3");
 var itemsPerPage = 9;
 var async = require("async");
+const { handleError, MIME_TYPE_MAP } = require("../../common");
 exports.getDishes = function (req, res, next) {
-  if (req.query.page) req.query.page = +req.query.page;
-  var skip =
-    req.query.page && req.query.page != "undefined"
-      ? (parseInt(req.query.page) - 1) * itemsPerPage
-      : 0;
+  let query = {};
+  if (req.query.brandId) query["brandId"] = req.params.brandId;
   async.parallel(
     [
       function (callback) {
         Dish.aggregate(
           [
-            { $match: { brandId: req.params.brandId } },
-            { $skip: skip },
+            { $match: query },
+            { $skip: req.query.skip },
             { $limit: itemsPerPage },
-            {
-              $group: {
-                _id: "$brandId",
-                dishes: { $push: "$$ROOT" },
-              },
-            },
           ],
           function (err, data) {
+            if (err) {
+              return callback(err);
+            }
             callback(null, {
-              dishes: data.length == 0 ? [] : data[0].dishes,
+              dishes: data.length == 0 ? [] : data,
             });
           }
         );
@@ -53,6 +42,7 @@ exports.getDishes = function (req, res, next) {
             },
           ],
           function (err, data) {
+            if (err) return callback(err);
             callback(null, {
               totalItems: data.length == 0 ? 0 : data[0].totalItems,
             });
@@ -61,6 +51,13 @@ exports.getDishes = function (req, res, next) {
       },
     ],
     function (err, data) {
+      if (err) {
+        return handleError(res, {
+          message: "Some error occurred",
+          statusCode: 500,
+          error: err,
+        });
+      }
       res.status(200).json({
         message: "Dishes Fetched",
         dishes: data[0].length == 0 ? [] : data[0].dishes,
@@ -79,6 +76,12 @@ exports.getCategories = function (req, res, next) {
       },
     ],
     function (err, data) {
+      if (err)
+        return handleError(res, {
+          message: "Some error occurred",
+          statusCode: 500,
+          error: err,
+        });
       res.status(200).json({
         message: "Categories Fetched",
         categories: data,
@@ -90,18 +93,23 @@ exports.getSuperCategories = function (req, res, next) {
   DishSuperCategory.aggregate(
     [{ $match: { brandId: req.params.brandId } }],
     function (err, data) {
+      if (err)
+        return handleError(res, {
+          message: "Some error occurred",
+          statusCode: 500,
+          error: err,
+        });
       res.status(200).json({ superCategories: data });
     }
   );
 };
 exports.getDish = function (req, res, next) {
-  Dish.find({ _id: mongoose.Types.ObjectId(req.params.dishId) })
+  Dish.find({ _id: req.params.dishId })
     .then(function (dish) {
       if (!dish) {
         var error = new HttpError("Dish not found", 404);
         return next(error);
       }
-      console.log(dish);
       res.status(200).json({
         message: "Dish Fetched",
         dish: dish[0],
@@ -113,7 +121,7 @@ exports.getDish = function (req, res, next) {
     });
 };
 exports.createDish = function (req, res, next) {
-  var { name, price, description } = req.body;
+  var { name, rate, description } = req.body;
   var fileName = "";
   if (req.files) {
     if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
@@ -127,9 +135,16 @@ exports.createDish = function (req, res, next) {
     data: req.files ? req.files.image.data : "",
   })
     .then(function () {
+      req.body.taxes = req.body.taxes?.map((tax)=>{
+        return {
+          id: new mongoose.Types.ObjectId(tax.id),
+          name: tax.name,
+          taxAmount: +tax.taxAmount
+        }
+      })
       var newDish = new Dish({
         name: name,
-        price: price,
+        rate: +rate,
         description: description,
         superCategory: {
           id: req.body.superCategoryId,
@@ -137,7 +152,7 @@ exports.createDish = function (req, res, next) {
         },
         category: { id: req.body.categoryId, name: req.body.categoryName },
         image: fileName,
-        taxes: JSON.parse(req.body.taxes),
+        taxes: req.body.taxes,
         brandId: req.body.brandId,
       });
       newDish
@@ -159,13 +174,12 @@ exports.createDish = function (req, res, next) {
     });
 };
 exports.updateDish = function (req, res, next) {
-  Dish.findOne({ _id: mongoose.Types.ObjectId(req.query.dishId) }).then(
+  Dish.findOne({ _id: req.query.dishId }).then(
     function (founddish) {
       if (!founddish) {
         var error = new HttpError("Dish not found", 404);
         return next(error);
       }
-      console.log(founddish);
       var fileName = "";
       if (req.files) {
         if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
@@ -176,7 +190,6 @@ exports.updateDish = function (req, res, next) {
         deleteImageFromS3({
           fileName: founddish.image,
         });
-
         founddish.image = fileName;
       }
       addImageToS3(req, {
@@ -193,19 +206,22 @@ exports.updateDish = function (req, res, next) {
             founddish.category.id = req.body.categoryId;
           }
           founddish.taxes = req.body.taxes
-            ? JSON.parse(req.body.taxes)
+            ? req.body.taxes?.map((tax)=>{
+              return {
+                id: new mongoose.Types.ObjectId(tax.id),
+                name: tax.name,
+                taxAmount: +tax.taxAmount
+              }
+            })
             : founddish.taxes;
           founddish.name = req.body.name ? req.body.name : founddish.name;
-          founddish.price = req.body.price ? req.body.price : founddish.price;
+          founddish.rate = req.body.rate ? req.body.rate : founddish.rate;
           founddish.description = req.body.description
             ? req.body.description
             : founddish.description;
-          founddish.status = req.body.status
-            ? req.body.status
-            : founddish.dishStatus;
-          founddish.isdeleted = req.body.status
-            ? req.body.isdeleted
-            : founddish.isdeleted;
+          founddish.isDeleted = req.body.status
+            ? req.body.isDeleted
+            : founddish.isDeleted;
           founddish.save().then(function (updatedDish) {
             res.status(200).json({
               message: "Dish Updated",
@@ -221,7 +237,6 @@ exports.updateDish = function (req, res, next) {
   );
 };
 exports.createSuperCategory = function (req, res, next) {
-  console.log(req.body);
   var newSuperCategory = new DishSuperCategory({
     name: req.body.name,
     description: req.body.description,
@@ -241,87 +256,51 @@ exports.createSuperCategory = function (req, res, next) {
     });
 };
 exports.createCategory = function (req, res, next) {
-  DishSuperCategory.find({ id: req.body.superCategoryId }).then(function (
-    superCategory
-  ) {
-    if (!superCategory) {
-      var error = new HttpError("Dish Super not found", 404);
-      return next(error);
-    }
-    var newCategory = new DishCategory({
-      name: req.body.name,
-      description: req.body.description,
-      dishSuperCategoryId: req.body.superCategoryId,
-    });
-    newCategory
-      .save()
-      .then(function (newCategory) {
-        res.status(200).json({
-          message: "Dish Category Created",
-          dishCategory: newCategory,
-        });
-      })
-      .catch(function (err) {
-        console.log(err);
-        next(err);
-      });
-  });
-};
-exports.createTax = function (req, res, next) {
-  console.log(req.body)
-  var tax = new Tax({
+  var newCategory = new DishCategory({
     name: req.body.name,
-    range: {
-      to: req.body.to,
-      from: req.body.from,
-    },
-    brandId:req.body.brandId
+    description: req.body.description,
+    dishSuperCategoryId: req.body.superCategoryId,
   });
-  tax
+  newCategory
     .save()
-    .then(function (newTax) {
+    .then(function (newCategory) {
       res.status(200).json({
-        message: "Tax created",
-        tax: newTax,
+        message: "Dish Category Created",
+        dishCategory: newCategory,
       });
     })
-    .catch(function () {
+    .catch(function (err) {
       console.log(err);
       next(err);
     });
 };
-exports.updateTax = function (req, res, next) {
-  Tax.findOne({ name: req.body.oldName }).then(function (oldTax) {
-    if (!oldTax) {
-      var error = new HttpError("Tax not found", 404);
-      return next(error);
-    }
-    oldTax.name = req.body.name ? req.body.name : oldTax.name;
-    oldTax.range.to = req.body.to ? +req.body.to : oldTax.range.to;
-    oldTax.range.from = req.body.from ? +req.body.from : oldTax.range.from;
-    oldTax
-      .save()
-      .then(function (newTax) {
-        res.status(200).json({
-          message: "Tax updated",
-          tax: newTax,
-        });
-      })
-      .catch(function (err) {
-        console.log(err);
-        next(err);
-      });
-  });
-};
-exports.taxes=function(req,res,next){
-  console.log(req.params)
-  Tax.find({brandId:req.params.brandId}).then(function(taxes){
+exports.updateSuperCategory = async function (req, res, next) {
+  try{
+    let superCategory = await DishSuperCategory.findById(req.body.superCategoryId);
+    superCategory.name = req.body.name ? req.body.name : superCategory.name;
+    superCategory.description = req.body.description ? req.body.description : superCategory.description;
+    superCategory.brandId = req.body.brandId ? req.body.brandId : superCategory.brandId;
+    await superCategory.save();
     res.status(200).json({
-      message:"Taxes Fetched",
-      taxes:taxes
-    })
-  }).catch(function(err){
-    console.log(err);
+      message: "Dish Super Category Created",
+      dishSuperCategory: superCategory,
+    });
+  } catch(err){
     next(err);
-  })
-}
+  }
+};
+exports.createCategory = async function (req, res, next) {
+  try{
+    let category = await DishCategory.findById(req.body.categoryId);
+    category.name = req.body.name ? req.body.name : category.name;
+    category.description = req.body.description ? req.body.description : category.description;
+    category.dishSuperCategoryId = req.body.dishSuperCategoryId ? req.body.dishSuperCategoryId : category.dishSuperCategoryId;
+    await category.save();
+    res.status(200).json({
+      message: "Dish Category Created",
+      dishCategory: category,
+    });
+  } catch(err){
+    next(err);
+  }
+};

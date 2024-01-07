@@ -19,7 +19,7 @@ var dish = new mongoose.Schema(
       {
         id:{type:mongoose.Types.ObjectId,required:true},
         name: { type: String, required: true },
-        percentAmount: { type: Number, required: true },
+        taxAmount: { type: Number, required: true },
       },
     ],
   },

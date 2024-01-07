@@ -5,6 +5,8 @@ sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 var io = require("../../socket");
 var Order = require("../../models/order");
 const { addToQueue } = require("../email-service/aws-sqs");
+const { default: mongoose } = require("mongoose");
+const { emailTemplates } = require("../../common");
 function deleteMessage(data) {
   const deleteParams = {
     QueueUrl: process.env.SQS_QUEUE_ORDER_URL,
@@ -21,17 +23,40 @@ function deleteMessage(data) {
 
 function receiveMessage(message) {
   const details = JSON.parse(message.Body);
+  let dishes = details?.order?.dishes?.map((dish) => {
+    return {
+      dishDetails: {
+        id: new mongoose.Types.ObjectId(dish.dishDetails.id),
+        name: dish.dishDetails.name,
+        rate: +dish.dishDetails.rate,
+      },
+      price: +dish.price,
+      quantity: +dish.quantity,
+    };
+  });
+
   var newOrder = new Order({
-    customerName: details.order.customerName,
-    customerEmail: details.order.customerEmail,
-    customerContact: details.order.customerContact,
-    dishes: details.order.dishes,
-    type: details.order.orderType,
-    totalTax: details.order.totalTax,
+    customerDetails: {
+      name: details.order.customerName,
+      email: details.order.customerEmail,
+      contact: details.order.customerContact,
+    },
+    dishes: dishes,
+    totalTax: +details.order.totalTax,
     date: details.order.orderDate,
-    status: "Done",
-    outletDetails: details.order.outletDetails,
-    brandDetails: details.order.brandDetails,
+    status: details.order.status,
+    outletDetails: {
+      id: new mongoose.Types.ObjectId(details.order.outletDetails.id),
+      name: details.order.outletDetails.name
+    },
+    brandDetails: {
+      id: new mongoose.Types.ObjectId(details.order.brandDetails.id),
+      name: details.order.brandDetails.name
+    },
+    tenantDetails: {
+      id: new mongoose.Types.ObjectId(details.order.tenantDetails.id),
+      name: details.order.tenantDetails.name
+    },
     price: +details.order.price + +details.order.totalTax,
   });
   newOrder
@@ -39,30 +64,16 @@ function receiveMessage(message) {
     .then(function (newOrder) {
       var orderDetails = [];
       orderDetails.push(`Quantity - DishName @ DishPrice `);
-      newOrder.dishes.forEach(function (order) {
+      newOrder.dishes.forEach(function (dish) {
         orderDetails.push(
-          `${order.quantity} - ${order.dishId.name} @ ${order.dishId.price} each`
+          `${dish.quantity} - ${dish.dishDetails.name} @ ${dish.dishDetails.rate} each`
         );
       });
       addToQueue({
         email: details.order.customerEmail,
-        subject: "Order Created!",
-        text: "Your Order has been Created",
-        html: `<div><h1>Hi ${details.order.customerName},</h1></div>
-              <h3>Here are your Order Details</h3>
-              <div><p>Total Cost: ${newOrder.price}</p></div>
-              <div><p>Order Type: ${newOrder.type}</p></div>
-              <div><p>Order Date: ${newOrder.date}</p></div>
-              <div><p>Order Status: ${newOrder.status}</p></div>
-              <div>Dishes Ordered</div>
-              <div>${orderDetails.join("<br>")}</div>
-              <div><p>Thank You for using our Outlet</p></div>
-              `,
-      });
-      io.getio().emit("orders", {
-        action: "update",
-        order: newOrder,
-        outlet: details.outlet,
+        subject: emailTemplates.ORDER_CREATED.subject,
+        text: emailTemplates.ORDER_CREATED.text,
+        html: emailTemplates.ORDER_CREATED.html(order, orderDetails),
       });
       deleteMessage(message);
     })
