@@ -55,7 +55,7 @@ const Auth = () => {
 
     return errors;
   };
-  if(isLoading){
+  if (isLoading) {
     return <Loader />;
   }
   return (
