@@ -20,8 +20,9 @@ const orderConsmer = require("./aws-services/order-service/aws-consumer");
 const { redis_channels } = require("./common");
 app.use(passport.initialize());
 app.use(express.json());
-app.use(express.urlencoded())
+app.use(express.urlencoded());
 require("./config/passport");
+require("./firebase");
 app.use("/api", require("./routes"));
 app.use(fileUpload());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
@@ -82,12 +83,12 @@ Object.values(redis_channels).forEach((channel) => {
 
 subscriber.on("message", (channel, message) => {
   console.log("Received data :" + message + ", channel is" + channel);
-  try{
+  try {
     message = JSON.parse(message);
-    if(channel == redis_channels.user_update){
+    if (channel == redis_channels.user_update) {
       subscriber.hset("users", message.id, JSON.stringify(message));
     }
-  } catch(err){
+  } catch (err) {
     console.log("Error occurred", err);
   }
 });
