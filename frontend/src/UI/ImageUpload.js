@@ -11,7 +11,7 @@ const ImageUpload = ({ field, form: { touched, errors }, ...props }) => {
     setImage(file);
     let obj = {};
     obj.backgroundImage =
-      "linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(" +
+      "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(" +
       URL.createObjectURL(file) +
       ")";
     obj.backgroundSize = "cover";

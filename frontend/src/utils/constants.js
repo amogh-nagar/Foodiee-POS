@@ -51,7 +51,26 @@ export const getRandomColors = function getRandomLightColor() {
   return color;
 };
 
-export const getColor = function (img) {
+function stringToHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return hash;
+}
+
+function hashToRGBA(hash) {
+  const red = (hash & 0xff0000) >> 16;
+  const green = (hash & 0x00ff00) >> 8;
+  const blue = hash & 0x0000ff;
+  const alpha = ((hash & 0xff) / 255).toFixed(2); // Alpha value between 0 and 1
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
+export const getColor = function (img, name) {
   let styleObj = {};
   if (img) {
     styleObj.backgroundImage =
@@ -60,8 +79,10 @@ export const getColor = function (img) {
     styleObj.color = "white";
     styleObj.backgroundPosition = "center";
   } else {
-    styleObj.backgroundImage =
-      "linear-gradient(" + getRandomColors() + "," + getRandomColors() + ")";
+    const hash = stringToHash(name);
+    const color1 = hashToRGBA(hash);
+    const color2 = hashToRGBA(~hash);
+    styleObj.backgroundImage = `linear-gradient(${color1}, ${color2})`;
   }
   return styleObj;
 };
