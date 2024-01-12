@@ -11,9 +11,7 @@ const Tenants = () => {
     name: "",
     description: "",
   };
-  const onSubmit = async (values) => {
-
-  }
+  const onSubmit = async (values) => {};
   const validate = (values) => {
     const errors = {};
 
@@ -28,7 +26,9 @@ const Tenants = () => {
   };
   return (
     <div>
-      <PageNameWithDate name="Tenants" />
+      <PageNameWithDate
+        name="Tenants"
+      />
       <div>
         <div className=" items-center gap-x-3 mx-3 my-5 flex h-fit">
           <input
@@ -37,21 +37,19 @@ const Tenants = () => {
           />
           <Modal
             PopUpButton={
-              <button
-                className="flex gap-x-1 items-center bg-secondary-500 p-3 rounded-lg"
-              >
+              <button className="flex gap-x-1 items-center bg-secondary-500 p-3 rounded-lg">
                 <IoMdAdd />
                 <p>Tenant</p>
               </button>
             }
-            isJSX = {true}
+            isJSX={true}
             HeaderText={() => <h3>Add New Tenant</h3>}
             BodyContent={
               <CustomForm
                 initialValues={initialValues}
                 onSubmit={onSubmit}
                 validate={validate}
-                btnClass = "w-40 h-10"
+                btnClass="w-40 h-10"
                 validator={() => {}}
                 fields={[
                   {
@@ -71,7 +69,7 @@ const Tenants = () => {
                     name: "image",
                     label: "Image",
                     placeholder: "Tenant Image",
-                  }
+                  },
                 ]}
                 buttonText="Create"
                 isTrusted={true}

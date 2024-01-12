@@ -1,6 +1,6 @@
 import React from "react";
 import moment from "moment";
-const PageNameWithDate = ({ name, searchBox }) => {
+const PageNameWithDate = ({ name, searchBox, MultiSelect }) => {
   return (
     <div className="border-b-gray-400 border-b-2 w-full px-7 py-3 flex justify-between">
       <div className="w-6/12 flex items-end gap-x-4">
@@ -16,6 +16,7 @@ const PageNameWithDate = ({ name, searchBox }) => {
           />
         </div>
       )}
+      {MultiSelect && <MultiSelect/>}
     </div>
   );
 };

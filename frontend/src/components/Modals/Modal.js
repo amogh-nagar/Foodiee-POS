@@ -16,7 +16,7 @@ const Modal = ({ PopUpButton, HeaderText, BodyContent, isJSX }) => {
                     </div>
                     <div className="actions px-5 py-3">
                         <button
-                            className="button bg-secondary-500 hover:bg-secondary-700"
+                            className="button w-14 h-8 bg-secondary-500 hover:bg-secondary-700"
                             onClick={() => {
                                 close();
                             }}
