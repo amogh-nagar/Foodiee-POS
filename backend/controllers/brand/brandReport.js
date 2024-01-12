@@ -81,7 +81,6 @@ exports.getBrandsHourlySalesReport = function (req, res, next) {
             date: "$date",
           },
         },
-        outletDetails: 1,
         brandDetails: 1,
         _id: 1,
         price: 1,
@@ -107,6 +106,7 @@ exports.getBrandsHourlySalesReport = function (req, res, next) {
     {
       $project: {
         brandId: "$_id",
+        sales: 1
       },
     },
   ]);
@@ -275,7 +275,7 @@ exports.getTop3ItemsofBrandsHourlyWise = function (req, res, next) {
     {
       $group: {
         _id: "$brandId",
-        items: {
+        dishes: {
           $push: {
             orderDate: "$orderDate",
             dishes: "$dishes",
@@ -283,6 +283,12 @@ exports.getTop3ItemsofBrandsHourlyWise = function (req, res, next) {
         },
       },
     },
+    {
+      $project: {
+        brandId: "$_id",
+        dishes: 1
+      }
+    }
   ]);
   cursor.on("error", (err) => {
     handleError(res, {

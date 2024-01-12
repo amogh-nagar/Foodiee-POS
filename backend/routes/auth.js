@@ -29,22 +29,4 @@ router.post(
   ],
   reLoginUser
 );
-
-router.post(
-  "/signup",
-  [
-    check("email").isEmail().withMessage("Please enter a valid email."),
-    check("password")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters long."),
-  ],
-  registerUser
-);
-
-router.delete(
-  "/logout",
-  passport.authenticate("jwt", { session: false }),
-  logoutUser
-);
-
 module.exports = router;

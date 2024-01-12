@@ -11,4 +11,7 @@ var Role = new Schema({
     entityId: {type:mongoose.Types.ObjectId, required: true}
 })
 
+//This Roles will be Predefined
+//SuperAdmin, TenantAdmin, BrandAdmin, OutletAdmin
+
 module.exports = mongoose.Model("Role", Role);

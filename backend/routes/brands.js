@@ -10,14 +10,14 @@ router.get(
   "/getAllBrands",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisistBrandsPage")
+  checkPermission("isVisitBrandsPage")
 );
 
 router.get(
   "/getBrand/:brandId",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisistBrandsPage")
+  checkPermission("isVisitBrandsPage")
 );
 
 router.post(

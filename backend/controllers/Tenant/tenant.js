@@ -3,7 +3,7 @@ const {
   deleteImageFromS3,
 } = require("../../../aws-services/s3-service/aws-s3");
 var mongoose = require("mongoose");
-var Brand = require("../../models/brand");
+var Tenant = require("../../models/tenant");
 var User = require("../../models/user");
 const HttpError = require("../../models/http-error");
 var { v4: uuidv4 } = require("uuid");
@@ -12,28 +12,28 @@ var async = require("async");
 const { MIME_TYPE_MAP } = require("../../common");
 var itemsPerPage = 10;
 
-exports.getBrands = function (req, res, next) {
+exports.getTenants = function (req, res, next) {
   var skip = req.query.skip;
   async.parallel(
     [
       function (cb) {
-        Brand.aggregate(
+        Tenant.aggregate(
           [
-            { $match: { tenantId: req.body.tenantId } },
+            { $match: { superAdminId: req.user.id } },
             { $skip: skip },
             { $limit: itemsPerPage },
           ],
           function (err, data) {
             if (err) return cb(err);
             cb(null, {
-              brands: data.length == 0 ? [] : data,
+              tenants: data.length == 0 ? [] : data,
             });
           }
         );
       },
       function (cb) {
-        Brand.aggregate(
-          [{ $match: { tenantId: req.body.tenantId } }, { $count: "totalItems" }],
+        Tenant.aggregate(
+          [{ $match: { superAdminId: req.user.id } }, { $count: "totalItems" }],
           function (err, data) {
             if (err) return cb(err);
             cb(null, {
@@ -51,26 +51,26 @@ exports.getBrands = function (req, res, next) {
           error: err,
         });
       res.status(200).json({
-        message: "Brands Fetched",
-        brands: data[0].brands,
+        message: "Tenants Fetched",
+        tenants: data[0].tenants,
         totalItems: data[1].totalItems,
       });
     }
   );
 };
 
-exports.getBrand = function (req, res, next) {
-  Brand.findOne({
-    _id: mongoose.Types.ObjectId(req.params.brandId),
+exports.getTenant = function (req, res, next) {
+  Tenant.findOne({
+    _id: mongoose.Types.ObjectId(req.params.tenantId),
   })
-    .then(function (brand) {
-      if (!brand) {
-        var error = new HttpError("Brand not found", 404);
+    .then(function (tenant) {
+      if (!tenant) {
+        var error = new HttpError("Tenant not found", 400);
         return next(error);
       }
       res.status(200).json({
-        message: "Brand Fetched",
-        brand: brand,
+        message: "Tenant Fetched",
+        tenant: tenant,
       });
     })
     .catch(function (err) {
@@ -79,16 +79,15 @@ exports.getBrand = function (req, res, next) {
     });
 };
 
-exports.createBrand = function (req, res, next) {
-  Brand.findOne({
-    tenantId: req.body.tenantId,
+exports.createTenant = function (req, res, next) {
+  Tenant.findOne({
+    superAdminId: req.user.id,
     name: req.body.name,
-  }).then(function (brand) {
-    if (brand) {
-      var error = new HttpError("Duplicate Brand found", 400);
+  }).then(function (tenant) {
+    if (tenant) {
+      var error = new HttpError("Duplicate Tenant found", 400);
       return next(error);
     }
-
     var fileName = "";
 
     if (req.files) {
@@ -104,18 +103,18 @@ exports.createBrand = function (req, res, next) {
     }).then(function () {
       let name = req.body.name;
       let description = req.body.description;
-      var brand = new Brand({
+      var tenant = new Tenant({
         name: name,
         image: fileName,
         description: description,
-        tenantId: req.body.tenantId,
+        superAdminId: req.user.id,
       });
-      brand
+      tenant
         .save()
-        .then(function (brand) {
+        .then(function (tenant) {
           res
             .status(200)
-            .json({ message: "Brand created successfully", brand: brand });
+            .json({ message: "Tenant created successfully", tenant: tenant });
         })
         .catch(function (err) {
           console.log(err);
@@ -125,12 +124,12 @@ exports.createBrand = function (req, res, next) {
   });
 };
 
-exports.updateBrand = function (req, res, next) {
-  Brand.findOne({
-    _id: req.query.brandId,
-  }).then(function (oldbrand) {
-    if (!oldbrand) {
-      var error = new HttpError("Brand not found", 404);
+exports.updateTenant = function (req, res, next) {
+  Tenant.findOne({
+    _id: req.query.tenantId,
+  }).then(function (oldTenant) {
+    if (!oldTenant) {
+      var error = new HttpError("Tenant not found", 400);
       return next(error);
     }
     var fileName = "";
@@ -141,30 +140,30 @@ exports.updateBrand = function (req, res, next) {
       }
       fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
       deleteImageFromS3({
-        fileName: oldbrand.image,
+        fileName: oldTenant.image,
       });
-      oldbrand.image = fileName;
+      oldTenant.image = fileName;
     }
     addImageToS3(req, {
       fileName: fileName,
       data: req.files ? req.files.image.data : "",
     }).then(function () {
-      oldbrand.name = req.body.name ? req.body.name : oldbrand.name;
-      oldbrand.description = req.body.description
+      oldTenant.name = req.body.name ? req.body.name : oldTenant.name;
+      oldTenant.description = req.body.description
         ? req.body.description
-        : oldbrand.description;
-      oldbrand.isDeleted = req.body.isDeleted
+        : oldTenant.description;
+      oldTenant.isDeleted = req.body.isDeleted
         ? req.body.isDeleted
-        : oldbrand.isDeleted;
-      oldbrand.isActive = req.body.isActive
+        : oldTenant.isDeleted;
+      oldTenant.isActive = req.body.isActive
         ? req.body.isActive
-        : oldbrand.isActive;
-      oldbrand
+        : oldTenant.isActive;
+      oldTenant
         .save()
-        .then(function (newBrand) {
+        .then(function (newTenant) {
           res.status(200).json({
-            message: "Brand Updated",
-            brand: newBrand,
+            message: "Tenant Updated",
+            tenant: newTenant,
           });
         })
         .catch(function (err) {

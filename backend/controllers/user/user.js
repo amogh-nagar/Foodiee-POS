@@ -4,6 +4,7 @@ const HttpError = require("../../models/http-error");
 const { redis_channels, handleError, emailTemplates, projectUser } = require("../../common");
 const { addImageToS3 } = require("../../aws-services/s3-service/aws-s3");
 const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
+const { default: mongoose } = require("mongoose");
 const client = redis.createClient();
 
 exports.userProfile = function (req, res, next) {
@@ -60,10 +61,10 @@ exports.updateUser = function (req, res, next) {
         data: req.files ? req.files.image.data : "",
       })
         .then(function () {
-          olduser.name = req.body.name ? req.body.name : olduser.name;
-          olduser.email = req.body.email ? req.body.email : olduser.email;
+          olduser.name = req.body.name ?? olduser.name;
+          olduser.email = req.body.email ?? olduser.email;
           olduser.password = req.body.password
-            ? hashSync(req.body.password, 10)
+            ? req.body.password
             : olduser.password;
           olduser.isActive = req.body.isActive
             ? parseInt(req.body.isActive)
@@ -73,6 +74,22 @@ exports.updateUser = function (req, res, next) {
             : olduser.isDeleted;
           if (req.body.permissions) {
             olduser.permissions = req.body.permissions;
+          }
+          if (req.body.entityDetails) {
+            olduser.entityDetails = req.body.entityDetails.map((entity)=>{
+              return {
+                entityId: new mongoose.Types.ObjectId(entity.entityId),
+                entityName: entity.entityName,
+              }
+            });
+          }
+          if (req.body.roles) {
+            olduser.roles = req.body.roles.map((role)=>{
+              return {
+                roleId: new mongoose.Types.ObjectId(role.roleId),
+                roleName: role.roleName,
+              }
+            });
           }
           olduser
             .save()
@@ -127,11 +144,8 @@ exports.createUser = function (req, res, next) {
       email,
       password,
       name,
-      entity,
-      roleName,
-      entityId,
-      entityImage,
-      entityName,
+      roles,
+      entityDetails,
       permissions,
     } = req.body;
     User.findOne({
@@ -144,20 +158,23 @@ exports.createUser = function (req, res, next) {
       const newUser = new User({
         name: name,
         email: email,
-        password: hashSync(password, 10),
-        role: {
-          entity: entity,
-          roleName: roleName,
-        },
-        entityDetails: [
-          {
-            entityId: entityId,
-            entityImage: entityImage,
-            entityName: entityName,
-          },
-        ],
-        permissions: JSON.parse(permissions),
+        password: password,
+        role: [],
+        entityDetails: [],
+        permissions: permissions,
       });
+      entityDetails && entityDetails.forEach((entity)=>{
+        newUser.entityDetails.push({
+          entityId: new mongoose.Types.ObjectId(entity.entityId),
+          entityName: entity.entityName
+        })
+      })
+      roles && roles.forEach((role)=>{
+        newUser.roles.push({
+          roleId: new mongoose.Types.ObjectId(role.roleId),
+          roleName: role.roleName
+        })
+      })
       newUser.save().then(function () {
         addToQueue({
           email: email,

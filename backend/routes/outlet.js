@@ -10,14 +10,14 @@ router.get(
   "/getAllOutlets",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisistOutletsPage")
+  checkPermission("isVisitOutletsPage")
 );
 
 router.get(
   "/getAllOutlet/:outletId",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisistOutletsPage")
+  checkPermission("isVisitOutletsPage")
 );
 
 router.post(

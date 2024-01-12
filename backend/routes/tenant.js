@@ -10,7 +10,7 @@ router.get(
   "/getAllTenants",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisistTenantsPage")
+  checkPermission("isVisitTenantsPage")
 );
 
 router.post(
