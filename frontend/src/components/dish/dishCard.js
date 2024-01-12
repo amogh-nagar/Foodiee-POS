@@ -1,7 +1,7 @@
 import { CiEdit } from "react-icons/ci";
 import { getColor } from "../../utils/constants";
 const DishCard = ({ img , name = "XYZ", price = 12 }) => {
-  let styleObj = getColor(img);
+  let styleObj = getColor(img, name);
   return (
     <div className="bg-primary-700 shadow-lg shadow-primary-700 w-48 h-60 border-2 border-[#393C49] rounded-xl">
       <div className="w-full py-2 h-4/5 flex flex-col items-center justify-center">

@@ -6,14 +6,14 @@ import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
 const UserCard = ({
   img = '',
-  userName = "XYZ",
+  name = "XYZ",
   email = "xyz@gmail.com",
   mobile = "1111111111",
   status = 1,
 }) => {
   let styleObj;
   if(img && img.length)
-    styleObj = getColor(img);
+    styleObj = getColor(img, name);
   return (
     <tr className="">
       <td className="py-3">
@@ -23,7 +23,7 @@ const UserCard = ({
       </td>
       <td className="py-3">
         <div className="flex items-center justify-center">
-          <p>{userName}</p>
+          <p>{name}</p>
         </div>
       </td>
       <td className="py-3">

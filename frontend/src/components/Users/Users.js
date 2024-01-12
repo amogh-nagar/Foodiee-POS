@@ -28,19 +28,6 @@ const User = () => {
           </thead>
           <tbody className="">
             <UserCard/>
-            <UserCard status={0}/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
-            <UserCard/>
           </tbody>
         </table>
       </div>
