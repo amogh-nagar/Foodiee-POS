@@ -14,4 +14,5 @@ var outlet = new mongoose.Schema({
   isDeleted: { type: Boolean, default: false },
   isActive: { type: String, default: true },
 });
+outlet.index({ name: "text" });
 module.exports = mongoose.model("Outlet", outlet);

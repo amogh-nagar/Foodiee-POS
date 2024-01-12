@@ -38,7 +38,7 @@ exports.loginUser = function (req, res, next) {
 };
 exports.reLoginUser = function (req, res, next) {
   let token = req.headers?.authorization?.split(" ")[1];
-  const payload = jwt.decode(token);
+  let payload = jwt.decode(token);
   User.findById(payload.userId)
     .then(function (user) {
       if (!user || user.isDeleted || !user.isActive) {
@@ -57,6 +57,12 @@ exports.reLoginUser = function (req, res, next) {
         });
       } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
+          payload = {
+            roles: user.roles,
+            name: user.name,
+            userId: user._id,
+            permissions: user.permissions,
+          };
           token = jwt.sign(payload, process.env.JWT_SECRET);
           return res.status(200).json({
             message: "ReLogged In!",

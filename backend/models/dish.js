@@ -17,7 +17,7 @@ var dish = new mongoose.Schema(
     isDeleted: { type: Boolean, default: false },
     taxes: [
       {
-        id:{type:mongoose.Types.ObjectId,required:true},
+        id: { type: mongoose.Types.ObjectId, required: true },
         name: { type: String, required: true },
         taxAmount: { type: Number, required: true },
       },
@@ -25,4 +25,5 @@ var dish = new mongoose.Schema(
   },
   { timestamps: true }
 );
+dish.index({ name: "text" });
 module.exports = mongoose.model("Dish", dish);

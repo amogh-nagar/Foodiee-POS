@@ -34,4 +34,5 @@ user.methods.isValidPassword = function (password) {
   console.log("password", password);
   return compareSync(password, this.password);
 };
+user.index({ name: "text" });
 module.exports = mongoose.model("User", user);

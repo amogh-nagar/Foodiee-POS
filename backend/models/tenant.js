@@ -7,4 +7,6 @@ var tenant = new mongoose.Schema({
   isDeleted: { type: Boolean, default: false },
   isActive: { type: String, default: true },
 });
+tenant.index({ name: "text" });
+
 module.exports = mongoose.model("Tenant", tenant);
