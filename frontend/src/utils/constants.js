@@ -65,7 +65,7 @@ function hashToRGBA(hash) {
   const red = (hash & 0xff0000) >> 16;
   const green = (hash & 0x00ff00) >> 8;
   const blue = hash & 0x0000ff;
-  const alpha = ((hash & 0xff) / 255).toFixed(2); // Alpha value between 0 and 1
+  const alpha = ((hash & 0xff) / 255).toFixed(2);
 
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
