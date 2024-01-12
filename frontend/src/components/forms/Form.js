@@ -1,5 +1,7 @@
 import { Field, Form, Formik } from "formik";
 import Input from "../../UI/Input";
+import TextArea from "../../UI/TextArea";
+import ImageUpload from "../../UI/ImageUpload";
 
 const CustomForm = ({
   initialValues,
@@ -8,7 +10,7 @@ const CustomForm = ({
   validator,
   fields,
   buttonText,
-  btnClass
+  btnClass,
 }) => {
   return (
     <Formik
@@ -17,11 +19,21 @@ const CustomForm = ({
       validate={validate}
       validator={validator}
     >
-      <Form>
+      <Form className="w-full">
         {fields.map((field, index) => {
+          let Component = Input;
+          if(field.type === "textarea"){
+            Component = TextArea
+          }
+          if(field.type === "imageupload"){
+            Component = ImageUpload
+          }
           if (field.type === "checkbox") {
             return (
-              <label key={index} className="label cursor-pointer inline-flex items-center">
+              <label
+                key={index}
+                className="label cursor-pointer inline-flex items-center"
+              >
                 <Field
                   type={field.type}
                   name={field.name}
@@ -40,12 +52,14 @@ const CustomForm = ({
               id={field.name}
               label={field.label}
               placeholder={field.placeholder}
-              component={Input}
+              component={Component}
             />
           );
         })}
         <button
-          className={`${btnClass ? btnClass : 'w-full h-11'} bg-secondary-300 mt-4 rounded-md font-bold hover:bg-secondary-500`}
+          className={`${
+            btnClass ? btnClass : "w-full h-11"
+          } bg-secondary-300 mt-4 rounded-md font-bold hover:bg-secondary-500`}
           type="submit"
         >
           {buttonText}

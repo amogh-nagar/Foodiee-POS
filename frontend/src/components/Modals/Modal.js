@@ -1,6 +1,6 @@
 import React from 'react'
 import Popup from 'reactjs-popup'
-const Modal = ({ PopUpButton, HeaderText, BodyContent }) => {
+const Modal = ({ PopUpButton, HeaderText, BodyContent, isJSX }) => {
     return (
         <Popup
             trigger={PopUpButton}
@@ -12,7 +12,7 @@ const Modal = ({ PopUpButton, HeaderText, BodyContent }) => {
                 <div className="modal bg-slate-900 text-white">
                     <div className="header px-5 py-3"><HeaderText /></div>
                     <div className='content px-5 py-3 flex justify-center items-center overflow-y-auto h-[30rem] w-[50rem] hide-scrollbar'>
-                        <BodyContent />
+                        {isJSX ? BodyContent : <BodyContent />}
                     </div>
                     <div className="actions px-5 py-3">
                         <button

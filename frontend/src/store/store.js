@@ -22,6 +22,7 @@ function redirectMiddleware(store){
                         store.dispatch(authApi.endpoints.login());
                     } else {
                         const history = createBrowserHistory();
+                        localStorage.clear();
                         history.push('/auth');
                     }
                 }
