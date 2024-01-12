@@ -51,7 +51,7 @@ const ImageUpload = ({ field, form: { touched, errors }, ...props }) => {
           style={styleObj}
           className="bg-primary-700 shadow-lg shadow-primary-700 w-1/2 h-36 text-secondary-500 rounded-xl flex items-center justify-center"
         >
-          {styleObj.backgroundImage ? "" : <p>Preview</p>}
+          {styleObj.backgroundImage ? image.name : <p>Preview</p>}
         </div>
       </div>
       {isError && (
