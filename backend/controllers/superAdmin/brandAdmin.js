@@ -8,11 +8,7 @@ var mongoose = require("mongoose");
 const HttpError = require("../../models/http-error");
 const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
 const redis = require("redis");
-// const client = redis.createClient();
-const {
-  deleteImageFromS3,
-  addImageToS3,
-} = require("../../../aws-services/s3-service/aws-s3");
+const { addImageToS3, deleteImageFromS3 } = require("../../common");
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -21,11 +17,6 @@ const MIME_TYPE_MAP = {
 };
 var itemsPerPage = 9;
 exports.getAdminsOfABrand = function (req, res, next) {
-  if (req.query.page) req.query.page = +req.query.page;
-  var skip =
-    req.query.page && req.query.page != "undefined"
-      ? (parseInt(req.query.page) - 1) * itemsPerPage
-      : 0;
   User.aggregate(
     [
       { $unwind: "$entityDetails" },

@@ -1,4 +1,4 @@
-import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 import {
   useGetAllBrandsSalesQuery,
   useGetAllOutletsSalesQuery,
@@ -70,11 +70,13 @@ function hashToRGBA(hash) {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
+export const itemsPerPage = 20;
+
 export const getColor = function (img, name) {
   let styleObj = {};
   if (img) {
     styleObj.backgroundImage =
-      "linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(" + img + ")";
+      "linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(" + `https://${process.env.REACT_APP_AWS_BUCKET}.s3.ap-south-1.amazonaws.com/${img}` + ")";
     styleObj.backgroundSize = "cover";
     styleObj.color = "white";
     styleObj.backgroundPosition = "center";
@@ -85,6 +87,19 @@ export const getColor = function (img, name) {
     styleObj.backgroundImage = `linear-gradient(${color1}, ${color2})`;
   }
   return styleObj;
+};
+
+export const showToast = (message, type = "error") => {
+  toast[type](message, {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  });
 };
 
 export const permissionToRoleBasedAPIs = {

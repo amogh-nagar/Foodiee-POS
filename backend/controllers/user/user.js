@@ -1,8 +1,7 @@
 var User = require("../../models/user");
 const redis = require("redis");
 const HttpError = require("../../models/http-error");
-const { redis_channels, handleError, emailTemplates, projectUser } = require("../../common");
-const { addImageToS3 } = require("../../aws-services/s3-service/aws-s3");
+const { redis_channels, handleError, emailTemplates, projectUser, addImageToS3, deleteImageFromS3 } = require("../../common");
 const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
 const { default: mongoose } = require("mongoose");
 const client = redis.createClient();

@@ -6,7 +6,6 @@ const ExtractJWT = passportJWT.ExtractJwt;
 const User = require("../models/user");
 const HttpError = require("../models/http-error");
 const redis = require("redis");
-const client = redis.createClient();
 passport.use(
   new JWTStrategy(
     {
@@ -14,10 +13,9 @@ passport.use(
       secretOrKey: process.env.JWT_SECRET,
     },
     function (jwtPayload, done) {
-      User.findById(jwtPayload.id)
+      User.findById(jwtPayload.userId)
         .then(function (user) {
           if (user) {
-            console.log(user)
             return done(null, user);
           } else {
             return done(new Error("No user found"), false);

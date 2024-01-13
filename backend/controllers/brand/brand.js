@@ -1,7 +1,3 @@
-const {
-  addImageToS3,
-  deleteImageFromS3,
-} = require("../../../aws-services/s3-service/aws-s3");
 var mongoose = require("mongoose");
 var Brand = require("../../models/brand");
 var User = require("../../models/user");
@@ -9,7 +5,7 @@ const HttpError = require("../../models/http-error");
 var { v4: uuidv4 } = require("uuid");
 var mongoose = require("mongoose");
 var async = require("async");
-const { MIME_TYPE_MAP } = require("../../common");
+const { MIME_TYPE_MAP, deleteImageFromS3, addImageToS3 } = require("../../common");
 var itemsPerPage = 10;
 
 exports.getBrands = function (req, res, next) {

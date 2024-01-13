@@ -25,7 +25,7 @@ const CustomForm = ({
           if(field.type === "textarea"){
             Component = TextArea
           }
-          if(field.type === "imageupload"){
+          if(field.type === "file"){
             Component = ImageUpload
           }
           if (field.type === "checkbox") {

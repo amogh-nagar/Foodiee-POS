@@ -8,10 +8,6 @@ const HttpError = require("../../models/http-error");
 const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
 const redis = require("redis");
 const client = redis.createClient();
-const {
-  deleteImageFromS3,
-  addImageToS3,
-} = require("../../../aws-services/s3-service/aws-s3");
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 var itemsPerPage = 9;
 var async = require("async");

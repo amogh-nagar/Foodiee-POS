@@ -2,6 +2,7 @@ const HttpError = require("./models/http-error");
 var s3 = require("./aws-services/aws");
 const { default: mongoose } = require("mongoose");
 require("dotenv").config();
+let async = require("async");
 exports.handleError = (res, err) => {
   return res
     .status(500)
@@ -64,7 +65,6 @@ exports.addImageToS3 = function (req, details) {
       resolve();
       return;
     }
-
     var params = {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: details.fileName,
@@ -151,9 +151,9 @@ var mongooseIdArrayFields = [
 ];
 let itemsPerPage = 10;
 exports.itemsPerPage = itemsPerPage;
-exports.checkAndValidateReq = (req, res, next) => {
+exports.checkAndValidateReq = () => (req, res, next) => {
   try {
-    async.each(mongooseIdFields, (entry, cb) => {
+    mongooseIdFields.forEach((entry) => {
       if (req.query[entry]) {
         req.query[entry] = new mongoose.Types.ObjectId(req.query[entry]);
       }
@@ -164,7 +164,7 @@ exports.checkAndValidateReq = (req, res, next) => {
         req.body[entry] = new mongoose.Types.ObjectId(req.body[entry]);
       }
     });
-    async.each(mongooseIdArrayFields, (entry, cb) => {
+    mongooseIdArrayFields.forEach((entry) => {
       if (req.query[entry]) {
         req.query[entry] = req.query[entry].map(
           (ele) => new mongoose.Types.ObjectId(ele)
@@ -174,6 +174,11 @@ exports.checkAndValidateReq = (req, res, next) => {
         req.body[entry] = req.body[entry].map(
           (ele) => new mongoose.Types.ObjectId(ele)
         );
+      }
+    });
+    Object.keys(req.query).forEach((key) => {
+      if (req.query[key] === "undefined" || req.query[key] === "null" || req.query[key].length === 0) {
+        req.query[key] = null;
       }
     });
     if (req.query.page) {
@@ -210,24 +215,23 @@ exports.validateDateFor1Day = (req, res, next) => {
   }
 };
 
-
 exports.validateDateFor1Month = (req, res, next) => {
-    try {
-      if (req.query.startDate) {
-        req.query.startDate = req.body.startDate
-          ? new Date(req.body.startDate)
-          : new Date().setMonth(new Date().getMonth() - 1);
-      }
-      if (req.query.endDate) {
-        req.query.startDate = req.body.endDate
-          ? new Date(req.body.endDate)
-          : new Date();
-      }
-      next();
-    } catch (err) {
-      next(err);
+  try {
+    if (req.query.startDate) {
+      req.query.startDate = req.body.startDate
+        ? new Date(req.body.startDate)
+        : new Date().setMonth(new Date().getMonth() - 1);
     }
-  };
+    if (req.query.endDate) {
+      req.query.startDate = req.body.endDate
+        ? new Date(req.body.endDate)
+        : new Date();
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.MIME_TYPE_MAP = {
   "image/png": "png",

@@ -3,14 +3,10 @@ const HttpError = require("../../models/http-error");
 var mongoose = require("mongoose");
 var { v4: uuidv4 } = require("uuid");
 var DishSuperCategory = require("../../models/dishSuperCategory");
-var DishCategory = require("../../models/dishCategory");
-const {
-  deleteImageFromS3,
-  addImageToS3,
-} = require("../../../aws-services/s3-service/aws-s3");
+var DishCategory = require("../../models/dishCategory")
 var itemsPerPage = 9;
 var async = require("async");
-const { handleError, MIME_TYPE_MAP } = require("../../common");
+const { handleError, MIME_TYPE_MAP, addImageToS3, deleteImageFromS3 } = require("../../common");
 exports.getDishes = function (req, res, next) {
   let query = {};
   if (req.query.brandId) query["brandId"] = req.params.brandId;

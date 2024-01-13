@@ -11,9 +11,7 @@ var mongoose = require("mongoose");
 var url = "mongodb://0.0.0.0:27017/foodOrdering";
 const passport = require("passport");
 const HttpError = require("./models/http-error");
-const authRoutes = require("./routes/auth");
 var fs = require("fs");
-var bodyParser = require("body-parser");
 var port = process.env.PORT || 3030;
 const emailConsumer = require("./aws-services/email-service/aws-consumer");
 const orderConsmer = require("./aws-services/order-service/aws-consumer");
@@ -23,7 +21,6 @@ app.use(express.json());
 app.use(express.urlencoded());
 require("./config/passport");
 require("./firebase");
-app.use("/api", require("./routes"));
 app.use(fileUpload());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 app.use((req, res, next) => {
@@ -36,20 +33,13 @@ app.use((req, res, next) => {
 
   next();
 });
-
-app.use("/api/auth", authRoutes);
-
+app.use("/api", require("./routes"));
 app.use(() => {
   const error = new HttpError("Could not find this route.", 404);
   throw error;
 });
 
 app.use((error, req, res, next) => {
-  if (req.file) {
-    fs.unlink(req.file.path, (err) => {
-      console.log(err);
-    });
-  }
   if (res.headerSent) {
     return next(error);
   }

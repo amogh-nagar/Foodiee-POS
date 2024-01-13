@@ -7,6 +7,8 @@ import useRefreshToken from "./hooks/useRefreshToken";
 import Loader from "./UI/Loaders/Loader";
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken } from "firebase/messaging";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 function Layout() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const refreshToken = useRefreshToken();
@@ -71,6 +73,7 @@ function Layout() {
             <Redirect to={isAuthenticated ? "/" : "/auth"} />
           </Route>
         </Switch>
+        <ToastContainer />
       </div>
     </div>
   );

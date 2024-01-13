@@ -1,28 +1,26 @@
-const {
-  addImageToS3,
-  deleteImageFromS3,
-} = require("../../../aws-services/s3-service/aws-s3");
 var mongoose = require("mongoose");
 var Tenant = require("../../models/tenant");
-var User = require("../../models/user");
 const HttpError = require("../../models/http-error");
 var { v4: uuidv4 } = require("uuid");
 var mongoose = require("mongoose");
 var async = require("async");
-const { MIME_TYPE_MAP } = require("../../common");
-var itemsPerPage = 10;
+const {
+  MIME_TYPE_MAP,
+  addImageToS3,
+  deleteImageFromS3,
+  handleError,
+} = require("../../common");
+var itemsPerPage = 20;
 
 exports.getTenants = function (req, res, next) {
   var skip = req.query.skip;
+  let query = { superAdminId: req.user._id };
+  if (req.query.name) query["$text"] = { $search: req.query.name };
   async.parallel(
     [
       function (cb) {
         Tenant.aggregate(
-          [
-            { $match: { superAdminId: req.user.id } },
-            { $skip: skip },
-            { $limit: itemsPerPage },
-          ],
+          [{ $match: query }, { $skip: skip }, { $limit: itemsPerPage }],
           function (err, data) {
             if (err) return cb(err);
             cb(null, {
@@ -33,7 +31,7 @@ exports.getTenants = function (req, res, next) {
       },
       function (cb) {
         Tenant.aggregate(
-          [{ $match: { superAdminId: req.user.id } }, { $count: "totalItems" }],
+          [{ $match: query }, { $count: "totalItems" }],
           function (err, data) {
             if (err) return cb(err);
             cb(null, {
@@ -80,47 +78,38 @@ exports.getTenant = function (req, res, next) {
 };
 
 exports.createTenant = function (req, res, next) {
-  Tenant.findOne({
-    superAdminId: req.user.id,
-    name: req.body.name,
-  }).then(function (tenant) {
-    if (tenant) {
-      var error = new HttpError("Duplicate Tenant found", 400);
+  var fileName = "";
+
+  if (req.files) {
+    if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
+      var error = new HttpError("Invalid image type", 401);
       return next(error);
     }
-    var fileName = "";
-
-    if (req.files) {
-      if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
-        var error = new HttpError("Invalid image type", 401);
-        return next(error);
-      }
-      fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
-    }
-    addImageToS3(req, {
-      fileName: fileName,
-      data: req.files ? req.files.image.data : "",
-    }).then(function () {
-      let name = req.body.name;
-      let description = req.body.description;
-      var tenant = new Tenant({
-        name: name,
-        image: fileName,
-        description: description,
-        superAdminId: req.user.id,
-      });
-      tenant
-        .save()
-        .then(function (tenant) {
-          res
-            .status(200)
-            .json({ message: "Tenant created successfully", tenant: tenant });
-        })
-        .catch(function (err) {
-          console.log(err);
-          next(err);
-        });
+    fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
+  }
+  addImageToS3(req, {
+    fileName: fileName,
+    data: req.files ? req.files.image.data : "",
+  }).then(function () {
+    let name = req.body.name;
+    let description = req.body.description;
+    var tenant = new Tenant({
+      name: name,
+      image: fileName,
+      description: description,
+      superAdminId: req.user._id,
     });
+    tenant
+      .save()
+      .then(function (tenant) {
+        res
+          .status(200)
+          .json({ message: "Tenant created successfully", tenant: tenant });
+      })
+      .catch(function (err) {
+        console.log(err);
+        next(err);
+      });
   });
 };
 

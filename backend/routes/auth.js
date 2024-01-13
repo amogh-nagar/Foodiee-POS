@@ -1,12 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { check, query, header } = require("express-validator");
-var passport = require("passport");
 const {
   loginUser,
-  reLoginUser,
-  logoutUser,
-  registerUser,
+  reLoginUser
 } = require("../controllers/user/userAuth");
 router.post(
   "/login",
