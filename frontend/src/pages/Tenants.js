@@ -7,18 +7,16 @@ import {
   useCreateTenantMutation,
   useGetAllTenantsQuery,
 } from "../services/tenant";
+import ReactPaginate from "react-paginate";
 import FlexDiv from "../components/Wrappers/FlexDiv";
 import Modal from "../components/Modals/Modal";
 import CustomForm from "../components/forms/Form";
 import Loader from "../UI/Loaders/Loader";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { itemsPerPage, showToast } from "../utils/constants";
 import InfiniteLoader from "../UI/Loaders/InfiniteLoader";
 const Tenants = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [tenants, setTenants] = useState([]);
-  const [hasNextPage, setHasNextPage] = useState(true);
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [
     createTenant,
@@ -31,17 +29,7 @@ const Tenants = () => {
     refetch,
   } = useGetAllTenantsQuery({ name: debouncedTerm, page: page });
   const totalItems = data?.totalItems ?? 0;
-  useEffect(() => {
-    if (data && data.tenants) {
-      const newTenants = data.tenants.filter(
-        (newTenant) =>
-          !tenants.some(
-            (existingTenant) => existingTenant._id === newTenant._id
-          )
-      );
-      setTenants((prev) => [...prev, ...newTenants]);
-    }
-  }, [data]);
+  const tenants = data?.tenants ?? 0;
   const initialValues = {
     name: "",
     description: "",
@@ -64,7 +52,7 @@ const Tenants = () => {
     try {
       const formData = new FormData();
       for (var key in values) {
-        formData.append(key, values[key]);
+        formData.append(key, values[key]?.trim());
       }
       await createTenant(formData).unwrap();
       refetch();
@@ -86,17 +74,9 @@ const Tenants = () => {
 
     return errors;
   };
-  let tenantClickHandler = (tenantId) => {
-    console.log("tenantId", tenantId);
-  };
-  useEffect(() => {
-    let itemsTillNow = (page - 1) * itemsPerPage + itemsPerPage;
-    setHasNextPage(itemsTillNow <= totalItems);
-  }, [page, totalItems]);
-  let fetchMoreData = () => {
-    if (hasNextPage) {
-      setPage((currentPage) => currentPage + 1);
-    }
+  const pageCount = Math.ceil(totalItems / itemsPerPage);
+  const handlePageClick = (event) => {
+    setPage(event.selected + 1);
   };
   return (
     <div>
@@ -156,21 +136,27 @@ const Tenants = () => {
               />
             </div>
             <div className="mx-3">
-              <InfiniteScroll
-                dataLength={tenants.length}
-                next={fetchMoreData}
-                height={690}
-                className="hide-scrollbar"
-                hasMore={hasNextPage || false}
-                loader={<InfiniteLoader />}
-              >
-                <FlexDiv
-                  className="gap-y-4"
-                  Component={EntityCard}
-                  items={tenants}
-                  onClick={tenantClickHandler}
-                />
-              </InfiniteScroll>
+              <FlexDiv
+                className="gap-y-4"
+                Component={EntityCard}
+                items={tenants}
+              />
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel=">"
+                breakClassName=""
+                containerClassName="bg-primary-700 h-12 px-3 flex items-center gap-x-3 w-fit m-auto rounded-xl absolute bottom-4 left-1/2"
+                pageClassName="bg-primary-100 rounded-xl hover:bg-slate-500 w-8 h-8 flex items-center justify-center"
+                activeClassName="bg-slate-500"
+                previousClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                nextClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                disabledClassName=""
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={5}
+                pageCount={pageCount}
+                previousLabel="<"
+                renderOnZeroPageCount={null}
+              />
             </div>
           </>
         )}

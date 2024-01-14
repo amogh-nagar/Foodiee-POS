@@ -14,7 +14,8 @@ export const tenantApi = createApi({
   endpoints: (builder) => ({
     //get all tenants
     getAllTenants: builder.query({
-      query: (query) => `/getTenants?name=${query.name || ''}&page=${query.page}`,
+      query: (query) =>
+        `/getTenants?name=${query?.name || ""}&page=${query?.page}`,
     }),
     //get tenants
     getTenant: builder.query({
@@ -49,6 +50,8 @@ export const tenantApi = createApi({
 
 export const {
   useCreateTenantMutation,
+  useLazyGetAllTenantsQuery,
+  useLazyGetTenantQuery,
   useDeleteTenantMutation,
   useGetAllTenantsQuery,
   useSearchTenantsQuery,

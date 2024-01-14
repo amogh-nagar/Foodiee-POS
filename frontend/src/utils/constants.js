@@ -74,9 +74,11 @@ export const itemsPerPage = 20;
 
 export const getColor = function (img, name) {
   let styleObj = {};
-  if (img) {
+  if (img && img.length > 0) {
     styleObj.backgroundImage =
-      "linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(" + `https://${process.env.REACT_APP_AWS_BUCKET}.s3.ap-south-1.amazonaws.com/${img}` + ")";
+      "linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(" +
+      `https://${process.env.REACT_APP_AWS_BUCKET}.s3.ap-south-1.amazonaws.com/${img}` +
+      ")";
     styleObj.backgroundSize = "cover";
     styleObj.color = "white";
     styleObj.backgroundPosition = "center";
