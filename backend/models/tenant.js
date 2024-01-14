@@ -5,7 +5,7 @@ var tenant = new mongoose.Schema({
   description: { type: String },
   superAdminId: { type: mongoose.Types.ObjectId, required: true },
   isDeleted: { type: Boolean, default: false },
-  isActive: { type: String, default: true },
+  isActive: { type: Boolean, default: true },
 });
 tenant.index({ name: "text" });
 

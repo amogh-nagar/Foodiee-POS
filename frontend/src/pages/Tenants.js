@@ -5,7 +5,9 @@ import EntityCard from "../components/Entity/EntityCard";
 import debounce from "lodash.debounce";
 import {
   useCreateTenantMutation,
+  useDeleteTenantMutation,
   useGetAllTenantsQuery,
+  useUpdateTenantMutation,
 } from "../services/tenant";
 import ReactPaginate from "react-paginate";
 import FlexDiv from "../components/Wrappers/FlexDiv";
@@ -22,6 +24,14 @@ const Tenants = () => {
     createTenant,
     { isLoading: isCreateTenantLoading, isError: isCreateTenantError },
   ] = useCreateTenantMutation();
+  const [
+    updateTenant,
+    { isLoading: isUpdateTenantLoading, isError: isUpdateTenantError },
+  ] = useUpdateTenantMutation();
+  const [
+    deleteTenant,
+    { isLoading: isDeleteTenantLoading, isError: isDeleteTenantError },
+  ] = useDeleteTenantMutation();
   const {
     data,
     isError: isGetAllTenantsError,
@@ -30,6 +40,16 @@ const Tenants = () => {
   } = useGetAllTenantsQuery({ name: debouncedTerm, page: page });
   const totalItems = data?.totalItems ?? 0;
   const tenants = data?.tenants ?? 0;
+  const isLoading =
+    isCreateTenantLoading ||
+    isGetAllTenantsLoading ||
+    isUpdateTenantLoading ||
+    isDeleteTenantLoading;
+  const isError =
+    isCreateTenantError ||
+    isGetAllTenantsError ||
+    isUpdateTenantError ||
+    isDeleteTenantError;
   const initialValues = {
     name: "",
     description: "",
@@ -59,7 +79,7 @@ const Tenants = () => {
       showToast("Tenant Created Successfully", "success");
     } catch (err) {
       console.log("Some error occurred", err);
-      showToast(err.message);
+      showToast(err?.data?.message || "Some error occurred!");
     }
   };
   const validate = (values) => {
@@ -78,11 +98,29 @@ const Tenants = () => {
   const handlePageClick = (event) => {
     setPage(event.selected + 1);
   };
+  const onEditBtnClick = async (values) => {
+    try {
+      const formData = new FormData();
+      for (var key in values) {
+        formData.append(
+          key,
+          typeof values[key] === "string" ? values[key]?.trim() : values[key]
+        );
+      }
+      await updateTenant(formData).unwrap();
+      refetch();
+      showToast("Tenant Updated Successfully", "success");
+    } catch (err) {
+      console.log("Some error occurred", err);
+      showToast(err?.data?.message || "Some error occurred!");
+    }
+  };
+  console.log("tenants", tenants);
   return (
     <div>
       <PageNameWithDate name="Tenants" />
       <div>
-        {isCreateTenantLoading || isGetAllTenantsLoading ? (
+        {isLoading ? (
           <Loader />
         ) : (
           <>
@@ -140,6 +178,35 @@ const Tenants = () => {
                 className="gap-y-4"
                 Component={EntityCard}
                 items={tenants}
+                showEditBtn={true}
+                validateUpdate={validate}
+                onEditBtnClick={onEditBtnClick}
+                updateHeaderText={() => <h3>Update Tenant</h3>}
+                updateFields={[
+                  {
+                    type: "text",
+                    name: "name",
+                    label: "Name",
+                    placeholder: "Tenant Name",
+                  },
+                  {
+                    type: "textarea",
+                    name: "description",
+                    label: "Description",
+                    placeholder: "Tenant Description",
+                  },
+                  {
+                    type: "file",
+                    name: "image",
+                    label: "Image",
+                    placeholder: "Tenant Image",
+                  },
+                  {
+                    type: "toggle",
+                    name: "isActive",
+                    label: "Active",
+                  },
+                ]}
               />
               <ReactPaginate
                 breakLabel="..."

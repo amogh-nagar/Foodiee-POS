@@ -78,87 +78,105 @@ exports.getTenant = function (req, res, next) {
 };
 
 exports.createTenant = function (req, res, next) {
-  var fileName = "";
-
-  if (req.files) {
-    if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
-      var error = new HttpError("Invalid image type", 401);
-      return next(error);
-    }
-    fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
-  }
-  addImageToS3(req, {
-    fileName: fileName,
-    data: req.files ? req.files.image.data : "",
-  }).then(function () {
-    let name = req.body.name;
-    let description = req.body.description;
-    var tenant = new Tenant({
-      name: name,
-      image: fileName,
-      description: description,
-      superAdminId: req.user._id,
-    });
-    tenant
-      .save()
-      .then(function (tenant) {
-        res
-          .status(200)
-          .json({ message: "Tenant created successfully", tenant: tenant });
-      })
-      .catch(function (err) {
-        console.log(err);
-        next(err);
-      });
-  });
-};
-
-exports.updateTenant = function (req, res, next) {
   Tenant.findOne({
-    _id: req.query.tenantId,
-  }).then(function (oldTenant) {
-    if (!oldTenant) {
-      var error = new HttpError("Tenant not found", 400);
+    superAdminId: req.user._id,
+    name: req.body.name,
+  }).then(function (tenant) {
+    if (tenant) {
+      const error = new HttpError("Duplicate Tenant Found", 400);
       return next(error);
     }
     var fileName = "";
+
     if (req.files) {
       if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
         var error = new HttpError("Invalid image type", 401);
         return next(error);
       }
       fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
-      deleteImageFromS3({
-        fileName: oldTenant.image,
-      });
-      oldTenant.image = fileName;
     }
     addImageToS3(req, {
       fileName: fileName,
       data: req.files ? req.files.image.data : "",
     }).then(function () {
-      oldTenant.name = req.body.name ? req.body.name : oldTenant.name;
-      oldTenant.description = req.body.description
-        ? req.body.description
-        : oldTenant.description;
-      oldTenant.isDeleted = req.body.isDeleted
-        ? req.body.isDeleted
-        : oldTenant.isDeleted;
-      oldTenant.isActive = req.body.isActive
-        ? req.body.isActive
-        : oldTenant.isActive;
-      oldTenant
+      let name = req.body.name;
+      let description = req.body.description;
+      var tenant = new Tenant({
+        name: name,
+        image: fileName,
+        description: description,
+        superAdminId: req.user._id,
+      });
+      tenant
         .save()
-        .then(function (newTenant) {
-          res.status(200).json({
-            message: "Tenant Updated",
-            tenant: newTenant,
-          });
+        .then(function (tenant) {
+          res
+            .status(200)
+            .json({ message: "Tenant created successfully", tenant: tenant });
         })
         .catch(function (err) {
           console.log(err);
           next(err);
         });
+    });
+  });
+};
+
+exports.updateTenant = function (req, res, next) {
+  console.log("req.body---", req.body);
+  Tenant.findOne({
+    superAdminId: req.user._id,
+    name: req.body.name,
+    _id: {
+      $ne: req.body.tenantId,
+    },
+  }).then(function (tenant) {
+    if (tenant) {
+      const error = new HttpError("Duplicate Tenant Found", 400);
+      return next(error);
+    }
+    Tenant.findOne({
+      _id: req.body.tenantId,
+    }).then(function (oldTenant) {
+      if (!oldTenant) {
+        var error = new HttpError("Tenant not found", 400);
+        return next(error);
+      }
+      var fileName = "";
+      if (req.files) {
+        if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
+          var error = new HttpError("Invalid image type", 401);
+          return next(error);
+        }
+        fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
+        deleteImageFromS3({
+          fileName: oldTenant.image,
+        });
+        oldTenant.image = fileName;
+      }
+      addImageToS3(req, {
+        fileName: fileName,
+        data: req.files ? req.files.image.data : "",
+      }).then(function () {
+        oldTenant.name = req.body.name ? req.body.name : oldTenant.name;
+        oldTenant.description = req.body.description
+          ? req.body.description
+          : oldTenant.description;
+        oldTenant.isDeleted = req.body.isDeleted ?? oldTenant.isDeleted;
+        oldTenant.isActive = req.body.isActive ?? oldTenant.isActive;
+        oldTenant
+          .save()
+          .then(function (newTenant) {
+            res.status(200).json({
+              message: "Tenant Updated",
+              tenant: newTenant,
+            });
+          })
+          .catch(function (err) {
+            console.log(err);
+            next(err);
+          });
+      });
     });
   });
 };

@@ -5,7 +5,7 @@ const { check, query } = require("express-validator");
 var passport = require("passport");
 var checkRole = require("../middleware/check-role");
 var checkPermission = require("../middleware/check-permission");
-const { createTenant, getTenants, searchTenants } = require("../controllers/Tenant/tenant");
+const { createTenant, getTenants, searchTenants, updateTenant } = require("../controllers/Tenant/tenant");
 const { checkAndValidateReq } = require("../common");
 
 router.get(
@@ -22,6 +22,7 @@ router.post(
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isCreateTenants"),
+  checkAndValidateReq(),
   createTenant
 );
 
@@ -29,7 +30,9 @@ router.patch(
   "/updateTenant",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isUpdateTenants")
+  checkPermission("isUpdateTenants"),
+  checkAndValidateReq(),
+  updateTenant
 );
 
 router.delete(

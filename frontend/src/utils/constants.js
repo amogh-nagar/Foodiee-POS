@@ -72,6 +72,13 @@ function hashToRGBA(hash) {
 
 export const itemsPerPage = 20;
 
+export const checkForSame = (objectToCompare, ObjectWithCompare) => {
+  Object.keys(ObjectWithCompare).forEach((key) => {
+    if (objectToCompare[key] != ObjectWithCompare[key]) return false;
+  });
+  return true;
+};
+
 export const getColor = function (img, name) {
   let styleObj = {};
   if (img && img.length > 0) {

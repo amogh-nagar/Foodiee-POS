@@ -12,7 +12,7 @@ var outlet = new mongoose.Schema({
     name: { type: String, required: true },
   },
   isDeleted: { type: Boolean, default: false },
-  isActive: { type: String, default: true },
+  isActive: { type: Boolean, default: true },
 });
 outlet.index({ name: "text" });
 module.exports = mongoose.model("Outlet", outlet);

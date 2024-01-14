@@ -2,6 +2,7 @@ import { Field, Form, Formik } from "formik";
 import Input from "../../UI/Input";
 import TextArea from "../../UI/TextArea";
 import ImageUpload from "../../UI/ImageUpload";
+import ToggleBtn from "../Buttons/ToggleBtn";
 
 const CustomForm = ({
   initialValues,
@@ -27,6 +28,9 @@ const CustomForm = ({
           }
           if(field.type === "file"){
             Component = ImageUpload
+          }
+          if(field.type === "toggle"){
+            Component = ToggleBtn
           }
           if (field.type === "checkbox") {
             return (
