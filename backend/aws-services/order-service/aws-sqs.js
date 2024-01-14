@@ -9,7 +9,7 @@ const { default: mongoose } = require("mongoose");
 const { emailTemplates } = require("../../common");
 function deleteMessage(data) {
   const deleteParams = {
-    QueueUrl: process.env.SQS_QUEUE_ORDER_URL,
+    QueueUrl: process.env.AWS_SQS_QUEUE_ORDER_URL,
     ReceiptHandle: data.ReceiptHandle,
   };
   sqs.deleteMessage(deleteParams, (err, data) => {
@@ -86,7 +86,7 @@ exports.addToQueueOrder = function (details) {
   console.log("Adding to queue");
   const params = {
     MessageBody: JSON.stringify(details),
-    QueueUrl: process.env.SQS_QUEUE_ORDER_URL,
+    QueueUrl: process.env.AWS_SQS_QUEUE_ORDER_URL,
   };
   sqs.sendMessage(params, (err, data) => {
     if (err) {

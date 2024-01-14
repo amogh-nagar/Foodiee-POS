@@ -177,20 +177,22 @@ exports.checkAndValidateReq = () => (req, res, next) => {
       }
     });
     Object.keys(req.query).forEach((key) => {
-      if (req.query[key] === "undefined" || req.query[key] === "null" || req.query[key].length === 0) {
+      if (key == "page") {
+        if (
+          req.query[key] === "undefined" ||
+          req.query[key] === "null" ||
+          req.query[key].length === 0
+        )
+          req.query[key] = 1;
+        else req.query[key] = +req.query[key];
+      } else if (
+        req.query[key] === "undefined" ||
+        req.query[key] === "null" ||
+        req.query[key].length === 0
+      ) {
         req.query[key] = null;
       }
     });
-    if (req.query.page) {
-      req.query.page = +req.query.page;
-      req.query.skip =
-        req.query.page && req.query.page != "undefined"
-          ? (parseInt(req.query.page) - 1) * itemsPerPage
-          : 0;
-    } else {
-      req.query.page = 0;
-      req.query.skip = 0;
-    }
     next();
   } catch (err) {
     next(err);

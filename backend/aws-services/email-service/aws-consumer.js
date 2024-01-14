@@ -5,7 +5,7 @@ var sqs = require("../sqs");
 
 module.exports = function(){  
   const app = Consumer.create({
-    queueUrl: process.env.SENDGRID_SQS_QUEUE_EMAIL_URL,
+    queueUrl: process.env.AWS_SQS_QUEUE_EMAIL_URL,
     handleMessageBatch:async (message) => {
       receiveMessage(message[0]);
     },

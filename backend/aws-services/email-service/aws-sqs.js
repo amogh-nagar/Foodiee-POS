@@ -5,7 +5,7 @@ sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 function deleteMessage(data) {
   const deleteParams = {
-    QueueUrl: process.env.SENDGRID_SQS_QUEUE_EMAIL_URL,
+    QueueUrl: process.env.AWS_SQS_QUEUE_EMAIL_URL,
     ReceiptHandle: data.ReceiptHandle,
   };
   sqs.deleteMessage(deleteParams, (err, data) => {
@@ -39,7 +39,7 @@ function receiveMessage(message) {
 exports.addToQueue = function (details) {
   const params = {
     MessageBody: JSON.stringify(details),
-    QueueUrl: process.env.SENDGRID_SQS_QUEUE_EMAIL_URL,
+    QueueUrl: process.env.AWS_SQS_QUEUE_EMAIL_URL,
   };
   sqs.sendMessage(params, (err, data) => {
     if (err) {

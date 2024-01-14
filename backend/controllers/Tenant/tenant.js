@@ -13,7 +13,7 @@ const {
 var itemsPerPage = 20;
 
 exports.getTenants = function (req, res, next) {
-  var skip = req.query.skip;
+  var skip = (req.query.page - 1) * itemsPerPage;
   let query = { superAdminId: req.user._id };
   if (req.query.name) query["$text"] = { $search: req.query.name };
   async.parallel(

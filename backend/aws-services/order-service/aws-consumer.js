@@ -5,7 +5,7 @@ var sqs = require("../sqs");
 
 module.exports = function(){  
   const app = Consumer.create({
-    queueUrl: process.env.SQS_QUEUE_ORDER_URL,
+    queueUrl: process.env.AWS_SQS_QUEUE_ORDER_URL,
     handleMessageBatch:async (message) => {
       receiveMessageOrder(message[0]);
     },
