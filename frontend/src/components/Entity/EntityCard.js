@@ -21,13 +21,14 @@ const EntityCard = React.forwardRef(
     },
     ref
   ) => {
-    let styleObj = getColor(image, name);
-    console.log("isActive", isActive);
+    let styleObj = getColor(image, name, !isActive);
     return (
       <div
         ref={ref}
         style={styleObj}
-        className="h-72 max-h-96 w-56 rounded-lg flex items-end cursor-pointer flex-col"
+        className={`h-72 max-h-96 w-56 rounded-lg flex items-end flex-col ${
+          isActive && "cursor-pointer"
+        }`}
       >
         {showEditBtn && (
           <>
@@ -73,19 +74,23 @@ const EntityCard = React.forwardRef(
             </div>
           </>
         )}
-        <Link
-          to={{
-            pathname: "/brands",
-            state: { selectedTenant: { _id: args?._id, name: name } },
-          }}
+        <div
+          className={`${isActive ? "cursor-pointer" : "pointer-events-none"}`}
         >
-          <div className="h-64 max-h-96 w-56 rounded-lg flex items-end cursor-pointer">
-            <div className="inner-div rounded-lg before:rounded-lg w-full h-32 max-h-80 px-2 py-3">
-              <h4 className="text-xl">{name}</h4>
-              <p className="text-md">{description}</p>
+          <Link
+            to={{
+              pathname: "/brands",
+              state: { selectedTenant: { _id: args?._id, name: name } },
+            }}
+          >
+            <div className={`h-64 max-h-96 w-56 rounded-lg flex items-end `}>
+              <div className="inner-div rounded-lg before:rounded-lg w-full h-32 max-h-80 px-2 py-3">
+                <h4 className="text-xl">{name}</h4>
+                <p className="text-md">{description}</p>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
       </div>
     );
   }

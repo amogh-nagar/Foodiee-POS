@@ -73,17 +73,20 @@ function hashToRGBA(hash) {
 export const itemsPerPage = 20;
 
 export const checkForSame = (objectToCompare, ObjectWithCompare) => {
+  let isSame = true;
   Object.keys(ObjectWithCompare).forEach((key) => {
-    if (objectToCompare[key] != ObjectWithCompare[key]) return false;
+    if (objectToCompare[key] != ObjectWithCompare[key]) isSame = false;
   });
-  return true;
+  return isSame;
 };
 
-export const getColor = function (img, name) {
+export const getColor = function (img, name, isDisabled) {
   let styleObj = {};
   if (img && img.length > 0) {
     styleObj.backgroundImage =
-      "linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url(" +
+      `linear-gradient(rgba(0,0,0,${isDisabled ? 0.9 : 0}), rgba(0,0,0,${
+        isDisabled ? 0.9 : 0
+      })), url(` +
       `https://${process.env.REACT_APP_AWS_BUCKET}.s3.ap-south-1.amazonaws.com/${img}` +
       ")";
     styleObj.backgroundSize = "cover";
