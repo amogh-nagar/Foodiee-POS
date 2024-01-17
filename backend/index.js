@@ -11,11 +11,19 @@ var mongoose = require("mongoose");
 var url = "mongodb://0.0.0.0:27017/foodOrdering";
 const passport = require("passport");
 const HttpError = require("./models/http-error");
-var fs = require("fs");
+const morgan = require("morgan")
 var port = process.env.PORT || 3030;
 const emailConsumer = require("./aws-services/email-service/aws-consumer");
 const orderConsmer = require("./aws-services/order-service/aws-consumer");
 const { redis_channels } = require("./common");
+const { rateLimit } = require('express-rate-limit')
+
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, 
+	limit: 100,
+})
+app.use(limiter)
+app.use(morgan('dev'));
 app.use(passport.initialize());
 app.use(express.json());
 app.use(express.urlencoded());

@@ -39,7 +39,7 @@ const Tenants = () => {
     refetch,
   } = useGetAllTenantsQuery({ name: debouncedTerm, page: page });
   const totalItems = data?.totalItems ?? 0;
-  const tenants = data?.tenants ?? 0;
+  const tenants = data?.tenants ?? [];
   const isLoading =
     isCreateTenantLoading ||
     isGetAllTenantsLoading ||
@@ -72,7 +72,10 @@ const Tenants = () => {
     try {
       const formData = new FormData();
       for (var key in values) {
-        formData.append(key, values[key]?.trim());
+        formData.append(
+          key,
+          typeof values[key] === "string" ? values[key]?.trim() : values[key]
+        );
       }
       await createTenant(formData).unwrap();
       refetch();
@@ -115,7 +118,6 @@ const Tenants = () => {
       showToast(err?.data?.message || "Some error occurred!");
     }
   };
-  console.log("tenants", tenants);
   return (
     <div>
       <PageNameWithDate name="Tenants" />
@@ -174,56 +176,66 @@ const Tenants = () => {
               />
             </div>
             <div className="mx-3">
-              <FlexDiv
-                className="gap-y-4"
-                Component={EntityCard}
-                items={tenants}
-                showEditBtn={true}
-                validateUpdate={validate}
-                onEditBtnClick={onEditBtnClick}
-                updateHeaderText={() => <h3>Update Tenant</h3>}
-                updateFields={[
-                  {
-                    type: "text",
-                    name: "name",
-                    label: "Name",
-                    placeholder: "Tenant Name",
-                  },
-                  {
-                    type: "textarea",
-                    name: "description",
-                    label: "Description",
-                    placeholder: "Tenant Description",
-                  },
-                  {
-                    type: "file",
-                    name: "image",
-                    label: "Image",
-                    placeholder: "Tenant Image",
-                  },
-                  {
-                    type: "toggle",
-                    name: "isActive",
-                    label: "Active",
-                  },
-                ]}
-              />
-              <ReactPaginate
-                breakLabel="..."
-                nextLabel=">"
-                breakClassName=""
-                containerClassName="bg-primary-700 h-12 px-3 flex items-center gap-x-3 w-fit m-auto rounded-xl absolute bottom-4 left-1/2"
-                pageClassName="bg-primary-100 rounded-xl hover:bg-slate-500 w-8 h-8 flex items-center justify-center"
-                activeClassName="bg-slate-500"
-                previousClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
-                nextClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
-                disabledClassName=""
-                onPageChange={handlePageClick}
-                pageRangeDisplayed={5}
-                pageCount={pageCount}
-                previousLabel="<"
-                renderOnZeroPageCount={null}
-              />
+              {tenants?.length ? (
+                <>
+                  {" "}
+                  <FlexDiv
+                    className="gap-y-4"
+                    Component={EntityCard}
+                    items={tenants}
+                    showEditBtn={true}
+                    validateUpdate={validate}
+                    onEditBtnClick={onEditBtnClick}
+                    cardOnClickURL="/brands"
+                    updateHeaderText={() => <h3>Update Tenant</h3>}
+                    updateFields={[
+                      {
+                        type: "text",
+                        name: "name",
+                        label: "Name",
+                        placeholder: "Tenant Name",
+                      },
+                      {
+                        type: "textarea",
+                        name: "description",
+                        label: "Description",
+                        placeholder: "Tenant Description",
+                      },
+                      {
+                        type: "file",
+                        name: "image",
+                        label: "Image",
+                        placeholder: "Tenant Image",
+                      },
+                      {
+                        type: "toggle",
+                        name: "isActive",
+                        label: "Active",
+                      },
+                    ]}
+                  />
+                  <ReactPaginate
+                    breakLabel="..."
+                    nextLabel=">"
+                    breakClassName=""
+                    containerClassName="bg-primary-700 h-12 px-3 flex items-center gap-x-3 w-fit m-auto rounded-xl absolute bottom-4 left-1/2"
+                    pageClassName="bg-primary-100 rounded-xl hover:bg-slate-500 w-8 h-8 flex items-center justify-center"
+                    activeClassName="bg-slate-500"
+                    previousClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                    nextClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                    disabledClassName=""
+                    onPageChange={handlePageClick}
+                    pageRangeDisplayed={5}
+                    pageCount={pageCount}
+                    previousLabel="<"
+                    renderOnZeroPageCount={null}
+                  />
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <h4>No Tenants Available</h4>
+                </div>
+              )}
             </div>
           </>
         )}

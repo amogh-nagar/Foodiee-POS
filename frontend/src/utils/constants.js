@@ -61,13 +61,15 @@ function stringToHash(str) {
   return hash;
 }
 
-function hashToRGBA(hash) {
+function hashToRGBA(hash, isDisabled) {
   const red = (hash & 0xff0000) >> 16;
   const green = (hash & 0x00ff00) >> 8;
   const blue = hash & 0x0000ff;
   const alpha = ((hash & 0xff) / 255).toFixed(2);
 
-  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+  return isDisabled
+    ? "rgba(0,0,0,0.9)"
+    : `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
 export const itemsPerPage = 20;
@@ -94,8 +96,8 @@ export const getColor = function (img, name, isDisabled) {
     styleObj.backgroundPosition = "center";
   } else {
     const hash = stringToHash(name);
-    const color1 = hashToRGBA(hash);
-    const color2 = hashToRGBA(~hash);
+    const color1 = hashToRGBA(hash, isDisabled);
+    const color2 = hashToRGBA(~hash, isDisabled);
     styleObj.backgroundImage = `linear-gradient(${color1}, ${color2})`;
   }
   return styleObj;

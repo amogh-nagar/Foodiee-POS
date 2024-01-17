@@ -5,12 +5,16 @@ const { check, query } = require("express-validator");
 var passport = require("passport");
 var checkRole = require("../middleware/check-role");
 var checkPermission = require("../middleware/check-permission");
+const { checkAndValidateReq } = require("../common");
+const { getBrands, createBrand, updateBrand } = require("../controllers/brand/brand");
 
 router.get(
-  "/getAllBrands",
+  "/getBrands",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisitBrandsPage")
+  checkPermission("isVisitBrandsPage"),
+  checkAndValidateReq(),
+  getBrands
 );
 
 router.get(
@@ -24,14 +28,18 @@ router.post(
   "/createBrand",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isCreateBrands")
+  checkPermission("isCreateBrands"),
+  checkAndValidateReq(),
+  createBrand
 );
 
 router.patch(
   "/updateBrand",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isUpdateBrands")
+  checkPermission("isUpdateBrands"),
+  checkAndValidateReq(),
+  updateBrand
 );
 
 router.delete(

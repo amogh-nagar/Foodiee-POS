@@ -5,31 +5,45 @@ const HttpError = require("../../models/http-error");
 var { v4: uuidv4 } = require("uuid");
 var mongoose = require("mongoose");
 var async = require("async");
-const { MIME_TYPE_MAP, deleteImageFromS3, addImageToS3 } = require("../../common");
+const {
+  MIME_TYPE_MAP,
+  deleteImageFromS3,
+  addImageToS3,
+  handleError,
+} = require("../../common");
 var itemsPerPage = 10;
 
 exports.getBrands = function (req, res, next) {
-  var skip = req.query.skip;
+  var skip = (req.query.page - 1) * itemsPerPage;
+  let query = {};
+  if (req.query.tenantId)
+    query = {
+      tenantId: req.query.tenantId,
+    };
+  if (req.query.name) query["$text"] = { $search: req.query.name };
+  let aggPipeline = [
+    { $match: query },
+    { $project: { _id: 1, name: 1, description: 1, image: 1, isActive: 1 } },
+    { $skip: skip },
+    { $limit: itemsPerPage },
+  ];
+  if (req.query.getAll) {
+    aggPipeline = aggPipeline.slice(0, 2);
+    aggPipeline[1]["$project"] = { name: 1 };
+  }
   async.parallel(
     [
       function (cb) {
-        Brand.aggregate(
-          [
-            { $match: { tenantId: req.body.tenantId } },
-            { $skip: skip },
-            { $limit: itemsPerPage },
-          ],
-          function (err, data) {
-            if (err) return cb(err);
-            cb(null, {
-              brands: data.length == 0 ? [] : data,
-            });
-          }
-        );
+        Brand.aggregate(aggPipeline, function (err, data) {
+          if (err) return cb(err);
+          cb(null, {
+            brands: data.length == 0 ? [] : data,
+          });
+        });
       },
       function (cb) {
         Brand.aggregate(
-          [{ $match: { tenantId: req.body.tenantId } }, { $count: "totalItems" }],
+          [{ $match: query }, { $count: "totalItems" }],
           function (err, data) {
             if (err) return cb(err);
             cb(null, {
@@ -123,50 +137,51 @@ exports.createBrand = function (req, res, next) {
 
 exports.updateBrand = function (req, res, next) {
   Brand.findOne({
-    _id: req.query.brandId,
+    name: req.body.name,
+    tenantId: {
+      $ne: req.body.tenantId,
+    },
   }).then(function (oldbrand) {
-    if (!oldbrand) {
+    if (oldbrand) {
       var error = new HttpError("Brand not found", 404);
       return next(error);
     }
-    var fileName = "";
-    if (req.files) {
-      if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
-        var error = new HttpError("Invalid image type", 401);
-        return next(error);
-      }
-      fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
-      deleteImageFromS3({
-        fileName: oldbrand.image,
-      });
-      oldbrand.image = fileName;
-    }
-    addImageToS3(req, {
-      fileName: fileName,
-      data: req.files ? req.files.image.data : "",
-    }).then(function () {
-      oldbrand.name = req.body.name ? req.body.name : oldbrand.name;
-      oldbrand.description = req.body.description
-        ? req.body.description
-        : oldbrand.description;
-      oldbrand.isDeleted = req.body.isDeleted
-        ? req.body.isDeleted
-        : oldbrand.isDeleted;
-      oldbrand.isActive = req.body.isActive
-        ? req.body.isActive
-        : oldbrand.isActive;
-      oldbrand
-        .save()
-        .then(function (newBrand) {
-          res.status(200).json({
-            message: "Brand Updated",
-            brand: newBrand,
-          });
-        })
-        .catch(function (err) {
-          console.log(err);
-          next(err);
+    Brand.findOne({
+      _id: req.body.entityId,
+    }).then(function (oldbrand) {
+      var fileName = "";
+      if (req.files) {
+        if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
+          var error = new HttpError("Invalid image type", 400);
+          return next(error);
+        }
+        fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
+        deleteImageFromS3({
+          fileName: oldbrand.image,
         });
+        oldbrand.image = fileName;
+      }
+      addImageToS3(req, {
+        fileName: fileName,
+        data: req.files ? req.files.image.data : "",
+      }).then(function () {
+        oldbrand.name = req.body.name ?? oldbrand.name;
+        oldbrand.description = req.body.description ?? oldbrand.description;
+        oldbrand.isDeleted = req.body.isDeleted ?? oldbrand.isDeleted;
+        oldbrand.isActive = req.body.isActive ?? oldbrand.isActive;
+        oldbrand
+          .save()
+          .then(function (newBrand) {
+            res.status(200).json({
+              message: "Brand Updated",
+              brand: newBrand,
+            });
+          })
+          .catch(function (err) {
+            console.log(err);
+            next(err);
+          });
+      });
     });
   });
 };

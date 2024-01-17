@@ -15,7 +15,10 @@ export const tenantApi = createApi({
     //get all tenants
     getAllTenants: builder.query({
       query: (query) =>
-        `/getTenants?name=${query?.name || ""}&page=${query?.page}`,
+        `/getTenants?` +
+        (query.getAll
+          ? "getAll=true"
+          : `name=${query?.name || ""}&page=${query?.page || 0}`),
     }),
     //get tenants
     getTenant: builder.query({

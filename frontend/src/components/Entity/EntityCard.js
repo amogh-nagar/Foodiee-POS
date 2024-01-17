@@ -16,6 +16,7 @@ const EntityCard = React.forwardRef(
       validateUpdate,
       updateFields,
       updateHeaderText,
+      cardOnClickURL,
       showEditBtn = false,
       ...args
     },
@@ -60,7 +61,7 @@ const EntityCard = React.forwardRef(
                           isActive,
                         })
                       )
-                        onEditBtnClick({ tenantId: args?._id, ...values });
+                        onEditBtnClick({ entityId: args?._id, ...values });
                       else showToast("Nothing to Update", "info");
                     }}
                     validate={validateUpdate}
@@ -79,8 +80,9 @@ const EntityCard = React.forwardRef(
         >
           <Link
             to={{
-              pathname: "/brands",
-              state: { selectedTenant: { _id: args?._id, name: name } },
+
+              pathname: cardOnClickURL,
+              state: { selectedEntity: { _id: args?._id, name: name } },
             }}
           >
             <div className={`h-64 max-h-96 w-56 rounded-lg flex items-end `}>

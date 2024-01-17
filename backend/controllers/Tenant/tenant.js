@@ -16,18 +16,25 @@ exports.getTenants = function (req, res, next) {
   var skip = (req.query.page - 1) * itemsPerPage;
   let query = { superAdminId: req.user._id };
   if (req.query.name) query["$text"] = { $search: req.query.name };
+  let aggPipeline = [
+    { $match: query },
+    { $project: { _id: 1, name: 1, description: 1, image: 1, isActive: 1 } },
+    { $skip: skip },
+    { $limit: itemsPerPage },
+  ];
+  if (req.query.getAll) {
+    aggPipeline = aggPipeline.slice(0, 2);
+    aggPipeline[1]["$project"] = { name: 1 };
+  }
   async.parallel(
     [
       function (cb) {
-        Tenant.aggregate(
-          [{ $match: query }, { $skip: skip }, { $limit: itemsPerPage }],
-          function (err, data) {
-            if (err) return cb(err);
-            cb(null, {
-              tenants: data.length == 0 ? [] : data,
-            });
-          }
-        );
+        Tenant.aggregate(aggPipeline, function (err, data) {
+          if (err) return cb(err);
+          cb(null, {
+            tenants: data.length == 0 ? [] : data,
+          });
+        });
       },
       function (cb) {
         Tenant.aggregate(
@@ -59,7 +66,7 @@ exports.getTenants = function (req, res, next) {
 
 exports.getTenant = function (req, res, next) {
   Tenant.findOne({
-    _id: mongoose.Types.ObjectId(req.params.tenantId),
+    _id: mongoose.Types.ObjectId(req.params.entityId),
   })
     .then(function (tenant) {
       if (!tenant) {
@@ -123,12 +130,11 @@ exports.createTenant = function (req, res, next) {
 };
 
 exports.updateTenant = function (req, res, next) {
-  console.log("req.body---", req.body);
   Tenant.findOne({
     superAdminId: req.user._id,
     name: req.body.name,
     _id: {
-      $ne: req.body.tenantId,
+      $ne: req.body.entityId,
     },
   }).then(function (tenant) {
     if (tenant) {
@@ -136,7 +142,7 @@ exports.updateTenant = function (req, res, next) {
       return next(error);
     }
     Tenant.findOne({
-      _id: req.body.tenantId,
+      _id: req.body.entityId,
     }).then(function (oldTenant) {
       if (!oldTenant) {
         var error = new HttpError("Tenant not found", 400);
@@ -158,10 +164,8 @@ exports.updateTenant = function (req, res, next) {
         fileName: fileName,
         data: req.files ? req.files.image.data : "",
       }).then(function () {
-        oldTenant.name = req.body.name ? req.body.name : oldTenant.name;
-        oldTenant.description = req.body.description
-          ? req.body.description
-          : oldTenant.description;
+        oldTenant.name = req.body.name ?? oldTenant.name;
+        oldTenant.description = req.body.description ?? oldTenant.description;
         oldTenant.isDeleted = req.body.isDeleted ?? oldTenant.isDeleted;
         oldTenant.isActive = req.body.isActive ?? oldTenant.isActive;
         oldTenant

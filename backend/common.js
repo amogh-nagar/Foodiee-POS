@@ -149,11 +149,11 @@ var mongooseIdArrayFields = [
   "entityIds",
   "orderIds",
 ];
-var boolFields = ["isActive", "isDeleted"];
+var boolFields = ["isActive", "isDeleted", "getAll"];
 let itemsPerPage = 10;
 exports.itemsPerPage = itemsPerPage;
 exports.checkAndValidateReq = () => (req, res, next) => {
-  console.log("req.body->>", req.body);
+  console.log("validating req...", req.query, req.body)
   try {
     mongooseIdFields.forEach((entry) => {
       if (req.query[entry]) {
@@ -169,6 +169,9 @@ exports.checkAndValidateReq = () => (req, res, next) => {
     boolFields.forEach((entry) => {
       if (req.body[entry]) {
         req.body[entry] = req.body[entry] === "true" ? true : false;
+      }
+      if (req.query[entry]) {
+        req.query[entry] = req.query[entry] === "true" ? true : false;
       }
     });
     mongooseIdArrayFields.forEach((entry) => {

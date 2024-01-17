@@ -5,17 +5,20 @@ import { setupListeners } from "@reduxjs/toolkit/dist/query";
 import { authApi } from "../services/auth";
 import { tenantApi } from "../services/tenant";
 import { createBrowserHistory } from "history";
+import { brandApi } from "../services/brand";
 const appStore = configureStore({
   reducer: {
     auth: authReducer,
     cart: cartReducer,
     [authApi.reducerPath]: authApi.reducer,
     [tenantApi.reducerPath]: tenantApi.reducer,
+    [brandApi.reducerPath]: brandApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(authApi.middleware, redirectMiddleware)
-      .concat(tenantApi.middleware),
+      .concat(tenantApi.middleware)
+      .concat(brandApi.middleware),
 });
 setupListeners(appStore.dispatch);
 function redirectMiddleware(store) {

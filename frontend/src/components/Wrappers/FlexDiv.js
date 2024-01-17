@@ -1,12 +1,12 @@
 import React from "react";
 
 const FlexDiv = ({ className, items, Component, ...args }) => {
-    console.log(items, args)
-    return (
+  return (
     <div className={"flex items-center flex-wrap gap-x-5 gap-y-4 " + className}>
-      {items && items.map((item, index) => (
-        <Component key={index} {...item} {...args} />
-      ))}
+      {items &&
+        items.map((item, index) => (
+          <Component key={index} {...item} {...args} />
+        ))}
     </div>
   );
 };
