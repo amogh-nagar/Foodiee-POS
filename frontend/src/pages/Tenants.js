@@ -15,7 +15,6 @@ import Modal from "../components/Modals/Modal";
 import CustomForm from "../components/forms/Form";
 import Loader from "../UI/Loaders/Loader";
 import { itemsPerPage, showToast } from "../utils/constants";
-import InfiniteLoader from "../UI/Loaders/InfiniteLoader";
 const Tenants = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);

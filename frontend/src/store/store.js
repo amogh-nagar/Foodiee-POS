@@ -6,6 +6,7 @@ import { authApi } from "../services/auth";
 import { tenantApi } from "../services/tenant";
 import { createBrowserHistory } from "history";
 import { brandApi } from "../services/brand";
+import { outletApi } from "../services/outlet";
 const appStore = configureStore({
   reducer: {
     auth: authReducer,
@@ -13,12 +14,14 @@ const appStore = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [tenantApi.reducerPath]: tenantApi.reducer,
     [brandApi.reducerPath]: brandApi.reducer,
+    [outletApi.reducerPath]: outletApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(authApi.middleware, redirectMiddleware)
       .concat(tenantApi.middleware)
-      .concat(brandApi.middleware),
+      .concat(brandApi.middleware)
+      .concat(outletApi.middleware),
 });
 setupListeners(appStore.dispatch);
 function redirectMiddleware(store) {

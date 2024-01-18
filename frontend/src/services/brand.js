@@ -16,7 +16,8 @@ export const brandApi = createApi({
     getAllBrands: builder.query({
       query: (query) => {
         const params = new URLSearchParams();
-        params.append("tenantId", query.tenantId);
+        if(query.tenantId)
+            params.append("tenantId", query.tenantId);
         return (
           `/getBrands?` +
           (query.getAll

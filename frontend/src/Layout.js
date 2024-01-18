@@ -49,8 +49,7 @@ function Layout() {
         console.log("User Permission Denied.");
       }
     };
-    if(isAuthenticated)
-      retrievePushNotificationToken();
+    if (isAuthenticated) retrievePushNotificationToken();
   }, [initializeApp, getMessaging, isAuthenticated]);
   if (refreshToken.reLogin?.isLoading) {
     return <Loader />;
@@ -73,7 +72,10 @@ function Layout() {
             <Redirect to={isAuthenticated ? "/" : "/auth"} />
           </Route>
         </Switch>
-        <ToastContainer />
+        <ToastContainer
+          pauseOnFocusLoss={false}
+          toastStyle={{ backgroundColor: "#1e2130" }}
+        />
       </div>
     </div>
   );

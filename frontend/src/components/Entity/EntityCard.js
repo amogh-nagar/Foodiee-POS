@@ -13,9 +13,11 @@ const EntityCard = React.forwardRef(
       isActive,
       description,
       onEditBtnClick,
+      address,
       validateUpdate,
       updateFields,
       updateHeaderText,
+      entityIdType,
       cardOnClickURL,
       showEditBtn = false,
       ...args
@@ -23,6 +25,15 @@ const EntityCard = React.forwardRef(
     ref
   ) => {
     let styleObj = getColor(image, name, !isActive);
+    let initialValues = {
+      name: name,
+      image: image
+        ? `https://${process.env.REACT_APP_AWS_BUCKET}.s3.ap-south-1.amazonaws.com/${image}`
+        : "",
+      isActive: isActive,
+    };
+    if (description) initialValues.description = description;
+    if (address) initialValues.address = address;
     return (
       <div
         ref={ref}
@@ -44,23 +55,10 @@ const EntityCard = React.forwardRef(
                 HeaderText={updateHeaderText}
                 BodyContent={
                   <CustomForm
-                    initialValues={{
-                      name: name,
-                      description: description,
-                      image: image
-                        ? `https://${process.env.REACT_APP_AWS_BUCKET}.s3.ap-south-1.amazonaws.com/${image}`
-                        : "",
-                      isActive: isActive,
-                    }}
+                    initialValues={initialValues}
                     onSubmit={(values) => {
-                      if (
-                        !checkForSame(values, {
-                          name,
-                          description,
-                          image,
-                          isActive,
-                        })
-                      )
+                      console.log("values", values,initialValues)
+                      if (!checkForSame(values, initialValues))
                         onEditBtnClick({ entityId: args?._id, ...values });
                       else showToast("Nothing to Update", "info");
                     }}
@@ -79,10 +77,18 @@ const EntityCard = React.forwardRef(
           className={`${isActive ? "cursor-pointer" : "pointer-events-none"}`}
         >
           <Link
+            onClick={(e) => {
+              if (!cardOnClickURL) e.preventDefault();
+            }}
             to={{
-
               pathname: cardOnClickURL,
-              state: { selectedEntity: { _id: args?._id, name: name } },
+              state: {
+                selectedEntity: {
+                  _id: args?._id,
+                  name: name,
+                  entityId: args[entityIdType],
+                },
+              },
             }}
           >
             <div className={`h-64 max-h-96 w-56 rounded-lg flex items-end `}>

@@ -252,6 +252,7 @@ const Brands = () => {
                     className="gap-y-4"
                     Component={EntityCard}
                     items={brands}
+                    entityIdType="tenantId"
                     showEditBtn={true}
                     cardOnClickURL="/outlets"
                     validateUpdate={validate}
