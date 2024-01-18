@@ -29,7 +29,7 @@ exports.getBrands = function (req, res, next) {
   ];
   if (req.query.getAll) {
     aggPipeline = aggPipeline.slice(0, 2);
-    aggPipeline[1]["$project"] = { name: 1 };
+    aggPipeline[1]["$project"] = { name: 1, tenantId: 1 };
   }
   async.parallel(
     [
@@ -136,19 +136,23 @@ exports.createBrand = function (req, res, next) {
 };
 
 exports.updateBrand = function (req, res, next) {
+  console.log("req.body", req.body);
   Brand.findOne({
+    tenantId: req.body.tenantId,
     name: req.body.name,
-    tenantId: {
-      $ne: req.body.tenantId,
+    _id: {
+      $ne: req.body.entityId,
     },
   }).then(function (oldbrand) {
     if (oldbrand) {
-      var error = new HttpError("Brand not found", 404);
+      var error = new HttpError("Duplicate Brand Name Found", 404);
       return next(error);
     }
-    Brand.findOne({
-      _id: req.body.entityId,
-    }).then(function (oldbrand) {
+    Brand.findById(req.body.entityId).then(function (oldbrand) {
+      if (!oldbrand) {
+        var error = new HttpError("Brand not found", 404);
+        return next(error);
+      }
       var fileName = "";
       if (req.files) {
         if (!MIME_TYPE_MAP[req.files.image.mimetype]) {

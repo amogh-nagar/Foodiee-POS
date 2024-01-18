@@ -1,14 +1,9 @@
 var Outlet = require("../../models/outlet");
-var User = require("../../models/user");
-var Dish = require("../../models/dish");
-var Brand = require("../../models/brand");
-var s3 = require("../../aws-services/aws");
 const { v4: uuidv4 } = require("uuid");
 const sendGridMail = require("@sendgrid/mail");
 const { hashSync } = require("bcrypt");
 const HttpError = require("../../models/http-error");
 const redis = require("redis");
-// const client = redis.createClient();
 const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 const MIME_TYPE_MAP = {
@@ -21,30 +16,46 @@ const mongoose = require("mongoose");
 const { addImageToS3 } = require("../../common");
 var itemsPerPage = 9;
 exports.getOutlets = function (req, res, next) {
-  var skip = req.query.skip;
+  var skip = (req.query.page - 1) * itemsPerPage;
+  let query = {};
+  if (req.query.brandId)
+    query = {
+      "brandDetails.id": req.query.brandId,
+    };
+  if (req.query.name) query["$text"] = { $search: req.query.name };
+  let aggPipeline = [
+    { $match: query },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        address: 1,
+        image: 1,
+        isActive: 1,
+        brandDetails: 1,
+        tenantDetails: 1,
+      },
+    },
+    { $skip: skip },
+    { $limit: itemsPerPage },
+  ];
+  if (req.query.getAll) {
+    aggPipeline = aggPipeline.slice(0, 2);
+    aggPipeline[1]["$project"] = { name: 1 };
+  }
   async.parallel(
     [
       function (cb) {
-        Outlet.aggregate(
-          [
-            { $match: { "brandDetails.id": req.params.brandId } },
-            { $skip: skip },
-            { $limit: itemsPerPage },
-          ],
-          function (err, data) {
-            if (err) return cb(err);
-            cb(null, {
-              outlets: data.length == 0 ? [] : data,
-            });
-          }
-        );
+        Outlet.aggregate(aggPipeline, function (err, data) {
+          if (err) return cb(err);
+          cb(null, {
+            outlets: data.length == 0 ? [] : data,
+          });
+        });
       },
       function (cb) {
         Outlet.aggregate(
-          [
-            { $match: { "brandDetails.id": req.params.brandId } },
-            { $count: "totalItems" },
-          ],
+          [{ $match: query }, { $count: "totalItems" }],
           function (err, data) {
             if (err) return cb(err);
             cb(null, {
@@ -89,9 +100,9 @@ exports.getOutlet = function (req, res, next) {
 };
 
 exports.createOutlet = function (req, res, next) {
-  var { name, address } = req.body;
+  var { name, address, brandId, tenantId } = req.body;
   Outlet.findOne({
-    "brandDetails.id": req.body.brandDetails.id,
+    "brandDetails.id": brandId,
     name: name,
   }).then(function (outlet) {
     if (outlet) {
@@ -117,12 +128,10 @@ exports.createOutlet = function (req, res, next) {
         image: fileName,
         address: address,
         brandDetails: {
-          id: req.body.brandDetails.id,
-          name: req.body.brandDetails.name,
+          id: brandId,
         },
         tenantDetails: {
-          id: req.body.tenantDetails.id,
-          name: req.body.tenantDetails.name,
+          id: tenantId,
         },
       });
       newoutlet
@@ -142,57 +151,63 @@ exports.createOutlet = function (req, res, next) {
 };
 
 exports.updateOutlet = function (req, res, next) {
-  Outlet.findById(req.query.outletId)
-    .then(function (oldoutlet) {
-      if (!oldoutlet) {
-        var error = new HttpError("Outlet not found", 404);
-        return next(error);
-      }
-      var fileName = "";
-      if (req.files) {
-        if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
-          var error = new HttpError("Invalid image type", 401);
+  Outlet.findOne({
+    name: req.body.name,
+    _id: {
+      $ne: req.body.entityId,
+    },
+    "brandDetails.id": req.body.brandId,
+  }).then(function (oldOutlet) {
+    if (oldOutlet) {
+      var error = new HttpError("Duplicate Outlet Name Found", 404);
+      return next(error);
+    }
+    Outlet.findById(req.body.entityId)
+      .then(function (oldoutlet) {
+        if (!oldoutlet) {
+          var error = new HttpError("Outlet not found", 404);
           return next(error);
         }
-        fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
-        deleteImageFromS3({
-          fileName: oldoutlet.outletImage,
-        });
-      }
-      addImageToS3(req, {
-        fileName: fileName,
-        data: req.files ? req.files.image.data : "",
-      })
-        .then(function () {
-          oldoutlet.image = fileName;
-          oldoutlet.isActive = req.body.isActive
-            ? req.body.isActive
-            : oldoutlet.isActive;
-          oldoutlet.isDeleted = req.body.isDeleted
-            ? req.body.isDeleted
-            : oldoutlet.isDeleted;
-          oldoutlet.name = req.body.name ? req.body.name : oldoutlet.name;
-          oldoutlet.address = req.body.address
-            ? req.body.address
-            : oldoutlet.address;
-
-          oldoutlet
-            .save()
-            .then(function (newOutlet) {
-              res.status(200).json({
-                message: "Outlet updated successfully!",
-                outlet: newOutlet,
-              });
-            })
-            .catch(function (err) {
-              next(err);
-            });
+        var fileName = "";
+        if (req.files) {
+          if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
+            var error = new HttpError("Invalid image type", 401);
+            return next(error);
+          }
+          fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
+          deleteImageFromS3({
+            fileName: oldoutlet.outletImage,
+          });
+        }
+        addImageToS3(req, {
+          fileName: fileName,
+          data: req.files ? req.files.image.data : "",
         })
-        .catch(function (err) {
-          next(err);
-        });
-    })
-    .catch(function (err) {
-      next(err);
-    });
+          .then(function () {
+            oldoutlet.image = fileName;
+            oldoutlet.isActive = req.body.isActive ?? oldoutlet.isActive;
+            oldoutlet.isDeleted = req.body.isDeleted ?? oldoutlet.isDeleted;
+            oldoutlet.name = req.body.name ?? oldoutlet.name;
+            oldoutlet.address = req.body.address ?? oldoutlet.address;
+
+            oldoutlet
+              .save()
+              .then(function (newOutlet) {
+                res.status(200).json({
+                  message: "Outlet updated successfully!",
+                  outlet: newOutlet,
+                });
+              })
+              .catch(function (err) {
+                next(err);
+              });
+          })
+          .catch(function (err) {
+            next(err);
+          });
+      })
+      .catch(function (err) {
+        next(err);
+      });
+  });
 };

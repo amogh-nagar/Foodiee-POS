@@ -5,40 +5,43 @@ const { check, query } = require("express-validator");
 var passport = require("passport");
 var checkRole = require("../middleware/check-role");
 var checkPermission = require("../middleware/check-permission");
+const { getOutlets, createOutlet, updateOutlet, getOutlet } = require("../controllers/outlet/outlet");
+const { checkAndValidateReq } = require("../common");
 
 router.get(
-  "/getAllOutlets",
+  "/getOutlets",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisitOutletsPage")
+  checkPermission("isVisitOutletsPage"),
+  checkAndValidateReq,
+  getOutlets
 );
 
 router.get(
-  "/getAllOutlet/:outletId",
+  "/getOutlet/:outletId",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisitOutletsPage")
+  checkPermission("isVisitOutletsPage"),
+  checkAndValidateReq,
+  getOutlet
 );
 
 router.post(
   "/createOutlet",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isCreateOutlets")
+  checkPermission("isCreateOutlets"),
+  checkAndValidateReq,
+  createOutlet
 );
 
 router.patch(
   "/updateOutlet",
   [],
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isUpdateOutlets")
-);
-
-router.delete(
-  "/deleteOutlet",
-  [],
-  passport.authenticate("jwt", { session: false }),
-  checkPermission("isDeleteOutlets")
+  checkPermission("isUpdateOutlets"),
+  checkAndValidateReq,
+  updateOutlet
 );
 
 module.exports = router;

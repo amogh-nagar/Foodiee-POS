@@ -65,9 +65,7 @@ exports.getTenants = function (req, res, next) {
 };
 
 exports.getTenant = function (req, res, next) {
-  Tenant.findOne({
-    _id: mongoose.Types.ObjectId(req.params.entityId),
-  })
+  Tenant.findById(req.params.tenantId)
     .then(function (tenant) {
       if (!tenant) {
         var error = new HttpError("Tenant not found", 400);
@@ -138,7 +136,7 @@ exports.updateTenant = function (req, res, next) {
     },
   }).then(function (tenant) {
     if (tenant) {
-      const error = new HttpError("Duplicate Tenant Found", 400);
+      const error = new HttpError("Duplicate Tenant Name Found", 400);
       return next(error);
     }
     Tenant.findOne({

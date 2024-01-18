@@ -152,7 +152,7 @@ var mongooseIdArrayFields = [
 var boolFields = ["isActive", "isDeleted", "getAll"];
 let itemsPerPage = 10;
 exports.itemsPerPage = itemsPerPage;
-exports.checkAndValidateReq = () => (req, res, next) => {
+exports.checkAndValidateReq = (req, res, next) => {
   console.log("validating req...", req.query, req.body)
   try {
     mongooseIdFields.forEach((entry) => {

@@ -5,11 +5,9 @@ var outlet = new mongoose.Schema({
   image: { type: String },
   brandDetails: {
     id: { type: mongoose.Types.ObjectId, required: true },
-    name: { type: String, required: true },
   },
   tenantDetails: {
     id: { type: mongoose.Types.ObjectId, required: true },
-    name: { type: String, required: true },
   },
   isDeleted: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
