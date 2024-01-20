@@ -15,7 +15,6 @@ const User = ({ users }) => {
               <th className="py-4">Operations</th>
             </tr>
           </thead>
-
           <tbody className="">
             {users.map((user) => (
               <UserCard user={user} />
@@ -24,7 +23,7 @@ const User = ({ users }) => {
         </table>
       ) : (
         <div className="h-full p-10 flex item-center justify-center">
-          <h3>No User Found</h3>
+          <h3>No Users Found</h3>
         </div>
       )}
     </div>

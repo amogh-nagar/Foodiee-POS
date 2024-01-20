@@ -1,50 +1,25 @@
 import React, { useState } from "react";
 import RoleCard from "./RoleCard";
-const Roles = () => {
+const Roles = ({ roles }) => {
   const onEditBtnClick = () => {};
   const onDeleteHandler = () => {};
   const validateUpdate = () => {};
-  const breadcrumbItems = [
-    { title: "Entity Type" },
-    {
-      title: "Entity",
-      values: [
-        {
-          label: "Tenant",
-          value: "Tenant",
-        },
-        {
-          label: "Brand",
-          value: "Brand",
-        },
-        {
-          label: "Outlet",
-          value: "Outlet",
-        },
-      ],
-      type: "array",
-    },
-  ];
   return (
-    <div className="flex items-center justify-around flex-wrap gap-x-2 gap-y-5 mt-4">
-      <RoleCard
-        role={{
-          name: "Tenant Admin",
-          description: "Tenant Admin",
-          permissions: [
-            "isCreateBrands",
-            "isUpdateBrands",
-            "isDeleteBrands",
-            "isVisitBrandsPage",
-            "isVisitBrandsPage",
-            "isVisitBrandsPage",
-            "isVisitBrandsPage",
-          ],
-        }}
-        onDeleteHandler={onDeleteHandler}
-        onEditBtnClick={onEditBtnClick}
-        validateUpdate={validateUpdate}
-      />
+    <div className="flex bg-primary-700 w-full items-center justify-around flex-wrap gap-x-2 gap-y-5 mt-4">
+      {roles && roles.length ? (
+        roles.map((role) => (
+          <RoleCard
+            role={role}
+            onDeleteHandler={onDeleteHandler}
+            onEditBtnClick={onEditBtnClick}
+            validateUpdate={validateUpdate}
+          />
+        ))
+      ) : (
+        <div className="h-full p-10 flex item-center justify-center">
+          <h3>No Roles Found</h3>
+        </div>
+      )}
     </div>
   );
 };

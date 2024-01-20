@@ -15,6 +15,7 @@ const Users = () => {
   const [activeTab, setActiveTab] = useState("Users");
   const [entityArr, setEntityArr] = useState([]);
   const [activeEntity, setActiveEntity] = useState("");
+  const [activeEntityItem, setActiveEntityItem] = useState("");
   const [getTenants, { data: tenants, isLoadingTenants, isErrorTenants }] =
     useLazyGetAllTenantsQuery();
   const [getBrands, { data: brands, isLoadingBrands, isErrorBrands }] =
@@ -105,14 +106,18 @@ const Users = () => {
       }),
       type: "array",
       onChange: (value) => {
-        let query = {
-          entityIds: [value.value],
-          page: 1
-        };
-        displayUser ? getUsers(query) : getRoles(query);
+        setActiveEntityItem(value.value);
       },
     });
   }
+  useEffect(() => {
+    if (!activeEntityItem) return;
+    let query = {
+      entityIds: [activeEntityItem],
+      page: 1,
+    };
+    activeTab === "Users" ? getUsers(query) : getRoles(query);
+  }, [activeEntityItem, activeTab]);
   return (
     <div>
       <PageNameWithDate name="Users" />
