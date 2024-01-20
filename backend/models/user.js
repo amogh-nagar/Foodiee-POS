@@ -6,12 +6,15 @@ var user = new Schema({
   isDeleted: { type: Boolean, default: false },
   name: { type: String, required: true },
   email: { type: String, required: true },
+  mobile: {
+    type: String,
+    required: true,
+    match: [/^\+[1-9]\d{1,14}$/, "Please fill a valid mobile number"],
+  },
   password: { type: String, required: true },
   image: { type: String },
   roles: [
     {
-      entity: { type: String },
-      roleName: { type: String, required: true },
       roleId: { type: mongoose.Types.ObjectId, required: true },
     },
   ],
@@ -24,14 +27,13 @@ var user = new Schema({
   permissions: [{ type: String }],
   isActive: { type: Boolean, default: true },
 });
-user.index({ email: 1 }, { unique: true });
+user.index({ email: 1, mobile: 1 }, { unique: true });
 
 user.pre("save", function (next) {
   this.password = hashSync(this.password, 10);
   next();
 });
 user.methods.isValidPassword = function (password) {
-  console.log("password", password);
   return compareSync(password, this.password);
 };
 user.index({ name: "text" });

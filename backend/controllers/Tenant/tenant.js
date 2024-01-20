@@ -15,6 +15,13 @@ var itemsPerPage = 20;
 exports.getTenants = function (req, res, next) {
   var skip = (req.query.page - 1) * itemsPerPage;
   let query = { superAdminId: req.user._id };
+  if (req.query.tenantIds) {
+    query = {
+      _id: {
+        $in: req.query.tenantIds,
+      },
+    };
+  }
   if (req.query.name) query["$text"] = { $search: req.query.name };
   let aggPipeline = [
     { $match: query },
@@ -26,42 +33,42 @@ exports.getTenants = function (req, res, next) {
     aggPipeline = aggPipeline.slice(0, 2);
     aggPipeline[1]["$project"] = { name: 1 };
   }
-  async.parallel(
-    [
-      function (cb) {
-        Tenant.aggregate(aggPipeline, function (err, data) {
+  let parallelArr = [
+    function (cb) {
+      Tenant.aggregate(aggPipeline, function (err, data) {
+        if (err) return cb(err);
+        cb(null, {
+          tenants: data.length == 0 ? [] : data,
+        });
+      });
+    },
+  ];
+  if (!req.query.notIncludeTotal) {
+    parallelArr.push(function (cb) {
+      Tenant.aggregate(
+        [{ $match: query }, { $count: "totalItems" }],
+        function (err, data) {
           if (err) return cb(err);
           cb(null, {
-            tenants: data.length == 0 ? [] : data,
+            totalItems: data.length == 0 ? 0 : data[0].totalItems,
           });
-        });
-      },
-      function (cb) {
-        Tenant.aggregate(
-          [{ $match: query }, { $count: "totalItems" }],
-          function (err, data) {
-            if (err) return cb(err);
-            cb(null, {
-              totalItems: data.length == 0 ? 0 : data[0].totalItems,
-            });
-          }
-        );
-      },
-    ],
-    function (err, data) {
-      if (err)
-        return handleError(res, {
-          message: "Some error occurred",
-          statusCode: 500,
-          error: err,
-        });
-      res.status(200).json({
-        message: "Tenants Fetched",
-        tenants: data[0].tenants,
-        totalItems: data[1].totalItems,
+        }
+      );
+    });
+  }
+  async.parallel(parallelArr, function (err, data) {
+    if (err)
+      return handleError(res, {
+        message: "Some error occurred",
+        statusCode: 500,
+        error: err,
       });
-    }
-  );
+    res.status(200).json({
+      message: "Tenants Fetched",
+      tenants: data[0].tenants,
+      totalItems: data[1]?.totalItems,
+    });
+  });
 };
 
 exports.getTenant = function (req, res, next) {

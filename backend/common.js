@@ -140,6 +140,7 @@ var mongooseIdFields = [
   "outletId",
   "entityId",
   "orderId",
+  "roleId",
 ];
 var mongooseIdArrayFields = [
   "brandIds",
@@ -149,11 +150,11 @@ var mongooseIdArrayFields = [
   "entityIds",
   "orderIds",
 ];
-var boolFields = ["isActive", "isDeleted", "getAll"];
+var boolFields = ["isActive", "isDeleted", "getAll", "notIncludeTotal"];
 let itemsPerPage = 10;
 exports.itemsPerPage = itemsPerPage;
 exports.checkAndValidateReq = (req, res, next) => {
-  console.log("validating req...", req.query, req.body)
+  console.log("validating req...", req.query, req.body);
   try {
     mongooseIdFields.forEach((entry) => {
       if (req.query[entry]) {
@@ -176,14 +177,22 @@ exports.checkAndValidateReq = (req, res, next) => {
     });
     mongooseIdArrayFields.forEach((entry) => {
       if (req.query[entry]) {
-        req.query[entry] = req.query[entry].map(
-          (ele) => new mongoose.Types.ObjectId(ele)
-        );
+        if (Array.isArray(req.query[entry])) {
+          req.query[entry] = req.query[entry].map(
+            (ele) => new mongoose.Types.ObjectId(ele)
+          );
+        } else {
+          req.query[entry] = [new mongoose.Types.ObjectId(req.query[entry])];
+        }
       }
       if (req.body[entry]) {
-        req.body[entry] = req.body[entry].map(
-          (ele) => new mongoose.Types.ObjectId(ele)
-        );
+        if (Array.isArray(req.body[entry])) {
+          req.body[entry] = req.body[entry].map(
+            (ele) => new mongoose.Types.ObjectId(ele)
+          );
+        } else {
+          req.body[entry] = [new mongoose.Types.ObjectId(req.body[entry])];
+        }
       }
     });
     Object.keys(req.query).forEach((key) => {
@@ -205,6 +214,7 @@ exports.checkAndValidateReq = (req, res, next) => {
     });
     next();
   } catch (err) {
+    console.log("err is", err);
     next(err);
   }
 };

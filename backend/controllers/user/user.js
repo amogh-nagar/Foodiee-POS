@@ -1,12 +1,23 @@
 var User = require("../../models/user");
-const redis = require("redis");
+const { v4: uuidv4 } = require("uuid");
+const sendGridMail = require("@sendgrid/mail");
 const HttpError = require("../../models/http-error");
-const { redis_channels, handleError, emailTemplates, projectUser, addImageToS3, deleteImageFromS3 } = require("../../common");
 const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
-const { default: mongoose } = require("mongoose");
+const redis = require("redis");
 const client = redis.createClient();
+sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
+var itemsPerPage = 9;
+var async = require("async");
+const {
+  redis_channels,
+  handleError,
+  emailTemplates,
+  projectUser,
+  addImageToS3,
+  deleteImageFromS3,
+} = require("../../common");
 
-exports.userProfile = function (req, res, next) {
+exports.getUser = function (req, res, next) {
   client.hget("users", req.params.userId, function (err, data) {
     if (data) {
       console.log("Fetched from redis");
@@ -16,7 +27,13 @@ exports.userProfile = function (req, res, next) {
         user: data,
       });
     } else {
-      User.findById(req.params.userId)
+      User.findById(req.params.userId, {
+        name: 1,
+        email: 1,
+        mobile: 1,
+        image: 1,
+        isActive: 1,
+      })
         .then(function (user) {
           if (!user) {
             var error = new HttpError("User not found", 401);
@@ -62,9 +79,8 @@ exports.updateUser = function (req, res, next) {
         .then(function () {
           olduser.name = req.body.name ?? olduser.name;
           olduser.email = req.body.email ?? olduser.email;
-          olduser.password = req.body.password
-            ? req.body.password
-            : olduser.password;
+          olduser.password = req.body.password ?? olduser.password;
+          olduser.mobile = req.body.mobile ?? olduser.mobile;
           olduser.isActive = req.body.isActive
             ? parseInt(req.body.isActive)
             : olduser.isActive;
@@ -75,19 +91,18 @@ exports.updateUser = function (req, res, next) {
             olduser.permissions = req.body.permissions;
           }
           if (req.body.entityDetails) {
-            olduser.entityDetails = req.body.entityDetails.map((entity)=>{
+            olduser.entityDetails = req.body.entityDetails.map((entity) => {
               return {
                 entityId: new mongoose.Types.ObjectId(entity.entityId),
                 entityName: entity.entityName,
-              }
+              };
             });
           }
           if (req.body.roles) {
-            olduser.roles = req.body.roles.map((role)=>{
+            olduser.roles = req.body.roles.map((role) => {
               return {
-                roleId: new mongoose.Types.ObjectId(role.roleId),
-                roleName: role.roleName,
-              }
+                roleId: new mongoose.Types.ObjectId(role.roleId)
+              };
             });
           }
           olduser
@@ -139,14 +154,7 @@ exports.updateUser = function (req, res, next) {
 
 exports.createUser = function (req, res, next) {
   try {
-    let {
-      email,
-      password,
-      name,
-      roles,
-      entityDetails,
-      permissions,
-    } = req.body;
+    let { email, password, name, roles, entityDetails, permissions } = req.body;
     User.findOne({
       email: email,
     }).then(function (user) {
@@ -162,18 +170,20 @@ exports.createUser = function (req, res, next) {
         entityDetails: [],
         permissions: permissions,
       });
-      entityDetails && entityDetails.forEach((entity)=>{
-        newUser.entityDetails.push({
-          entityId: new mongoose.Types.ObjectId(entity.entityId),
-          entityName: entity.entityName
-        })
-      })
-      roles && roles.forEach((role)=>{
-        newUser.roles.push({
-          roleId: new mongoose.Types.ObjectId(role.roleId),
-          roleName: role.roleName
-        })
-      })
+      entityDetails &&
+        entityDetails.forEach((entity) => {
+          newUser.entityDetails.push({
+            entityId: new mongoose.Types.ObjectId(entity.entityId),
+            entityName: entity.entityName,
+          });
+        });
+      roles &&
+        roles.forEach((role) => {
+          newUser.roles.push({
+            roleId: new mongoose.Types.ObjectId(role.roleId),
+            roleName: role.roleName,
+          });
+        });
       newUser.save().then(function () {
         addToQueue({
           email: email,
@@ -212,21 +222,21 @@ exports.disableUser = async function (req, res, next) {
       user.isDeleted = true;
     }
     await user.save();
-    if(type == "BLOCK_USER") {
+    if (type == "BLOCK_USER") {
       addToQueue({
         email: req.user.email,
         name: req.user.name,
         subject: emailTemplates["BLOCK_USER"].subject,
         text: emailTemplates["BLOCK_USER"].text,
-        html: emailTemplates["BLOCK_USER"].html(user)
-      });   
+        html: emailTemplates["BLOCK_USER"].html(user),
+      });
     } else {
       addToQueue({
         email: email,
         name: name,
         subject: emailTemplates["DELETE_USER"].subject,
         text: emailTemplates["DELETE_USER"].text,
-        html: emailTemplates["DELETE_USER"].html(user)
+        html: emailTemplates["DELETE_USER"].html(user),
       });
     }
     res.status(200).json({
@@ -239,4 +249,64 @@ exports.disableUser = async function (req, res, next) {
       statusCode: 500,
     });
   }
+};
+
+exports.getUsers = function (req, res, next) {
+  console.log("req.query", req.query)
+  var skip = (req.query.page - 1) * itemsPerPage;
+  let query = {
+    "entityDetails.entityId": {
+      $in: req.query.entityIds,
+    },
+  };
+  if (req.query.roleId) {
+    query["roles.roleId"] = req.body.roleId;
+  }
+  if (req.query.name) query["$text"] = { $search: req.query.name };
+  let aggPipeline = [
+    { $match: query },
+    { $project: { _id: 1, name: 1, email: 1, image: 1, isActive: 1 } },
+    { $skip: skip },
+    { $limit: itemsPerPage },
+  ];
+  if (req.query.getAll) {
+    aggPipeline = aggPipeline.slice(0, 2);
+    aggPipeline[1]["$project"] = { name: 1 };
+  }
+  async.parallel(
+    [
+      function (cb) {
+        User.aggregate(aggPipeline, function (err, data) {
+          if (err) return cb(err);
+          cb(null, {
+            users: data.length == 0 ? [] : data,
+          });
+        });
+      },
+      function (cb) {
+        User.aggregate(
+          [{ $match: query }, { $count: "totalItems" }],
+          function (err, data) {
+            if (err) return cb(err);
+            cb(null, {
+              totalItems: data.length == 0 ? 0 : data[0].totalItems,
+            });
+          }
+        );
+      },
+    ],
+    function (err, data) {
+      if (err)
+        return handleError(res, {
+          message: "Some error occurred",
+          statusCode: 500,
+          error: err,
+        });
+      res.status(200).json({
+        message: "Users Fetched",
+        users: data[0].users,
+        totalItems: data[1].totalItems,
+      });
+    }
+  );
 };

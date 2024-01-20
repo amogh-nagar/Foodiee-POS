@@ -22,6 +22,22 @@ exports.getOutlets = function (req, res, next) {
     query = {
       "brandDetails.id": req.query.brandId,
     };
+  if (req.query.tenantId)
+    query = {
+      "tenantDetails.id": req.query.tenantId,
+    };
+  if (req.query.brandIds)
+    query = {
+      "brandDetails.id": {
+        $in: req.query.brandIds,
+      },
+    };
+  if (req.query.tenantIds)
+    query = {
+      "tenantDetails.id": {
+        $in: req.query.tenantIds,
+      },
+    };
   if (req.query.name) query["$text"] = { $search: req.query.name };
   let aggPipeline = [
     { $match: query },
@@ -43,42 +59,42 @@ exports.getOutlets = function (req, res, next) {
     aggPipeline = aggPipeline.slice(0, 2);
     aggPipeline[1]["$project"] = { name: 1 };
   }
-  async.parallel(
-    [
-      function (cb) {
-        Outlet.aggregate(aggPipeline, function (err, data) {
+  var parallelArr = [
+    function (cb) {
+      Outlet.aggregate(aggPipeline, function (err, data) {
+        if (err) return cb(err);
+        cb(null, {
+          outlets: data.length == 0 ? [] : data,
+        });
+      });
+    },
+  ];
+  if (!req.query.notIncludeTotal) {
+    parallelArr.push(function (cb) {
+      Outlet.aggregate(
+        [{ $match: query }, { $count: "totalItems" }],
+        function (err, data) {
           if (err) return cb(err);
           cb(null, {
-            outlets: data.length == 0 ? [] : data,
+            totalItems: data.length == 0 ? 0 : data[0].totalItems,
           });
-        });
-      },
-      function (cb) {
-        Outlet.aggregate(
-          [{ $match: query }, { $count: "totalItems" }],
-          function (err, data) {
-            if (err) return cb(err);
-            cb(null, {
-              totalItems: data.length == 0 ? 0 : data[0].totalItems,
-            });
-          }
-        );
-      },
-    ],
-    function (err, data) {
-      if (err)
-        return handleError(res, {
-          message: "Some error occurred",
-          statusCode: 500,
-          error: err,
-        });
-      res.status(200).json({
-        message: "Outlets Fetched",
-        outlets: data[0].outlets,
-        totalItems: data[1].totalItems,
+        }
+      );
+    });
+  }
+  async.parallel(parallelArr, function (err, data) {
+    if (err)
+      return handleError(res, {
+        message: "Some error occurred",
+        statusCode: 500,
+        error: err,
       });
-    }
-  );
+    res.status(200).json({
+      message: "Outlets Fetched",
+      outlets: data[0].outlets,
+      totalItems: data[1]?.totalItems,
+    });
+  });
 };
 
 exports.getOutlet = function (req, res, next) {

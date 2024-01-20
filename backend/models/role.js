@@ -17,4 +17,4 @@ var Role = new Schema({
 //SuperAdmin, TenantAdmin, BrandAdmin, OutletAdmin
 Role.index({ name: "text" });
 
-module.exports = mongoose.Model("Role", Role);
+module.exports = mongoose.model("Role", Role);

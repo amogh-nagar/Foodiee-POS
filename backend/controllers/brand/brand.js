@@ -20,6 +20,14 @@ exports.getBrands = function (req, res, next) {
     query = {
       tenantId: req.query.tenantId,
     };
+  if (req.query.tenantIds)
+    query["tenantId"] = {
+      $in: req.query.tenantIds,
+    };
+  if (req.query.brandIds)
+    query["_id"] = {
+      $in: req.query.brandIds,
+    };
   if (req.query.name) query["$text"] = { $search: req.query.name };
   let aggPipeline = [
     { $match: query },
@@ -31,42 +39,42 @@ exports.getBrands = function (req, res, next) {
     aggPipeline = aggPipeline.slice(0, 2);
     aggPipeline[1]["$project"] = { name: 1, tenantId: 1 };
   }
-  async.parallel(
-    [
-      function (cb) {
-        Brand.aggregate(aggPipeline, function (err, data) {
+  let parallelArr = [
+    function (cb) {
+      Brand.aggregate(aggPipeline, function (err, data) {
+        if (err) return cb(err);
+        cb(null, {
+          brands: data.length == 0 ? [] : data,
+        });
+      });
+    },
+  ];
+  if (!req.query.notIncludeTotal) {
+    parallelArr.push(function (cb) {
+      Brand.aggregate(
+        [{ $match: query }, { $count: "totalItems" }],
+        function (err, data) {
           if (err) return cb(err);
           cb(null, {
-            brands: data.length == 0 ? [] : data,
+            totalItems: data.length == 0 ? 0 : data[0].totalItems,
           });
-        });
-      },
-      function (cb) {
-        Brand.aggregate(
-          [{ $match: query }, { $count: "totalItems" }],
-          function (err, data) {
-            if (err) return cb(err);
-            cb(null, {
-              totalItems: data.length == 0 ? 0 : data[0].totalItems,
-            });
-          }
-        );
-      },
-    ],
-    function (err, data) {
-      if (err)
-        return handleError(res, {
-          message: "Some error occurred",
-          statusCode: 500,
-          error: err,
-        });
-      res.status(200).json({
-        message: "Brands Fetched",
-        brands: data[0].brands,
-        totalItems: data[1].totalItems,
+        }
+      );
+    });
+  }
+  async.parallel(parallelArr, function (err, data) {
+    if (err)
+      return handleError(res, {
+        message: "Some error occurred",
+        statusCode: 500,
+        error: err,
       });
-    }
-  );
+    res.status(200).json({
+      message: "Brands Fetched",
+      brands: data[0].brands,
+      totalItems: data[1]?.totalItems,
+    });
+  });
 };
 
 exports.getBrand = function (req, res, next) {
