@@ -11,12 +11,13 @@ import {
 } from "../services/brand";
 import EntityCard from "../components/Entity/EntityCard";
 import debounce from "lodash.debounce";
-import { itemsPerPage, showToast } from "../utils/constants";
+import { itemsPerPage, selectCustomStyle, showToast } from "../utils/constants";
 import Modal from "../components/Modals/Modal";
 import { IoMdAdd } from "react-icons/io";
 import CustomForm from "../components/forms/Form";
 import FlexDiv from "../components/Wrappers/FlexDiv";
 import ReactPaginate from "react-paginate";
+import CustomDropdownIndicator from "../components/CustomDropdownIndicator";
 const Brands = () => {
   const location = useLocation();
   const [selectedTenant, setSelectedTenant] = useState({});
@@ -165,29 +166,14 @@ const Brands = () => {
         name="Brands"
         MultiSelect={() => (
           <Select
+            components={{ DropdownIndicator: CustomDropdownIndicator }}
             defaultValue={selectedTenant}
             onChange={handleSelectChange}
             name="colors"
             options={tenants}
             placeholder="Select Tenants"
             className="basic-multi-select w-96 bg-primary-700 rounded-lg text-secondary-600"
-            styles={{
-              control: (styles, { isFocused }) => ({
-                ...styles,
-                outlineWidth: 0,
-                color: "red",
-              }),
-              option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-                return {
-                  ...styles,
-                  backgroundColor:
-                    (isSelected && "#e85f48") ||
-                    (isFocused && "#EA7C69") ||
-                    "#1f222e",
-                  color: "white",
-                };
-              },
-            }}
+            styles={selectCustomStyle}
           />
         )}
       />
@@ -284,22 +270,24 @@ const Brands = () => {
                       },
                     ]}
                   />
-                  <ReactPaginate
-                    breakLabel="..."
-                    nextLabel=">"
-                    breakClassName=""
-                    containerClassName="bg-primary-700 h-12 px-3 flex items-center gap-x-3 w-fit m-auto rounded-xl absolute bottom-4 left-1/2"
-                    pageClassName="bg-primary-100 rounded-xl hover:bg-slate-500 w-8 h-8 flex items-center justify-center"
-                    activeClassName="bg-slate-500"
-                    previousClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
-                    nextClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
-                    disabledClassName=""
-                    onPageChange={handlePageClick}
-                    pageRangeDisplayed={5}
-                    pageCount={pageCount}
-                    previousLabel="<"
-                    renderOnZeroPageCount={null}
-                  />
+                  {pageCount > 1 && (
+                    <ReactPaginate
+                      breakLabel="..."
+                      nextLabel=">"
+                      breakClassName=""
+                      containerClassName="bg-primary-700 h-12 px-3 flex items-center gap-x-3 w-fit m-auto rounded-xl absolute bottom-4 left-1/2"
+                      pageClassName="bg-primary-100 rounded-xl hover:bg-slate-500 w-8 h-8 flex items-center justify-center"
+                      activeClassName="bg-slate-500"
+                      previousClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                      nextClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                      disabledClassName=""
+                      onPageChange={handlePageClick}
+                      pageRangeDisplayed={5}
+                      pageCount={pageCount}
+                      previousLabel="<"
+                      renderOnZeroPageCount={null}
+                    />
+                  )}
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">

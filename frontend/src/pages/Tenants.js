@@ -213,22 +213,24 @@ const Tenants = () => {
                       },
                     ]}
                   />
-                  <ReactPaginate
-                    breakLabel="..."
-                    nextLabel=">"
-                    breakClassName=""
-                    containerClassName="bg-primary-700 h-12 px-3 flex items-center gap-x-3 w-fit m-auto rounded-xl absolute bottom-4 left-1/2"
-                    pageClassName="bg-primary-100 rounded-xl hover:bg-slate-500 w-8 h-8 flex items-center justify-center"
-                    activeClassName="bg-slate-500"
-                    previousClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
-                    nextClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
-                    disabledClassName=""
-                    onPageChange={handlePageClick}
-                    pageRangeDisplayed={5}
-                    pageCount={pageCount}
-                    previousLabel="<"
-                    renderOnZeroPageCount={null}
-                  />
+                  {pageCount > 1 && (
+                    <ReactPaginate
+                      breakLabel="..."
+                      nextLabel=">"
+                      breakClassName=""
+                      containerClassName="bg-primary-700 h-12 px-3 flex items-center gap-x-3 w-fit m-auto rounded-xl absolute bottom-4 left-1/2"
+                      pageClassName="bg-primary-100 rounded-xl hover:bg-slate-500 w-8 h-8 flex items-center justify-center"
+                      activeClassName="bg-slate-500"
+                      previousClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                      nextClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                      disabledClassName=""
+                      onPageChange={handlePageClick}
+                      pageRangeDisplayed={5}
+                      pageCount={pageCount}
+                      previousLabel="<"
+                      renderOnZeroPageCount={null}
+                    />
+                  )}
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">

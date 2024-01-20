@@ -13,6 +13,11 @@ const CustomForm = ({
   buttonText,
   btnClass,
 }) => {
+  let fieldsType = {
+    textarea: TextArea,
+    file: ImageUpload,
+    toggle: ToggleBtn,
+  };
   return (
     <Formik
       initialValues={initialValues}
@@ -22,16 +27,7 @@ const CustomForm = ({
     >
       <Form className="w-full">
         {fields.map((field, index) => {
-          let Component = Input;
-          if(field.type === "textarea"){
-            Component = TextArea
-          }
-          if(field.type === "file"){
-            Component = ImageUpload
-          }
-          if(field.type === "toggle"){
-            Component = ToggleBtn
-          }
+          let Component = fieldsType[field.type] ?? Input;
           if (field.type === "checkbox") {
             return (
               <label
@@ -47,6 +43,22 @@ const CustomForm = ({
                 <span className="ml-2 text-gray-400">{field.label}</span>
               </label>
             );
+          }
+          if (field.type === "array") {
+            return field.value.map((field) => (
+              <label
+                key={index}
+                className="label cursor-pointer inline-flex items-center"
+              >
+                <Field
+                  type={field.type}
+                  name={field.name}
+                  id={field.name}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                <span className="ml-2 text-gray-400">{field.label}</span>
+              </label>
+            ));
           }
           return (
             <Field

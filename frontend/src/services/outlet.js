@@ -16,14 +16,10 @@ export const outletApi = createApi({
     getAllOutlets: builder.query({
       query: (query) => {
         const params = new URLSearchParams();
-        if (query.brandId) params.append("brandId", query.brandId);
-        return (
-          `/getOutlets?` +
-          (query.getAll
-            ? "getAll=true"
-            : `name=${query?.name || ""}&page=${query?.page || 0}`) +
-          (params ? `&${params}` : "")
-        );
+        Object.keys(query).forEach((key) => {
+          params.append(key, query[key]);
+        });
+        return `/getOutlets?${params}`;
       },
     }),
     //get outlet
@@ -63,4 +59,6 @@ export const {
   useGetAllOutletsQuery,
   useGetOutletQuery,
   useUpdateOutletMutation,
+  useLazyGetAllOutletsQuery,
+  useLazyGetOutletQuery,
 } = outletApi;

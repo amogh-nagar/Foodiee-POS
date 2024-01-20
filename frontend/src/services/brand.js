@@ -16,15 +16,10 @@ export const brandApi = createApi({
     getAllBrands: builder.query({
       query: (query) => {
         const params = new URLSearchParams();
-        if(query.tenantId)
-            params.append("tenantId", query.tenantId);
-        return (
-          `/getBrands?` +
-          (query.getAll
-            ? "getAll=true"
-            : `name=${query?.name || ""}&page=${query?.page || 0}`) +
-          (params ? `&${params}` : "")
-        );
+        Object.keys(query).forEach((key) => {
+          params.append(key, query[key]);
+        });
+        return `/getBrands?${params}`;
       },
     }),
     //get all brands

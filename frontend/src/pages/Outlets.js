@@ -9,7 +9,7 @@ import {
 import { useGetAllBrandsQuery } from "../services/brand";
 import EntityCard from "../components/Entity/EntityCard";
 import debounce from "lodash.debounce";
-import { itemsPerPage, showToast } from "../utils/constants";
+import { itemsPerPage, selectCustomStyle, showToast } from "../utils/constants";
 import Select from "react-select";
 import Modal from "../components/Modals/Modal";
 import { IoMdAdd } from "react-icons/io";
@@ -17,6 +17,7 @@ import CustomForm from "../components/forms/Form";
 import FlexDiv from "../components/Wrappers/FlexDiv";
 import Loader from "../UI/Loaders/Loader";
 import ReactPaginate from "react-paginate";
+import CustomDropdownIndicator from "../components/CustomDropdownIndicator";
 
 const Outlets = () => {
   const location = useLocation();
@@ -57,13 +58,13 @@ const Outlets = () => {
       setSelectedBrand({
         label: location.state?.selectedEntity?.name,
         value: location.state?.selectedEntity?._id,
-        tenantId: location.state?.selectedEntity?.entityId
+        tenantId: location.state?.selectedEntity?.entityId,
       });
     else if (brandsData?.brands?.length)
       setSelectedBrand({
         label: brandsData?.brands[0]?.name,
         value: brandsData?.brands[0]?._id,
-        tenantId: brandsData?.brands[0]?.tenantId
+        tenantId: brandsData?.brands[0]?.tenantId,
       });
   }, [brandsData?.brands]);
   const totalItems = data?.totalItems ?? 0;
@@ -96,7 +97,7 @@ const Outlets = () => {
       debouncer.cancel();
     };
   }, [searchTerm]);
-  console.log("selectedBrand", selectedBrand)
+  console.log("selectedBrand", selectedBrand);
   const onSubmit = async (values) => {
     try {
       const formData = new FormData();
@@ -107,7 +108,8 @@ const Outlets = () => {
         );
       }
       selectedBrand.value && formData.append("brandId", selectedBrand.value);
-      selectedBrand.tenantId && formData.append("tenantId", selectedBrand.tenantId);
+      selectedBrand.tenantId &&
+        formData.append("tenantId", selectedBrand.tenantId);
       await createOutlet(formData).unwrap();
       refetch();
       showToast("Outlet Created Successfully", "success");
@@ -134,7 +136,7 @@ const Outlets = () => {
   };
   const onEditBtnClick = async (values) => {
     try {
-      console.log("values", values)
+      console.log("values", values);
       const formData = new FormData();
       for (var key in values) {
         formData.append(
@@ -161,7 +163,7 @@ const Outlets = () => {
     }) ?? [];
 
   const handleSelectChange = (option) => {
-    console.log(option, "option")
+    console.log(option, "option");
     setSelectedBrand(option);
     refetch();
   };
@@ -171,29 +173,14 @@ const Outlets = () => {
         name="Brands"
         MultiSelect={() => (
           <Select
+            components={{ DropdownIndicator: CustomDropdownIndicator }}
             defaultValue={selectedBrand}
             onChange={handleSelectChange}
             name="colors"
             options={brands}
             placeholder="Select Brands"
             className="basic-multi-select w-96 bg-primary-700 rounded-lg text-secondary-600"
-            styles={{
-              control: (styles) => ({
-                ...styles,
-                outlineWidth: 0,
-                color: "red",
-              }),
-              option: (styles, { isFocused, isSelected }) => {
-                return {
-                  ...styles,
-                  backgroundColor:
-                    (isSelected && "#e85f48") ||
-                    (isFocused && "#EA7C69") ||
-                    "#1f222e",
-                  color: "white",
-                };
-              },
-            }}
+            styles={selectCustomStyle}
           />
         )}
       />
@@ -288,22 +275,24 @@ const Outlets = () => {
                       },
                     ]}
                   />
-                  <ReactPaginate
-                    breakLabel="..."
-                    nextLabel=">"
-                    breakClassName=""
-                    containerClassName="bg-primary-700 h-12 px-3 flex items-center gap-x-3 w-fit m-auto rounded-xl absolute bottom-4 left-1/2"
-                    pageClassName="bg-primary-100 rounded-xl hover:bg-slate-500 w-8 h-8 flex items-center justify-center"
-                    activeClassName="bg-slate-500"
-                    previousClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
-                    nextClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
-                    disabledClassName=""
-                    onPageChange={handlePageClick}
-                    pageRangeDisplayed={5}
-                    pageCount={pageCount}
-                    previousLabel="<"
-                    renderOnZeroPageCount={null}
-                  />
+                  {pageCount > 1 && (
+                    <ReactPaginate
+                      breakLabel="..."
+                      nextLabel=">"
+                      breakClassName=""
+                      containerClassName="bg-primary-700 h-12 px-3 flex items-center gap-x-3 w-fit m-auto rounded-xl absolute bottom-4 left-1/2"
+                      pageClassName="bg-primary-100 rounded-xl hover:bg-slate-500 w-8 h-8 flex items-center justify-center"
+                      activeClassName="bg-slate-500"
+                      previousClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                      nextClassName="rounded-xl bg-secondary-700 w-8 h-8 flex items-center justify-center"
+                      disabledClassName=""
+                      onPageChange={handlePageClick}
+                      pageRangeDisplayed={5}
+                      pageCount={pageCount}
+                      previousLabel="<"
+                      renderOnZeroPageCount={null}
+                    />
+                  )}
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">

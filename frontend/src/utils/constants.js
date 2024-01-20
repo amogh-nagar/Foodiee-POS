@@ -17,9 +17,6 @@ import {
   useGetAllOutletsDetailsQuery,
   useGetAllTenantsDetailsQuery,
 } from "../services/dashboard";
-import { login, logout } from "../store/authSlice";
-import { useHistory } from "react-router-dom/cjs/react-router-dom";
-
 export const currencyMap = {
   USD: "$",
   EUR: "€",
@@ -138,28 +135,6 @@ export const permissionToRoleBasedAPIs = {
     superAdmin: [useGetAllTenantsDetailsQuery, useGetAllTenantsSalesQuery],
     outletAdmin: [useGetAllOutletsDetailsQuery, useGetAllOutletsSalesQuery],
   },
-  isVisitUsersPage: {
-    tenantAdmin: [],
-    brandAdmin: [],
-    superAdmin: [],
-    outletAdmin: [],
-  },
-  isVisitTenantsPage: {
-    superAdmin: [],
-  },
-  isVisitOutletsPage: {
-    brandAdmin: [],
-  },
-  isVisitDishesPage: {
-    brandAdmin: [],
-  },
-  isVisitBrandsPage: {
-    tenantAdmin: [],
-  },
-};
-
-export const permissionOnlyAPIS = {
-  isVisitBillingPage: [],
 };
 
 var superAdminPermissions = [
@@ -167,27 +142,29 @@ var superAdminPermissions = [
   "isUpdateTenants",
   "isDeleteTenants",
   "isVisitTenantsPage",
-  "isCreatedUser",
-  "isUpdateUser",
 ];
 
 var commonPermissions = [
   "isVisitUsersPage",
+  "isVisitRolesPage",
+  "isCreateUsers",
+  "isCreateRoles",
+  "isUpdateUsers",
+  "isUpdateRoles",
+  "isDeleteUsers",
+  "isDeleteRoles",
   "isVisitAnalysisPage",
   "isVisitDashboardPage",
-  "isViewProfile",
 ];
 
-var tenantAdminPermissions = [
+var tenantUserPermissions = [
   "isCreateBrands",
   "isUpdateBrands",
   "isDeleteBrands",
   "isVisitBrandsPage",
-  "isCreatedUser",
-  "isUpdateUser",
 ];
 
-var brandAdminPermissions = [
+var brandUserPermissions = [
   "isCreateOutlets",
   "isCreateDishes",
   "isCreateTax",
@@ -200,19 +177,50 @@ var brandAdminPermissions = [
   "isUpdateTax",
   "isDeleteTax",
   "isVisitTaxesPage",
-  "isCreatedUser",
-  "isUpdateUser",
 ];
 
-var outletAdminPermissions = [
-  "isVisitBillingPage",
-  "isCreatedUser",
-  "isUpdateUser",
-];
+var outletUserPermissions = ["isVisitBillingPage"];
 
 export const rolesMappedToPermissions = {
   superAdmin: superAdminPermissions.concat(commonPermissions),
-  tenantAdmin: tenantAdminPermissions.concat(commonPermissions),
-  outletAdmin: outletAdminPermissions.concat(commonPermissions),
-  brandAdmin: brandAdminPermissions.concat(commonPermissions),
+  tenantUser: tenantUserPermissions.concat(commonPermissions),
+  outletUser: outletUserPermissions.concat(commonPermissions),
+  brandUser: brandUserPermissions.concat(commonPermissions),
+};
+
+export const selectCustomStyle = {
+  control: (provided, state) => ({
+    ...provided,
+    backgroundColor: "rgba(31, 41, 55)",
+    borderColor: "rgba(31, 41, 55)",
+    outlineWidth: 0,
+    outerHeight: 0,
+    outerWidth: 0,
+    cursor: "pointer",
+    border: state.isFocused ? 0 : 0,
+    boxShadow: state.isFocused ? 0 : 0,
+    "&:hover": {
+      border: state.isFocused ? 0 : 0,
+    },
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    height: "100%",
+    cursor: "pointer",
+    color: "white",
+    paddingTop: "3px",
+  }),
+  menuList: (provided) => ({
+    ...provided,
+    backgroundColor: "rgba(31, 41, 55)",
+  }),
+  option: (styles, { isFocused, isSelected }) => {
+    return {
+      ...styles,
+      backgroundColor:
+        (isSelected && "#e85f48") || (isFocused && "#673b34") || "#1f222e",
+      color: "white",
+      cursor: "pointer",
+    };
+  },
 };

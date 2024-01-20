@@ -14,11 +14,13 @@ export const tenantApi = createApi({
   endpoints: (builder) => ({
     //get all tenants
     getAllTenants: builder.query({
-      query: (query) =>
-        `/getTenants?` +
-        (query.getAll
-          ? "getAll=true"
-          : `name=${query?.name || ""}&page=${query?.page || 0}`),
+      query: (query) => {
+        const params = new URLSearchParams();
+        Object.keys(query).forEach((key) => {
+          params.append(key, query[key]);
+        });
+        return `/getTenants?${params}`;
+      },
     }),
     //get tenants
     getTenant: builder.query({
