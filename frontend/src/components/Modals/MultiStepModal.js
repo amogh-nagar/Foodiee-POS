@@ -81,16 +81,19 @@ const MultiStepModal = ({
                                 allFields
                               )
                             ) {
-                              setAllFields((prev) => {
-                                return {
-                                  ...prev,
-                                  ...values,
-                                };
-                              });
                               if (reachedIndex >= steps.length - 1) {
                                 resetState(close);
-                                onSubmitForm(allFields);
+                                onSubmitForm({
+                                  ...allFields,
+                                  ...values,
+                                });
                               } else {
+                                setAllFields((prev) => {
+                                  return {
+                                    ...prev,
+                                    ...values,
+                                  };
+                                });
                                 setStepIndex((prev) => prev + 1);
                                 setReachedIndex((prev) => prev + 1);
                               }
