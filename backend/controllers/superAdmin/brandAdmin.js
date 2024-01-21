@@ -230,7 +230,6 @@ exports.getAllAdmins = function (req, res, next) {
         },
       ],
       function (err, data) {
-        console.log(data);
         res.status(200).json({
           message: "All Admins Fetched",
           admins: data.length == 0 ? [] : data,

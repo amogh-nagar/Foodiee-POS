@@ -14,11 +14,13 @@ export const roleApi = createApi({
   endpoints: (builder) => ({
     //get all roles
     getAllRoles: builder.query({
-      query: (query) =>
-        `/getRoles?` +
-        (query.getAll
-          ? "getAll=true"
-          : `name=${query?.name || ""}&page=${query?.page || 0}`),
+      query: (query) => {
+        const params = new URLSearchParams();
+        Object.keys(query).forEach((key) => {
+          params.append(key, query[key]);
+        });
+        return `/getRoles?${params}`
+      }
     }),
     //get roles
     getRole: builder.query({

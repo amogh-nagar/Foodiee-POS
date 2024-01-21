@@ -252,7 +252,6 @@ exports.disableUser = async function (req, res, next) {
 };
 
 exports.getUsers = function (req, res, next) {
-  console.log("req.query", req.query)
   var skip = (req.query.page - 1) * itemsPerPage;
   let query = {
     "entityDetails.entityId": {

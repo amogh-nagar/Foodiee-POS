@@ -71,10 +71,18 @@ function hashToRGBA(hash, isDisabled) {
 
 export const itemsPerPage = 20;
 
-export const checkForSame = (objectToCompare, ObjectWithCompare) => {
+export const checkForSame = (objectToCompare, ObjectWithCompare, allFields) => {
   let isSame = true;
+  if(Array.isArray(ObjectWithCompare)){
+    return objectToCompare.every((v,i)=> v === ObjectWithCompare[i])
+  }
   Object.keys(ObjectWithCompare).forEach((key) => {
-    if (objectToCompare[key] != ObjectWithCompare[key]) isSame = false;
+    if (
+      allFields
+        ? objectToCompare[key] != allFields[key]
+        : objectToCompare[key] != ObjectWithCompare[key]
+    )
+      isSame = false;
   });
   return isSame;
 };
@@ -223,4 +231,22 @@ export const selectCustomStyle = {
       cursor: "pointer",
     };
   },
+};
+
+
+Object.defineProperty(String.prototype, 'capitalize', {
+  value: function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+  },
+  enumerable: false
+});
+
+export const validateForm = (values, initialValues) => {
+  const errors = {};
+  for (var key in initialValues) {
+    if (!values[key]) {
+      errors[key] = `${key.capitalize()} is required`;
+    }
+  }
+  return errors;
 };

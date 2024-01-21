@@ -19,7 +19,7 @@ const BreadcrumbItem = ({ item, isLast }) => {
       {item.type == "array" ? (
         <div>
           <Select
-            defaultValue={dropdownOptions?.length ? dropdownOptions[0] : null}
+            defaultValue={null}
             components={{ DropdownIndicator: CustomDropdownIndicator }}
             options={dropdownOptions}
             placeholder={item.title}

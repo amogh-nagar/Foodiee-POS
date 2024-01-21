@@ -11,7 +11,7 @@ const CustomForm = ({
   validator,
   fields,
   buttonText,
-  btnClass,
+  btnClass
 }) => {
   let fieldsType = {
     textarea: TextArea,
@@ -25,7 +25,7 @@ const CustomForm = ({
       validate={validate}
       validator={validator}
     >
-      <Form className="w-full">
+      <Form className="w-full px-5">
         {fields.map((field, index) => {
           let Component = fieldsType[field.type] ?? Input;
           if (field.type === "checkbox") {

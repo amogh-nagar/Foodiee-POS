@@ -2,9 +2,7 @@ var Role = require("../../models/role");
 const HttpError = require("../../models/http-error");
 var mongoose = require("mongoose");
 var async = require("async");
-const {
-  handleError,
-} = require("../../common");
+const { handleError } = require("../../common");
 var itemsPerPage = 20;
 
 exports.getRoles = function (req, res, next) {
@@ -21,42 +19,42 @@ exports.getRoles = function (req, res, next) {
     aggPipeline = aggPipeline.slice(0, 2);
     aggPipeline[1]["$project"] = { name: 1 };
   }
-  async.parallel(
-    [
-      function (cb) {
-        Role.aggregate(aggPipeline, function (err, data) {
+  let parallelArr = [
+    function (cb) {
+      Role.aggregate(aggPipeline, function (err, data) {
+        if (err) return cb(err);
+        cb(null, {
+          roles: data.length == 0 ? [] : data,
+        });
+      });
+    },
+  ];
+  if (!req.query.notIncludeTotal) {
+    parallelArr.push(function (cb) {
+      Role.aggregate(
+        [{ $match: query }, { $count: "totalItems" }],
+        function (err, data) {
           if (err) return cb(err);
           cb(null, {
-            roles: data.length == 0 ? [] : data,
+            totalItems: data.length == 0 ? 0 : data[0].totalItems,
           });
-        });
-      },
-      function (cb) {
-        Role.aggregate(
-          [{ $match: query }, { $count: "totalItems" }],
-          function (err, data) {
-            if (err) return cb(err);
-            cb(null, {
-              totalItems: data.length == 0 ? 0 : data[0].totalItems,
-            });
-          }
-        );
-      },
-    ],
-    function (err, data) {
-      if (err)
-        return handleError(res, {
-          message: "Some error occurred",
-          statusCode: 500,
-          error: err,
-        });
-      res.status(200).json({
-        message: "Roles Fetched",
-        roles: data[0].roles,
-        totalItems: data[1].totalItems,
+        }
+      );
+    });
+  }
+  async.parallel(parallelArr, function (err, data) {
+    if (err)
+      return handleError(res, {
+        message: "Some error occurred",
+        statusCode: 500,
+        error: err,
       });
-    }
-  );
+    res.status(200).json({
+      message: "Roles Fetched",
+      roles: data[0].roles,
+      totalItems: data[1].totalItems,
+    });
+  });
 };
 
 exports.getRole = function (req, res, next) {
@@ -147,11 +145,11 @@ exports.updateRole = function (req, res, next) {
 };
 
 exports.deleteRole = (req, res, next) => {
-    Role.findByIdAndDelete(req.body.roleId, function(err){
-        if (err) {
-            var error = new HttpError("Role not found", 400);
-            return next(error);
-        }
-        res.status(200).send("Role deleted successfully");
-    });
-}
+  Role.findByIdAndDelete(req.body.roleId, function (err) {
+    if (err) {
+      var error = new HttpError("Role not found", 400);
+      return next(error);
+    }
+    res.status(200).send("Role deleted successfully");
+  });
+};

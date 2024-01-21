@@ -1,9 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
 import { GrCaretNext, GrCaretPrevious } from "react-icons/gr";
-const MultiStepModal = ({ PopUpButton, HeaderText, steps }) => {
-    console.log("strps", steps)
+import CustomForm from "../forms/Form";
+import { checkForSame, showToast, validateForm } from "../../utils/constants";
+import MultiSelect from "../Select/MultiSelect";
+const MultiStepModal = ({
+  PopUpButton,
+  HeaderText,
+  steps,
+  onSubmitForm,
+  initialValues,
+}) => {
+  const [allFields, setAllFields] = useState(initialValues);
   const [stepIndex, setStepIndex] = useState(0);
+  const [reachedIndex, setReachedIndex] = useState(0);
+  const resetState = (close) => {
+    setStepIndex(0);
+    setAllFields(initialValues);
+    setReachedIndex(0);
+    close();
+  };
+  const onMultiSelectChange = (options, key) => {
+    setAllFields((prev) => {
+      return {
+        ...prev,
+        [key]: options.map((option) => {
+          return {
+            ...option,
+            isSelected: true,
+          };
+        }),
+      };
+    });
+  };
+  const onRemoveItem = (option, key) => {
+    setAllFields((prev) => {
+      return {
+        ...prev,
+        [key]: prev[key].filter((opt) => opt.value != option.value),
+      };
+    });
+  };
   return (
     <Popup
       trigger={PopUpButton}
@@ -31,7 +68,95 @@ const MultiStepModal = ({ PopUpButton, HeaderText, steps }) => {
             </div>
             <div className="flex justify-center items-center overflow-y-auto h-[30rem] w-[50rem] hide-scrollbar">
               {steps.map(
-                (Step, index) => stepIndex === index && <Step key={index} />
+                (Step, index) =>
+                  stepIndex === index && (
+                    <>
+                      {Step.isForm && (
+                        <CustomForm
+                          onSubmit={(values) => {
+                            if (
+                              !checkForSame(
+                                values,
+                                Step.initialValues,
+                                allFields
+                              )
+                            ) {
+                              setAllFields((prev) => {
+                                return {
+                                  ...prev,
+                                  ...values,
+                                };
+                              });
+                              if (reachedIndex >= steps.length - 1) {
+                                resetState(close);
+                                onSubmitForm(allFields);
+                              } else {
+                                setStepIndex((prev) => prev + 1);
+                                setReachedIndex((prev) => prev + 1);
+                              }
+                            } else showToast("Nothing to Create", "info");
+                          }}
+                          key={index}
+                          initialValues={allFields}
+                          onRender={Step.onRender}
+                          fields={Step.fields}
+                          validate={(values) =>
+                            validateForm(values, Step.initialValues)
+                          }
+                          btnClass="w-40 h-10"
+                          validator={() => {}}
+                          buttonText={
+                            reachedIndex === steps.length - 1
+                              ? "Submit"
+                              : "Next"
+                          }
+                        />
+                      )}
+                      {Step.isMultiSelect && (
+                        <MultiSelect
+                          initialValues={allFields[Step.key]}
+                          onChange={(options) =>
+                            onMultiSelectChange(options, Step.key)
+                          }
+                          btnClass="w-40 h-10"
+                          buttonText={
+                            reachedIndex === steps.length - 1
+                              ? "Submit"
+                              : "Next"
+                          }
+                          onSubmit={(options) => {
+                            if (!checkForSame(options, Step.initialValues)) {
+                              if (reachedIndex >= steps.length - 1) {
+                                resetState(close);
+                                onSubmitForm({
+                                  ...allFields,
+                                  [Step.key]: [...options],
+                                });
+                              } else {
+                                setAllFields((prev) => {
+                                  return {
+                                    ...prev,
+                                    [Step.key]: [...options],
+                                  };
+                                });
+                                setStepIndex((prev) => prev + 1);
+                                setReachedIndex((prev) => prev + 1);
+                              }
+                            } else
+                              showToast("Please Select " + Step.key, "info");
+                          }}
+                          onRemoveItem={onRemoveItem}
+                          skipIfNull={Step.skipIfNull}
+                          title={`Search ${Step.key}`}
+                          key={index}
+                          field={Step.key}
+                          inputQuery={Step.inputQuery}
+                          useOptionsQuery={Step.useOptionsQuery}
+                          value={allFields[Step.key]}
+                        />
+                      )}
+                    </>
+                  )
               )}
             </div>
             <div
@@ -41,7 +166,7 @@ const MultiStepModal = ({ PopUpButton, HeaderText, steps }) => {
                 );
               }}
               className={`w-7 h-7 flex justify-center items-center ${
-                stepIndex === steps.length - 1 ? "disableEntity" : ""
+                stepIndex < reachedIndex ? "" : "disableEntity"
               }`}
             >
               <button className="text-secondary-700">
@@ -54,7 +179,7 @@ const MultiStepModal = ({ PopUpButton, HeaderText, steps }) => {
               <span
                 key={index}
                 className={`h-3 w-3 block rounded-full ${
-                  stepIndex >= index ? "bg-secondary-600" : "bg-gray-700"
+                  reachedIndex >= index ? "bg-secondary-600" : "bg-gray-700"
                 }`}
               ></span>
             ))}
@@ -63,8 +188,7 @@ const MultiStepModal = ({ PopUpButton, HeaderText, steps }) => {
             <button
               className="button bg-secondary-500 hover:bg-secondary-700"
               onClick={() => {
-                stepIndex == steps.length - 1 && setStepIndex(0);
-                close();
+                resetState(close);
               }}
             >
               Close

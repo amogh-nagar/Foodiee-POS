@@ -97,7 +97,6 @@ const Outlets = () => {
       debouncer.cancel();
     };
   }, [searchTerm]);
-  console.log("selectedBrand", selectedBrand);
   const onSubmit = async (values) => {
     try {
       const formData = new FormData();
@@ -136,7 +135,6 @@ const Outlets = () => {
   };
   const onEditBtnClick = async (values) => {
     try {
-      console.log("values", values);
       const formData = new FormData();
       for (var key in values) {
         formData.append(
@@ -163,7 +161,6 @@ const Outlets = () => {
     }) ?? [];
 
   const handleSelectChange = (option) => {
-    console.log(option, "option");
     setSelectedBrand(option);
     refetch();
   };

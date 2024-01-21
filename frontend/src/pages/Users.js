@@ -8,9 +8,13 @@ import { useSelector } from "react-redux";
 import { useLazyGetAllTenantsQuery } from "../services/tenant";
 import { useLazyGetAllBrandsQuery } from "../services/brand";
 import { useLazyGetAllOutletsQuery } from "../services/outlet";
-import { useLazyGetUsersQuery } from "../services/user";
-import { useLazyGetAllRolesQuery } from "../services/role";
+import { useGetUsersQuery } from "../services/user";
+import { useGetAllRolesQuery } from "../services/role";
 import Loader from "../UI/Loaders/Loader";
+import CustomForm from "../components/forms/Form";
+import Modal from "../components/Modals/Modal";
+import { checkForSame, showToast, validateForm } from "../utils/constants";
+import MultiStepModal from "../components/Modals/MultiStepModal";
 const Users = () => {
   const [activeTab, setActiveTab] = useState("Users");
   const [entityArr, setEntityArr] = useState([]);
@@ -22,10 +26,32 @@ const Users = () => {
     useLazyGetAllBrandsQuery();
   const [getOutlets, { data: outlets, isLoadingOutlets, isErrorOutlets }] =
     useLazyGetAllOutletsQuery();
-  const [getUsers, { data: users, isLoadingUsers, isErrorUsers }] =
-    useLazyGetUsersQuery();
-  const [getRoles, { data: roles, isLoadingRoles, isErrorRoles }] =
-    useLazyGetAllRolesQuery();
+  const {
+    data: users,
+    isLoadingUsers,
+    isErrorUsers,
+  } = useGetUsersQuery(
+    {
+      entityIds: activeEntityItem,
+      page: 1,
+    },
+    {
+      skip: !activeEntityItem || activeTab !== "Users",
+    }
+  );
+  const {
+    data: roles,
+    isLoadingRoles,
+    isErrorRoles,
+  } = useGetAllRolesQuery(
+    {
+      entityIds: activeEntityItem,
+      page: 1,
+    },
+    {
+      skip: !activeEntityItem || activeTab !== "Roles",
+    }
+  );
   const isLoadingEntity =
     isLoadingBrands ||
     isLoadingOutlets ||
@@ -69,6 +95,7 @@ const Users = () => {
       type: "array",
       onChange: (value) => {
         setActiveEntity(value.value);
+        setActiveEntityItem("");
         let query = {
           notIncludeTotal: true,
           getAll: true,
@@ -110,14 +137,109 @@ const Users = () => {
       },
     });
   }
-  useEffect(() => {
-    if (!activeEntityItem) return;
-    let query = {
-      entityIds: [activeEntityItem],
-      page: 1,
+  const addUser = (values) => {};
+  const addRole = (values) => {};
+  const onSubmit = (values) => {
+    console.log("values are", values);
+    // displayUser ? addUser(values) : addRole(values);
+  };
+  let initialValues = {},
+    attributes = {
+      PopUpButton: (
+        <button className="flex items-center justify-between w-28 rounded-md hover:bg-secondary-600 bg-secondary-500 text-white px-3 py-2">
+          <IoMdAdd />
+          <p>Add {displayUser ? "User" : "Role"}</p>
+        </button>
+      ),
+      HeaderText: () => `Create ${displayUser ? "User" : "Role"}`,
+    },
+    Component = Modal;
+  if (displayUser) {
+    initialValues = {
+      name: "",
+      email: "",
+      mobile: "",
+      roles: [],
+      permissions: [],
+      image: "",
     };
-    activeTab === "Users" ? getUsers(query) : getRoles(query);
-  }, [activeEntityItem, activeTab]);
+    Component = MultiStepModal;
+    attributes["initialValues"] = initialValues;
+    attributes["onSubmitForm"] = onSubmit;
+    attributes["steps"] = [
+      {
+        isForm: true,
+        initialValues: {
+          name: "",
+          email: "",
+          mobile: "",
+        },
+        fields: [
+          {
+            type: "text",
+            name: "name",
+            label: "Name",
+            placeholder: "User Name",
+          },
+          {
+            type: "email",
+            name: "email",
+            label: "Email",
+            placeholder: "User Email",
+          },
+          {
+            type: "number",
+            name: "mobile",
+            label: "Mobile",
+            placeholder: "User Mobile",
+          },
+        ],
+      },
+      {
+        isMultiSelect: true,
+        useOptionsQuery: useGetAllRolesQuery,
+        inputQuery: {
+          entityIds: activeEntityItem,
+          getAll: true,
+        },
+        initialValues: [],
+        key: "roles",
+        skipIfNull: activeEntityItem,
+      },
+    ];
+  } else {
+    initialValues = {
+      name: "",
+      description: "",
+    };
+    Component = Modal;
+    attributes["isJSX"] = true;
+    attributes["BodyContent"] = (
+      <CustomForm
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={(values) => validateForm(values, initialValues)}
+        btnClass="w-40 h-10"
+        validator={() => {}}
+        fields={[
+          {
+            type: "text",
+            name: "name",
+            label: "Name",
+            placeholder: "Role Name",
+          },
+          {
+            type: "textarea",
+            name: "description",
+            label: "Description",
+            placeholder: "Role Description",
+          },
+        ]}
+        buttonText="Create"
+        isTrusted={true}
+      />
+    );
+  }
   return (
     <div>
       <PageNameWithDate name="Users" />
@@ -160,10 +282,17 @@ const Users = () => {
                     className="bg-gray-600 w-2/3 text-white font-sans p-2 rounded-lg outline-none"
                     placeholder={`Search ${displayUser ? "User" : "Role"}`}
                   />
-                  <button className="flex items-center justify-between w-28 rounded-md hover:bg-secondary-600 bg-secondary-500 text-white px-3 py-2">
-                    <IoMdAdd />
-                    <p>Add {displayUser ? "User" : "Role"}</p>
-                  </button>
+                  {activeEntityItem ? (
+                    <Component {...attributes} />
+                  ) : (
+                    <button
+                      disabled
+                      className="flex items-center justify-between w-28 rounded-md opacity-50 bg-secondary-500 text-white px-3 py-2"
+                    >
+                      <IoMdAdd />
+                      <p>Add {displayUser ? "User" : "Role"}</p>
+                    </button>
+                  )}
                 </div>
               </div>
               {displayUser ? (

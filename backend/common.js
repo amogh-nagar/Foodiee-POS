@@ -50,7 +50,6 @@ exports.deleteImageFromS3 = function (data) {
   if (!data.fileName || data.fileName.length == 0) return;
   var params = { Bucket: process.env.AWS_BUCKET_NAME, Key: data.fileName };
   s3.deleteObject(params, function (err, data) {
-    console.log("data", data);
     if (err) {
       console.log(err, err.stack);
       return;

@@ -130,7 +130,6 @@ const Brands = () => {
   };
   const onEditBtnClick = async (values) => {
     try {
-      console.log("values", values);
       const formData = new FormData();
       for (var key in values) {
         formData.append(
@@ -156,7 +155,6 @@ const Brands = () => {
     }) ?? [];
 
   const handleSelectChange = (option) => {
-    console.log("option", option);
     setSelectedTenant(option);
     refetch();
   };

@@ -144,7 +144,6 @@ exports.createBrand = function (req, res, next) {
 };
 
 exports.updateBrand = function (req, res, next) {
-  console.log("req.body", req.body);
   Brand.findOne({
     tenantId: req.body.tenantId,
     name: req.body.name,

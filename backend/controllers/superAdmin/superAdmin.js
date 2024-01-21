@@ -47,7 +47,6 @@ exports.createSuperAdmin = function (req, res, next) {
       ],
     });
     newUser.save().then(function (user) {
-      console.log("user is", user);
       addToQueue({
         email: email,
         name: name,

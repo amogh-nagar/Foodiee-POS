@@ -57,7 +57,6 @@ const EntityCard = React.forwardRef(
                   <CustomForm
                     initialValues={initialValues}
                     onSubmit={(values) => {
-                      console.log("values", values,initialValues)
                       if (!checkForSame(values, initialValues))
                         onEditBtnClick({ entityId: args?._id, ...values });
                       else showToast("Nothing to Update", "info");
