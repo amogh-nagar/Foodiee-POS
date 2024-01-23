@@ -24,9 +24,7 @@ const Auth = () => {
       localStorage.setItem("token", data?.token);
       dispatch(
         login({
-          user: values,
-          permissions: data?.user?.permissions,
-          role: data?.user?.role,
+          user: data?.user ?? values
         })
       );
       history.push("/");

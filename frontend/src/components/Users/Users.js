@@ -2,7 +2,7 @@ import React from "react";
 import UserCard from "./UserTableCard";
 const User = ({ users }) => {
   return (
-    <div className="w-full mt-3 bg-primary-700 rounded-md">
+    <div className="w-full p-7 mt-3 bg-primary-700 rounded-md">
       {users && users.length ? (
         <table className="w-full">
           <thead className="border-b-2 border-secondary-600">

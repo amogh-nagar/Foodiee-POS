@@ -16,9 +16,7 @@ const useRefreshToken = () => {
         localStorage.setItem("token", response?.token);
         dispatch(
           login({
-            user: response.user,
-            permissions: response?.user?.permissions,
-            role: response?.user?.role,
+            user: response.user
           })
         );
         history.push("/");

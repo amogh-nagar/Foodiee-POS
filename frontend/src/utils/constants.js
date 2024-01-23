@@ -73,8 +73,8 @@ export const itemsPerPage = 20;
 
 export const checkForSame = (objectToCompare, ObjectWithCompare, allFields) => {
   let isSame = true;
-  if(Array.isArray(ObjectWithCompare)){
-    return objectToCompare.every((v,i)=> v === ObjectWithCompare[i])
+  if (Array.isArray(ObjectWithCompare)) {
+    return objectToCompare.every((v, i) => v === ObjectWithCompare[i]);
   }
   Object.keys(ObjectWithCompare).forEach((key) => {
     if (
@@ -146,54 +146,56 @@ export const permissionToRoleBasedAPIs = {
 };
 
 var superAdminPermissions = [
-  "isCreateTenants",
-  "isUpdateTenants",
-  "isDeleteTenants",
-  "isVisitTenantsPage",
+  { label: "Create Tenants", value: "isCreateTenants" },
+  { label: "Update Tenants", value: "isUpdateTenants" },
+  { label: "Delete Tenants", value: "isDeleteTenants" },
+  { label: "Visit Tenants Page", value: "isVisitTenantsPage" },
 ];
 
 var commonPermissions = [
-  "isVisitUsersPage",
-  "isVisitRolesPage",
-  "isCreateUsers",
-  "isCreateRoles",
-  "isUpdateUsers",
-  "isUpdateRoles",
-  "isDeleteUsers",
-  "isDeleteRoles",
-  "isVisitAnalysisPage",
-  "isVisitDashboardPage",
+  { label: "Visit Users Page", value: "isVisitUsersPage" },
+  { label: "Visit Roles Page", value: "isVisitRolesPage" },
+  { label: "Create Users", value: "isCreateUsers" },
+  { label: "Create Roles", value: "isCreateRoles" },
+  { label: "Update Users", value: "isUpdateUsers" },
+  { label: "Update Roles", value: "isUpdateRoles" },
+  { label: "Delete Users", value: "isDeleteUsers" },
+  { label: "Delete Roles", value: "isDeleteRoles" },
+  { label: "Visit Analysis Page", value: "isVisitAnalysisPage" },
+  { label: "Visit Dashboard Page", value: "isVisitDashboardPage" },
 ];
 
 var tenantUserPermissions = [
-  "isCreateBrands",
-  "isUpdateBrands",
-  "isDeleteBrands",
-  "isVisitBrandsPage",
+  { label: "Create Brands", value: "isCreateBrands" },
+  { label: "Update Brands", value: "isUpdateBrands" },
+  { label: "Delete Brands", value: "isDeleteBrands" },
+  { label: "Visit Brands Page", value: "isVisitBrandsPage" },
 ];
 
 var brandUserPermissions = [
-  "isCreateOutlets",
-  "isCreateDishes",
-  "isCreateTax",
-  "isUpdateOutlets",
-  "isDeleteOutlets",
-  "isVisitOutletsPage",
-  "isUpdateDishes",
-  "isDeleteDishes",
-  "isVisitDishesPage",
-  "isUpdateTax",
-  "isDeleteTax",
-  "isVisitTaxesPage",
+  { label: "Create Outlets", value: "isCreateOutlets" },
+  { label: "Create Dishes", value: "isCreateDishes" },
+  { label: "Create Taxes", value: "isCreateTax" },
+  { label: "Update Outlets", value: "isUpdateOutlets" },
+  { label: "Delete Outlets", value: "isDeleteOutlets" },
+  { label: "Visit Outlets Page", value: "isVisitOutletsPage" },
+  { label: "Update Dishes", value: "isUpdateDishes" },
+  { label: "Delete Dishes", value: "isDeleteDishes" },
+  { label: "Visit Dishes Page", value: "isVisitDishesPage" },
+  { label: "Update Taxes", value: "isUpdateTax" },
+  { label: "Delete Taxes", value: "isDeleteTax" },
+  { label: "Visit Taxes Page", value: "isVisitTaxesPage" },
 ];
 
-var outletUserPermissions = ["isVisitBillingPage"];
+var outletUserPermissions = [
+  { label: "Visit Billing Page", value: "isVisitBillingPage" },
+];
 
 export const rolesMappedToPermissions = {
   superAdmin: superAdminPermissions.concat(commonPermissions),
   tenantUser: tenantUserPermissions.concat(commonPermissions),
-  outletUser: outletUserPermissions.concat(commonPermissions),
   brandUser: brandUserPermissions.concat(commonPermissions),
+  outletUser: outletUserPermissions.concat(commonPermissions),
 };
 
 export const selectCustomStyle = {
@@ -233,12 +235,11 @@ export const selectCustomStyle = {
   },
 };
 
-
-Object.defineProperty(String.prototype, 'capitalize', {
-  value: function() {
+Object.defineProperty(String.prototype, "capitalize", {
+  value: function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
   },
-  enumerable: false
+  enumerable: false,
 });
 
 export const validateForm = (values, initialValues) => {

@@ -5,9 +5,10 @@ const authSlice = createSlice({
     user: null,
     permissions: [],
     roles: [],
-    entityDetails: [],
+    entityDetails: null,
     tenantIds: null,
     brandIds: null,
+    isSuperAdmin: false,
     outletIds: null,
     isAuthenticated: false,
   },
@@ -18,9 +19,16 @@ const authSlice = createSlice({
       }
       state.isAuthenticated = true;
       state.user = action.payload.user;
-      state.permissions = action.payload.permissions ?? [];
-      state.entityDetails = action.payload.entityDetails ?? [];
-      state.roles = action.payload.roles;
+      state.permissions = action.payload.user.permissions ?? [];
+      state.entityDetails = action.payload.user.entityDetails ?? [];
+      state.roles = action.payload.user.roles;
+      if (
+        action.payload.user.roles &&
+        action.payload.user.roles[0] &&
+        action.payload.user.roles[0].roleName === "superAdmin"
+      ) {
+        state.isSuperAdmin = true;
+      }
       state.entityDetails?.map((entity) => {
         if (entity.entityName === "Tenant")
           state.tenantIds.push(entity.entityId);

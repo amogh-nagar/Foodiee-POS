@@ -16,7 +16,7 @@ const RoleCard = ({
     permissions,
   };
   return (
-    <div className="h-52 w-96 rounded-sm bg-primary-600 flex flex-col justify-between items-start">
+    <div className="h-52 w-96 rounded-md bg-primary-600 flex flex-col justify-between items-start">
       <div className="w-full">
         <div className="border-b-2 w-full flex items-center justify-between border-b-secondary-600 p-3">
           <h3>{name}</h3>

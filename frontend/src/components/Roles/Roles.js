@@ -5,7 +5,7 @@ const Roles = ({ roles }) => {
   const onDeleteHandler = () => {};
   const validateUpdate = () => {};
   return (
-    <div className="flex bg-primary-700 w-full items-center justify-around flex-wrap gap-x-2 gap-y-5 mt-4">
+    <div className="flex bg-primary-700 w-full items-center justify-start flex-wrap gap-x-2 gap-y-5 mt-4 p-7 rounded-lg">
       {roles && roles.length ? (
         roles.map((role) => (
           <RoleCard
@@ -16,7 +16,7 @@ const Roles = ({ roles }) => {
           />
         ))
       ) : (
-        <div className="h-full p-10 flex item-center justify-center">
+        <div className="h-full w-full p-10 flex item-center justify-center">
           <h3>No Roles Found</h3>
         </div>
       )}

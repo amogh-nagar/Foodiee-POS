@@ -8,20 +8,33 @@ import { useSelector } from "react-redux";
 import { useLazyGetAllTenantsQuery } from "../services/tenant";
 import { useLazyGetAllBrandsQuery } from "../services/brand";
 import { useLazyGetAllOutletsQuery } from "../services/outlet";
-import { useGetUsersQuery } from "../services/user";
-import { useGetAllRolesQuery } from "../services/role";
+import { useGetUsersQuery, useCreateUserMutation } from "../services/user";
+import { useGetAllRolesQuery, useCreateRoleMutation } from "../services/role";
 import Loader from "../UI/Loaders/Loader";
 import CustomForm from "../components/forms/Form";
 import Modal from "../components/Modals/Modal";
-import { checkForSame, showToast, validateForm } from "../utils/constants";
+import {
+  checkForSame,
+  rolesMappedToPermissions,
+  showToast,
+  validateForm,
+} from "../utils/constants";
 import MultiStepModal from "../components/Modals/MultiStepModal";
 const Users = () => {
   const [activeTab, setActiveTab] = useState("Users");
-  const [entityArr, setEntityArr] = useState([]);
+  const [accessibleEntities, setAccessibleEntities] = useState([]);
   const [activeEntity, setActiveEntity] = useState("");
   const [activeEntityItem, setActiveEntityItem] = useState("");
   const [getTenants, { data: tenants, isLoadingTenants, isErrorTenants }] =
     useLazyGetAllTenantsQuery();
+  const [
+    createRole,
+    { isLoading: isCreateRoleLoading, isError: isCreateRoleError },
+  ] = useCreateRoleMutation();
+  const [
+    createUser,
+    { isLoading: isCreateUserLoading, isError: isCreateUserError },
+  ] = useCreateUserMutation();
   const [getBrands, { data: brands, isLoadingBrands, isErrorBrands }] =
     useLazyGetAllBrandsQuery();
   const [getOutlets, { data: outlets, isLoadingOutlets, isErrorOutlets }] =
@@ -30,6 +43,7 @@ const Users = () => {
     data: users,
     isLoadingUsers,
     isErrorUsers,
+    refetch: refetchUsers,
   } = useGetUsersQuery(
     {
       entityIds: activeEntityItem,
@@ -43,9 +57,10 @@ const Users = () => {
     data: roles,
     isLoadingRoles,
     isErrorRoles,
+    refetch: refetchRoles,
   } = useGetAllRolesQuery(
     {
-      entityIds: activeEntityItem,
+      entityId: activeEntityItem,
       page: 1,
     },
     {
@@ -65,33 +80,36 @@ const Users = () => {
   const auth = useSelector((state) => state.auth);
   useEffect(() => {
     const newEntityArr = [];
-    if (auth.permissions.includes("isVisitTenantsPage")) {
+    if (auth.isSuperAdmin || auth.tenantIds) {
       newEntityArr.push({
         label: "Tenant",
         value: "Tenant",
       });
     }
-
-    if (auth.permissions.includes("isVisitBrandsPage")) {
+    if (auth.brandIds) {
       newEntityArr.push({
         label: "Brand",
         value: "Brand",
       });
     }
-
-    if (auth.permissions.includes("isVisitOutletsPage")) {
+    if (auth.outletIds) {
       newEntityArr.push({
         label: "Outlet",
         value: "Outlet",
       });
     }
-    setEntityArr(newEntityArr);
+    setAccessibleEntities(newEntityArr);
   }, [auth.entityDetails]);
+  let permissionAvailableForUserCreation =
+    (auth.isSuperAdmin && rolesMappedToPermissions.superAdmin) ||
+    (auth.tenantIds && rolesMappedToPermissions.tenantUser) ||
+    (auth.brandIds && rolesMappedToPermissions.brandUser) ||
+    (auth.outletIds && rolesMappedToPermissions.outletUser) || [];
   const breadcrumbItems = [
     { title: "Entity Type" },
     {
       title: "Entity",
-      values: entityArr,
+      values: accessibleEntities,
       type: "array",
       onChange: (value) => {
         setActiveEntity(value.value);
@@ -137,11 +155,22 @@ const Users = () => {
       },
     });
   }
-  const addUser = (values) => {};
-  const addRole = (values) => {};
+  const addUser = async (values) => {};
+  const addRole = async (values) => {
+    try {
+      let payload = {
+        ...values,
+        entityId: activeEntityItem
+      }
+      await createRole(payload);
+      showToast("Role Created Succesfully", "success");
+      refetchRoles();
+    } catch (err) {
+      showToast(err?.data?.message || "Some error occurred!");
+    }
+  };
   const onSubmit = (values) => {
-    console.log("values are", values);
-    // displayUser ? addUser(values) : addRole(values);
+    displayUser ? addUser(values) : addRole(values);
   };
   let initialValues = {},
     attributes = {
@@ -199,7 +228,7 @@ const Users = () => {
         isMultiSelect: true,
         useOptionsQuery: useGetAllRolesQuery,
         inputQuery: {
-          entityIds: activeEntityItem,
+          entityId: activeEntityItem,
           getAll: true,
         },
         initialValues: [],
@@ -211,6 +240,7 @@ const Users = () => {
     initialValues = {
       name: "",
       description: "",
+      permissions: [],
     };
     Component = Modal;
     attributes["isJSX"] = true;
@@ -233,6 +263,17 @@ const Users = () => {
             name: "description",
             label: "Description",
             placeholder: "Role Description",
+          },
+          {
+            type: "array",
+            name: "permissions",
+            label: "Permissions",
+            allValues: permissionAvailableForUserCreation.map((permission) => {
+              return {
+                label: permission.label,
+                value: permission.value,
+              };
+            }),
           },
         ]}
         buttonText="Create"
