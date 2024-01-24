@@ -8,6 +8,7 @@ const RoleCard = ({
   onEditBtnClick,
   onDeleteHandler,
   validateUpdate,
+  allPermissions,
   ...args
 }) => {
   const initialValues = {
@@ -77,13 +78,14 @@ const RoleCard = ({
           <p className="truncate">{description}</p>
         </div>
         <div className="flex items-center flex-wrap gap-2 px-2 overflow-hidden h-24">
-          {
-            permissions?.slice(0, 4)?.map((permission)=>(
-              <div className="border-2 border-secondary-25 w-fit px-2 py-1 rounded-lg">
-                <p className="truncate">{permission}</p>
+          {permissions?.slice(0, 4)?.map((permission) => {
+            let value = allPermissions.find((ele) => ele.value === permission);
+            return (
+              <div key={permission} className="border-2 border-secondary-25 w-fit px-2 py-1 rounded-lg">
+                <p className="truncate">{value?.label ?? ""}</p>
               </div>
-            ))
-          }
+            );
+          })}
         </div>
       </div>
     </div>

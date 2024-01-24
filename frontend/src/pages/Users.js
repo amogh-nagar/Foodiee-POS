@@ -339,7 +339,7 @@ const Users = () => {
               {displayUser ? (
                 <User users={users?.users ?? []} />
               ) : (
-                <Roles roles={roles?.roles ?? []} />
+                <Roles allPermissions={permissionAvailableForUserCreation} roles={roles?.roles ?? []} />
               )}
             </>
           )}

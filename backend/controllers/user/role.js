@@ -11,7 +11,7 @@ exports.getRoles = function (req, res, next) {
   if (req.query.name) query["$text"] = { $search: req.query.name };
   let aggPipeline = [
     { $match: query },
-    { $project: { _id: 1, name: 1, description: 1, isActive: 1 } },
+    { $project: { _id: 1, name: 1, description: 1, permissions: 1, isActive: 1 } },
     { $skip: skip },
     { $limit: itemsPerPage },
   ];

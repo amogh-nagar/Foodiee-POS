@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import RoleCard from "./RoleCard";
-const Roles = ({ roles }) => {
+const Roles = ({ roles, allPermissions }) => {
   const onEditBtnClick = () => {};
   const onDeleteHandler = () => {};
   const validateUpdate = () => {};
@@ -9,10 +9,12 @@ const Roles = ({ roles }) => {
       {roles && roles.length ? (
         roles.map((role) => (
           <RoleCard
+            key={role}
             role={role}
             onDeleteHandler={onDeleteHandler}
             onEditBtnClick={onEditBtnClick}
             validateUpdate={validateUpdate}
+            allPermissions={allPermissions}
           />
         ))
       ) : (
