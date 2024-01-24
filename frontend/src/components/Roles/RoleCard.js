@@ -2,9 +2,9 @@ import React from "react";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import Modal from "../Modals/Modal";
 import CustomForm from "../forms/Form";
-import { checkForSame, showToast } from "../../utils/constants";
+import { checkForSame, showToast, validateForm } from "../../utils/constants";
 const RoleCard = ({
-  role: { name, description, permissions },
+  role: { name, description, permissions, _id },
   onEditBtnClick,
   onDeleteHandler,
   validateUpdate,
@@ -29,20 +29,20 @@ const RoleCard = ({
                 </button>
               }
               isJSX={true}
-              HeaderText={"Update Role"}
+              HeaderText={() => "Update Role"}
               BodyContent={
                 <CustomForm
                   initialValues={initialValues}
                   onSubmit={(values) => {
                     if (!checkForSame(values, initialValues))
                       onEditBtnClick({
-                        _id: args?._id,
+                        _id: _id,
                         entityId: args?.entityId,
                         ...values,
                       });
                     else showToast("Nothing to Update", "info");
                   }}
-                  validate={validateUpdate}
+                  validate={(values) => validateForm(values, initialValues)}
                   btnClass="w-40 h-10"
                   validator={() => {}}
                   fields={[
@@ -50,21 +50,30 @@ const RoleCard = ({
                       type: "text",
                       name: "name",
                       label: "Name",
-                      placeholder: "Brand Name",
+                      placeholder: "Role Name",
                     },
                     {
                       type: "textarea",
                       name: "description",
                       label: "Description",
-                      placeholder: "Brand Description",
+                      placeholder: "Role Description",
                     },
                     {
                       type: "array",
                       name: "permissions",
-                      value: permissions,
+                      label: "Permissions",
+                      allValues:
+                        allPermissions?.map((permission) => {
+                          return {
+                            label: permission.label,
+                            value: permission.value,
+                            isSelected: permissions.includes(permission.value),
+                          };
+                        }) || [],
                     },
                   ]}
                   buttonText="Update"
+                  isTrusted={true}
                 />
               }
             />
@@ -81,11 +90,17 @@ const RoleCard = ({
           {permissions?.slice(0, 4)?.map((permission) => {
             let value = allPermissions.find((ele) => ele.value === permission);
             return (
-              <div key={permission} className="border-2 border-secondary-25 w-fit px-2 py-1 rounded-lg">
+              <div
+                key={permission}
+                className="border-2 border-secondary-25 w-fit px-2 py-1 rounded-lg"
+              >
                 <p className="truncate">{value?.label ?? ""}</p>
               </div>
             );
           })}
+          {permissions.length > 4 && (
+            <span className="flex items-end justify-start">...</span>
+          )}
         </div>
       </div>
     </div>

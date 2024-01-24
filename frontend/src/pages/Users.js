@@ -337,9 +337,9 @@ const Users = () => {
                 </div>
               </div>
               {displayUser ? (
-                <User users={users?.users ?? []} />
+                <User entityId={activeEntityItem} users={users?.users ?? []} />
               ) : (
-                <Roles allPermissions={permissionAvailableForUserCreation} roles={roles?.roles ?? []} />
+                <Roles entityId={activeEntityItem} allPermissions={permissionAvailableForUserCreation} roles={roles?.roles ?? []} />
               )}
             </>
           )}
