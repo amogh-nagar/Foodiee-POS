@@ -110,7 +110,6 @@ const Outlets = () => {
       selectedBrand.tenantId &&
         formData.append("tenantId", selectedBrand.tenantId);
       await createOutlet(formData).unwrap();
-      refetch();
       showToast("Outlet Created Successfully", "success");
     } catch (err) {
       console.log("Some error occurred", err);
@@ -144,7 +143,6 @@ const Outlets = () => {
       }
       selectedBrand.value && formData.append("brandId", selectedBrand.value);
       await updateOutlet(formData).unwrap();
-      refetch();
       showToast("Outlet Updated Successfully", "success");
     } catch (err) {
       console.log("Some error occurred", err);

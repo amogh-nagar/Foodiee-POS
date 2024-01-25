@@ -21,10 +21,18 @@ export const outletApi = createApi({
         });
         return `/getOutlets?${params}`;
       },
+      providesTags: (result, error, arg) =>
+        result
+          ? [
+              ...result.outlets.map(({ _id }) => ({ type: "Outlet", id: _id })),
+              "Outlet",
+            ]
+          : ["Outlet"],
     }),
     //get outlet
     getOutlet: builder.query({
       query: (outletId) => "/getOutlet/" + outletId,
+      providesTags: (result, error, arg) => [{ type: "Outlet", id: arg._id }],
     }),
     //create Outlet
     createOutlet: builder.mutation({
@@ -33,6 +41,7 @@ export const outletApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Outlet"],
     }),
     //update brand
     updateOutlet: builder.mutation({
@@ -41,6 +50,9 @@ export const outletApi = createApi({
         method: "PATCH",
         body: data,
       }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Outlet", id: arg.entityId },
+      ],
     }),
     //delete brand
     deleteOutlet: builder.mutation({

@@ -5,7 +5,7 @@ const Roles = ({ roles, allPermissions }) => {
   const onDeleteHandler = () => {};
   const validateUpdate = () => {};
   return (
-    <div className="flex bg-primary-700 w-full items-center justify-start flex-wrap gap-x-2 gap-y-5 mt-4 p-7 rounded-lg">
+    <div className="flex bg-primary-700 w-full items-center justify-start flex-wrap gap-5 mt-4 p-7 rounded-lg">
       {roles && roles.length ? (
         roles.map((role) => (
           <RoleCard

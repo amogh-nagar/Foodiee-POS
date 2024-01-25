@@ -21,10 +21,15 @@ export const tenantApi = createApi({
         });
         return `/getTenants?${params}`;
       },
+      providesTags: (result, error, arg) =>
+        result
+          ? [...result.tenants.map(({ _id }) => ({ type: 'Tenant' , id: _id })), 'Tenant']
+          : ['Tenant'],
     }),
     //get tenants
     getTenant: builder.query({
       query: (tenantId) => "/getTenant/" + tenantId,
+      providesTags: (result, error, arg) => [{ type: 'Tenant' , id: arg._id }]
     }),
     //create Tenant
     createTenant: builder.mutation({
@@ -33,16 +38,18 @@ export const tenantApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ['Tenant'],
     }),
-    //update brand
+    //update tenant
     updateTenant: builder.mutation({
       query: (data) => ({
         url: "updateTenant",
         method: "PATCH",
         body: data,
       }),
+      invalidatesTags: (result, error, arg) => [{ type: 'Tenant', id: arg.entityId }],
     }),
-    //delete brand
+    //delete tenant
     deleteTenant: builder.mutation({
       query: (data) => ({
         url: "deleteTenant",

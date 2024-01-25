@@ -21,10 +21,18 @@ export const brandApi = createApi({
         });
         return `/getBrands?${params}`;
       },
+      providesTags: (result, error, arg) =>
+        result
+          ? [
+              ...result.brands.map(({ _id }) => ({ type: "Brand", id: _id })),
+              "Brand",
+            ]
+          : ["Brand"],
     }),
     //get all brands
     getBrand: builder.query({
       query: (brandId) => "/getBrand/" + brandId,
+      providesTags: (result, error, arg) => [{ type: "Brand", id: arg._id }],
     }),
     //create Brand
     createBrand: builder.mutation({
@@ -33,6 +41,7 @@ export const brandApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Brand"],
     }),
     //update brand
     updateBrand: builder.mutation({
@@ -41,6 +50,9 @@ export const brandApi = createApi({
         method: "PATCH",
         body: data,
       }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Brand", id: arg.entityId },
+      ],
     }),
     //delete brand
     deleteBrand: builder.mutation({

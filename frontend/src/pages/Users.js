@@ -42,8 +42,7 @@ const Users = () => {
   const {
     data: users,
     isLoadingUsers,
-    isErrorUsers,
-    refetch: refetchUsers,
+    isErrorUsers
   } = useGetUsersQuery(
     {
       entityIds: activeEntityItem,
@@ -56,8 +55,7 @@ const Users = () => {
   const {
     data: roles,
     isLoadingRoles,
-    isErrorRoles,
-    refetch: refetchRoles,
+    isErrorRoles
   } = useGetAllRolesQuery(
     {
       entityId: activeEntityItem,
@@ -164,7 +162,6 @@ const Users = () => {
       }
       await createRole(payload);
       showToast("Role Created Succesfully", "success");
-      refetchRoles();
     } catch (err) {
       showToast(err?.data?.message || "Some error occurred!");
     }

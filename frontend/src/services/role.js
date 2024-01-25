@@ -20,11 +20,16 @@ export const roleApi = createApi({
           params.append(key, query[key]);
         });
         return `/getRoles?${params}`
-      }
+      },
+      providesTags: (result, error, arg) =>
+        result
+          ? [...result.roles.map(({ _id }) => ({ type: 'Role' , id: _id })), 'Role']
+          : ['Role'],
     }),
     //get roles
     getRole: builder.query({
       query: (roleId) => "/getRole/" + roleId,
+      providesTags: (result, error, arg) => [{ type: "Role", id: arg._id }],
     }),
     //create Role
     createRole: builder.mutation({
@@ -33,6 +38,7 @@ export const roleApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ['Role'],
     }),
     //update role
     updateRole: builder.mutation({
@@ -41,6 +47,7 @@ export const roleApi = createApi({
         method: "PATCH",
         body: data,
       }),
+      invalidatesTags: (result, error, arg) => [{ type: 'Role', id: arg._id }],
     }),
     //delete role
     deleteRole: builder.mutation({

@@ -104,8 +104,7 @@ const Brands = () => {
         );
       }
       formData.append("tenantId", selectedTenant.value);
-      await createBrand(formData).unwrap();
-      refetch();
+      await createBrand(formData).unwrap()
       showToast("Brand Created Successfully", "success");
     } catch (err) {
       console.log("Some error occurred", err);
@@ -139,7 +138,6 @@ const Brands = () => {
       }
       formData.append("tenantId", selectedTenant.value);
       await updateBrand(formData).unwrap();
-      refetch();
       showToast("Brand Updated Successfully", "success");
     } catch (err) {
       console.log("Some error occurred", err);

@@ -34,8 +34,7 @@ const Tenants = () => {
   const {
     data,
     isError: isGetAllTenantsError,
-    isLoading: isGetAllTenantsLoading,
-    refetch,
+    isLoading: isGetAllTenantsLoading
   } = useGetAllTenantsQuery({ name: debouncedTerm, page: page });
   const totalItems = data?.totalItems ?? 0;
   const tenants = data?.tenants ?? [];
@@ -77,7 +76,6 @@ const Tenants = () => {
         );
       }
       await createTenant(formData).unwrap();
-      refetch();
       showToast("Tenant Created Successfully", "success");
     } catch (err) {
       console.log("Some error occurred", err);
@@ -110,7 +108,6 @@ const Tenants = () => {
         );
       }
       await updateTenant(formData).unwrap();
-      refetch();
       showToast("Tenant Updated Successfully", "success");
     } catch (err) {
       console.log("Some error occurred", err);
