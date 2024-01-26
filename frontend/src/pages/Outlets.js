@@ -14,13 +14,16 @@ import FlexDiv from "../components/Wrappers/FlexDiv";
 import Loader from "../UI/Loaders/Loader";
 import ReactPaginate from "react-paginate";
 import CustomDropdownIndicator from "../components/CustomDropdownIndicator";
-import SearchDiv from "../components/SearchDiv";
+import SearchDiv from "../components/Containers/SearchDiv";
+import { useSelector } from "react-redux";
 
 const Outlets = () => {
   const location = useLocation();
   const [selectedBrand, setSelectedBrand] = useState({});
   const [page, setPage] = useState(1);
   const [searchedTerm, setSearchedTerm] = useState("");
+  const auth = useSelector((state) => state.auth);
+  const [searchBrands, setSearchBrands] = useState("");
   const [
     createOutlet,
     { isLoading: isCreateOutletLoading, isError: isCreateOutletError },
@@ -29,26 +32,44 @@ const Outlets = () => {
     updateOutlet,
     { isLoading: isUpdateOutletLoading, isError: isUpdateOutletError },
   ] = useUpdateOutletMutation();
+  const brandsQuery = {
+    name: searchBrands,
+    page: 1,
+  };
+  if (auth.isSuperAdmin) {
+    brandsQuery.tenantIds = "";
+  }
+  if (auth.tenantIds) {
+    brandsQuery.tenantIds = auth.tenantIds;
+  }
+  if (auth.brandIds) {
+    brandsQuery.brandIds = auth.brandIds;
+  }
   const {
     data: brandsData,
     isError: isGetAllBrandsError,
     isLoading: isGetAllBrandsLoading,
-  } = useGetAllBrandsQuery({ getAll: true });
+  } = useGetAllBrandsQuery(brandsQuery, {
+    skip: !auth.isSuperAdmin && !auth.tenantIds && !auth.brandIds,
+  });
+  const outletsQuery = {
+    name: searchedTerm,
+    page: page,
+  };
+  if (auth.outletIds) {
+    outletsQuery.outletIds = auth.outletIds;
+  }
+  if (selectedBrand?.value) {
+    outletsQuery.brandId = selectedBrand?.value;
+  }
   const {
     data,
     isError: isGetAllOutletsError,
     isLoading: isGetAllOutletsLoading,
     refetch,
-  } = useGetAllOutletsQuery(
-    {
-      name: searchedTerm,
-      page: page,
-      brandId: selectedBrand?.value,
-    },
-    {
-      skip: !selectedBrand.value,
-    }
-  );
+  } = useGetAllOutletsQuery(outletsQuery, {
+    skip: !selectedBrand.value && !auth.outletIds,
+  });
   useEffect(() => {
     if (location.state?.selectedEntity)
       setSelectedBrand({
@@ -148,13 +169,14 @@ const Outlets = () => {
   return (
     <div>
       <PageNameWithDate
-        name="Brands"
+        name="Outlets"
         MultiSelect={() => (
           <Select
             components={{ DropdownIndicator: CustomDropdownIndicator }}
             defaultValue={selectedBrand}
             onChange={handleSelectChange}
             name="colors"
+            onInputChange={(e) => setSearchBrands(e)}
             options={brands}
             placeholder="Select Brands"
             className="basic-multi-select w-96 bg-primary-700 rounded-lg text-secondary-600"

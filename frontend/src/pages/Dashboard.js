@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import PageNameWithDate from "../components/PageNameWithDate";
 import { Pie, Bar, Line } from "react-chartjs-2";
 import ChartWrapper from "../components/Charts/ChartWrapper";
-import "react-dates/initialize";
-import "react-dates/lib/css/_datepicker.css";
-import { DateRangePicker } from "react-dates";
+// import "react-dates/initialize";
+// import "react-dates/lib/css/_datepicker.css";
+// import { DateRangePicker } from "react-dates";
 import 'chart.js/auto';
 const InActiveActive = {
   labels: ["InActive", "Active"],
@@ -162,7 +162,7 @@ const Dashboard = () => {
       </div>
       <div className="mx-8 my-10 bg-primary-700 p-5 rounded-xl border-secondary-600 border-2">
         <div className="flex justify-end gap-x-4 items-center">
-         <DateRangePicker
+         {/* <DateRangePicker
             startDate={startDate}
             startDateId="start_date_id"
             endDate={endDate}
@@ -173,7 +173,7 @@ const Dashboard = () => {
             }}
             focusedInput={focusedInput}
             onFocusChange={(focusedInput) => setFocusedInput(focusedInput)}
-          />
+          /> */}
           <button className="bg-secondary-500 px-6 py-3 rounded-lg hover:bg-secondary-700">Past 1 Year</button>
         </div>
         <Line

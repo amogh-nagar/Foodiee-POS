@@ -26,6 +26,10 @@ exports.getOutlets = function (req, res, next) {
     query = {
       "tenantDetails.id": req.query.tenantId,
     };
+  if (req.query.outletId)
+    query = {
+      _id: req.query.outletId,
+    };
   if (req.query.brandIds)
     query = {
       "brandDetails.id": {
@@ -36,6 +40,12 @@ exports.getOutlets = function (req, res, next) {
     query = {
       "tenantDetails.id": {
         $in: req.query.tenantIds,
+      },
+    };
+  if (req.query.outletIds)
+    query = {
+      _id: {
+        $in: req.query.outletIds,
       },
     };
   if (req.query.name) query["$text"] = { $search: req.query.name };

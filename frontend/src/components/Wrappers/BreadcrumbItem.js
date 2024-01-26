@@ -23,6 +23,7 @@ const BreadcrumbItem = ({ item, isLast }) => {
             components={{ DropdownIndicator: CustomDropdownIndicator }}
             options={dropdownOptions}
             placeholder={item.title}
+            onInputChange={()=>{}}
             styles={selectCustomStyle}
             onChange={handleSelectChange}
             className="basic-multi-select bg-primary-700 rounded-2xl text-secondary-600 outline-none cursor-pointer"

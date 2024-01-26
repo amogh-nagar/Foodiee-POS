@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Modal from "./Modals/Modal";
+import Modal from "../Modals/Modal";
 import { IoMdAdd } from "react-icons/io";
 import debounce from "lodash.debounce";
 

@@ -47,7 +47,7 @@ export const roleApi = createApi({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: (result, error, arg) => [{ type: 'Role', id: arg._id }],
+      invalidatesTags: (result, error, arg) => [{ type: 'Role', id: arg.roleId }],
     }),
     //delete role
     deleteRole: builder.mutation({

@@ -1,7 +1,6 @@
 import React from "react";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import Modal from "../Modals/Modal";
-import CustomForm from "../forms/Form";
 import { checkForSame, showToast, validateForm } from "../../utils/constants";
 const RoleCard = ({
   role: { name, description, permissions, _id },
@@ -34,7 +33,7 @@ const RoleCard = ({
               onSubmit={(values) => {
                 if (!checkForSame(values, initialValues))
                   onEditBtnClick({
-                    _id: _id,
+                    roleId: _id,
                     entityId: args?.entityId,
                     ...values,
                   });
@@ -81,6 +80,7 @@ const RoleCard = ({
         <div className="flex items-center flex-wrap gap-2 px-2 overflow-hidden h-24">
           {permissions?.slice(0, 4)?.map((permission) => {
             let value = allPermissions.find((ele) => ele.value === permission);
+            console.log("value", value)
             return (
               <div
                 key={permission}

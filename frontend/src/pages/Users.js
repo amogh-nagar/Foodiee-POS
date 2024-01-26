@@ -20,13 +20,10 @@ import {
   validateForm,
 } from "../utils/constants";
 import MultiStepModal from "../components/Modals/MultiStepModal";
+import EntityBreadCrumbs from "../components/Containers/EntityBreadCrumbs";
 const Users = () => {
   const [activeTab, setActiveTab] = useState("Users");
-  const [accessibleEntities, setAccessibleEntities] = useState([]);
-  const [activeEntity, setActiveEntity] = useState("");
   const [activeEntityItem, setActiveEntityItem] = useState("");
-  const [getTenants, { data: tenants, isLoadingTenants, isErrorTenants }] =
-    useLazyGetAllTenantsQuery();
   const [
     createRole,
     { isLoading: isCreateRoleLoading, isError: isCreateRoleError },
@@ -35,131 +32,60 @@ const Users = () => {
     createUser,
     { isLoading: isCreateUserLoading, isError: isCreateUserError },
   ] = useCreateUserMutation();
-  const [getBrands, { data: brands, isLoadingBrands, isErrorBrands }] =
-    useLazyGetAllBrandsQuery();
-  const [getOutlets, { data: outlets, isLoadingOutlets, isErrorOutlets }] =
-    useLazyGetAllOutletsQuery();
+
   const {
     data: users,
     isLoadingUsers,
-    isErrorUsers
+    isErrorUsers,
   } = useGetUsersQuery(
     {
-      entityIds: activeEntityItem,
+      entityIds: activeEntityItem.value,
       page: 1,
     },
     {
-      skip: !activeEntityItem || activeTab !== "Users",
+      skip: !activeEntityItem.value || activeTab !== "Users",
     }
   );
   const {
     data: roles,
     isLoadingRoles,
-    isErrorRoles
+    isErrorRoles,
   } = useGetAllRolesQuery(
     {
-      entityId: activeEntityItem,
+      entityId: activeEntityItem.value,
       page: 1,
     },
     {
-      skip: !activeEntityItem || activeTab !== "Roles",
+      skip: !activeEntityItem.value || activeTab !== "Roles",
     }
   );
-  const isLoadingEntity =
-    isLoadingBrands ||
-    isLoadingOutlets ||
-    isLoadingTenants ||
-    isLoadingUsers ||
-    isLoadingRoles;
-  let entities = [];
-  if (activeEntity == "Tenant") entities = tenants?.tenants || [];
-  if (activeEntity == "Brand") entities = brands?.brands || [];
-  if (activeEntity == "Outlet") entities = outlets?.outlets || [];
+  const isLoadingEntity = isLoadingUsers || isLoadingRoles;
+
   const auth = useSelector((state) => state.auth);
-  useEffect(() => {
-    const newEntityArr = [];
-    if (auth.isSuperAdmin || auth.tenantIds) {
-      newEntityArr.push({
-        label: "Tenant",
-        value: "Tenant",
-      });
-    }
-    if (auth.brandIds) {
-      newEntityArr.push({
-        label: "Brand",
-        value: "Brand",
-      });
-    }
-    if (auth.outletIds) {
-      newEntityArr.push({
-        label: "Outlet",
-        value: "Outlet",
-      });
-    }
-    setAccessibleEntities(newEntityArr);
-  }, [auth.entityDetails]);
   let permissionAvailableForUserCreation =
-    (auth.isSuperAdmin && rolesMappedToPermissions.superAdmin) ||
-    (auth.tenantIds && rolesMappedToPermissions.tenantUser) ||
-    (auth.brandIds && rolesMappedToPermissions.brandUser) ||
-    (auth.outletIds && rolesMappedToPermissions.outletUser) || [];
-  const breadcrumbItems = [
-    { title: "Entity Type" },
-    {
-      title: "Entity",
-      values: accessibleEntities,
-      type: "array",
-      onChange: (value) => {
-        setActiveEntity(value.value);
-        setActiveEntityItem("");
-        let query = {
-          notIncludeTotal: true,
-          getAll: true,
-        };
-        if (auth.tenantIds) {
-          query["tenantIds"] = auth.tenantIds;
-        }
-        if (auth.brandIds) {
-          query["brandIds"] = auth.brandIds;
-        }
-        if (auth.outletIds) {
-          query["outletIds"] = auth.outletIds;
-        }
-        if (value.value === "Tenant") {
-          getTenants(query);
-        }
-        if (value.value === "Brand") {
-          getBrands(query);
-        }
-        if (value.value === "Outlet") {
-          getOutlets(query);
-        }
-      },
-    },
-  ];
+    (activeEntityItem.label === "Tenant" &&
+      (auth.isSuperAdmin
+        ? Array.from(
+            new Set(
+              rolesMappedToPermissions.superAdmin.concat(
+                rolesMappedToPermissions.tenantUser
+              )
+            )
+          )
+        : rolesMappedToPermissions.tenantUser)) ||
+    (activeEntityItem.label === "Brand" &&
+      rolesMappedToPermissions.brandUser) ||
+    (activeEntityItem.label === "Outlet" &&
+      rolesMappedToPermissions.outletUser) ||
+    [];
   let displayUser = activeTab === "Users";
-  if (entities && entities.length > 0) {
-    breadcrumbItems.push({
-      title: `Select ${activeEntity}`,
-      values: entities.map((entity) => {
-        return {
-          label: entity.name,
-          value: entity._id,
-        };
-      }),
-      type: "array",
-      onChange: (value) => {
-        setActiveEntityItem(value.value);
-      },
-    });
-  }
   const addUser = async (values) => {};
   const addRole = async (values) => {
     try {
       let payload = {
         ...values,
-        entityId: activeEntityItem
-      }
+        entityId: activeEntityItem.value,
+      };
       await createRole(payload);
       showToast("Role Created Succesfully", "success");
     } catch (err) {
@@ -225,12 +151,12 @@ const Users = () => {
         isMultiSelect: true,
         useOptionsQuery: useGetAllRolesQuery,
         inputQuery: {
-          entityId: activeEntityItem,
+          entityId: activeEntityItem.value,
           getAll: true,
         },
         initialValues: [],
         key: "roles",
-        skipIfNull: activeEntityItem,
+        skipIfNull: activeEntityItem.value,
       },
     ];
   } else {
@@ -240,42 +166,35 @@ const Users = () => {
       permissions: [],
     };
     Component = Modal;
-    attributes["isJSX"] = true;
-    attributes["BodyContent"] = (
-      <CustomForm
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-        validate={(values) => validateForm(values, initialValues)}
-        btnClass="w-40 h-10"
-        validator={() => {}}
-        fields={[
-          {
-            type: "text",
-            name: "name",
-            label: "Name",
-            placeholder: "Role Name",
-          },
-          {
-            type: "textarea",
-            name: "description",
-            label: "Description",
-            placeholder: "Role Description",
-          },
-          {
-            type: "array",
-            name: "permissions",
-            label: "Permissions",
-            allValues: permissionAvailableForUserCreation.map((permission) => {
-              return {
-                label: permission.label,
-                value: permission.value,
-              };
-            }),
-          },
-        ]}
-        buttonText="Create"
-      />
-    );
+    attributes["fields"] = [
+      {
+        type: "text",
+        name: "name",
+        label: "Name",
+        placeholder: "Role Name",
+      },
+      {
+        type: "textarea",
+        name: "description",
+        label: "Description",
+        placeholder: "Role Description",
+      },
+      {
+        type: "array",
+        name: "permissions",
+        label: "Permissions",
+        allValues: permissionAvailableForUserCreation.map((permission) => {
+          return {
+            label: permission.label,
+            value: permission.value,
+          };
+        }),
+      },
+    ];
+    attributes.initialValues = initialValues;
+    attributes.onSubmit = onSubmit;
+    attributes.buttonText = "Create";
+    attributes["isForm"] = true;
   }
   return (
     <div>
@@ -311,15 +230,13 @@ const Users = () => {
           ) : (
             <>
               <div className="flex justify-between items-center w-full gap-4">
-                <div>
-                  <Breadcrumbs options={breadcrumbItems} />
-                </div>
+                <EntityBreadCrumbs setEntity={setActiveEntityItem} />
                 <div className="flex justify-end items-center gap-4">
                   <input
                     className="bg-gray-600 w-2/3 text-white font-sans p-2 rounded-lg outline-none"
                     placeholder={`Search ${displayUser ? "User" : "Role"}`}
                   />
-                  {activeEntityItem ? (
+                  {activeEntityItem.value ? (
                     <Component {...attributes} />
                   ) : (
                     <button
@@ -333,9 +250,16 @@ const Users = () => {
                 </div>
               </div>
               {displayUser ? (
-                <User entityId={activeEntityItem} users={users?.users ?? []} />
+                <User
+                  entityId={activeEntityItem.value}
+                  users={users?.users ?? []}
+                />
               ) : (
-                <Roles entityId={activeEntityItem} allPermissions={permissionAvailableForUserCreation} roles={roles?.roles ?? []} />
+                <Roles
+                  entityId={activeEntityItem.value}
+                  allPermissions={permissionAvailableForUserCreation}
+                  roles={roles?.roles ?? []}
+                />
               )}
             </>
           )}

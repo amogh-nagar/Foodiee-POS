@@ -12,7 +12,8 @@ import ReactPaginate from "react-paginate";
 import FlexDiv from "../components/Wrappers/FlexDiv";
 import Loader from "../UI/Loaders/Loader";
 import { itemsPerPage, showToast } from "../utils/constants";
-import SearchDiv from "../components/SearchDiv";
+import SearchDiv from "../components/Containers/SearchDiv";
+import { useSelector } from "react-redux";
 const Tenants = () => {
   const [page, setPage] = useState(1);
   const [searchedTerm, setSearchedTerm] = useState("");
@@ -28,11 +29,16 @@ const Tenants = () => {
     deleteTenant,
     { isLoading: isDeleteTenantLoading, isError: isDeleteTenantError },
   ] = useDeleteTenantMutation();
+  const auth = useSelector((state) => state.auth);
   const {
     data,
     isError: isGetAllTenantsError,
     isLoading: isGetAllTenantsLoading,
-  } = useGetAllTenantsQuery({ name: searchedTerm, page: page });
+  } = useGetAllTenantsQuery({
+    name: searchedTerm,
+    page: page,
+    tenantIds: auth.tenantIds ?? '',
+  });
   const totalItems = data?.totalItems ?? 0;
   const tenants = data?.tenants ?? [];
   const isLoading =

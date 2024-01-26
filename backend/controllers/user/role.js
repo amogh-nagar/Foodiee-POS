@@ -105,6 +105,7 @@ exports.createRole = function (req, res, next) {
 };
 
 exports.updateRole = function (req, res, next) {
+    console.log("req.body", req.body)
   Role.findOne({
     entityId: req.body.entityId,
     name: req.body.name,

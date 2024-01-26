@@ -1,7 +1,22 @@
 import React, { useState } from "react";
 import RoleCard from "./RoleCard";
-const Roles = ({ roles, allPermissions }) => {
-  const onEditBtnClick = () => {};
+import { useUpdateRoleMutation } from "../../services/role";
+import { useUpdateUserMutation } from "../../services/user";
+import { showToast } from "../../utils/constants";
+const Roles = ({ roles, allPermissions, entityId }) => {
+  const [
+    updateRole,
+    { isLoading: isUpdateRoleLoading, isError: isUpdateRoleError },
+  ] = useUpdateRoleMutation();
+  const onEditBtnClick = async (values) => {
+    try {
+      await updateRole(values).unwrap();
+      showToast("Role Updated Successfully", "success");
+    } catch (err) {
+      console.log("Some error occurred", err);
+      showToast(err?.data?.message || "Some error occurred!");
+    }
+  };
   const onDeleteHandler = () => {};
   const validateUpdate = () => {};
   return (
@@ -10,6 +25,7 @@ const Roles = ({ roles, allPermissions }) => {
         roles.map((role) => (
           <RoleCard
             key={role}
+            entityId={entityId}
             role={role}
             onDeleteHandler={onDeleteHandler}
             onEditBtnClick={onEditBtnClick}
