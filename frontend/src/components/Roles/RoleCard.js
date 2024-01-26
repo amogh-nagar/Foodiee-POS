@@ -28,54 +28,46 @@ const RoleCard = ({
                   <MdOutlineEdit className="w-5 h-5" />
                 </button>
               }
-              isJSX={true}
+              isForm={true}
               HeaderText={() => "Update Role"}
-              BodyContent={
-                <CustomForm
-                  initialValues={initialValues}
-                  onSubmit={(values) => {
-                    if (!checkForSame(values, initialValues))
-                      onEditBtnClick({
-                        _id: _id,
-                        entityId: args?.entityId,
-                        ...values,
-                      });
-                    else showToast("Nothing to Update", "info");
-                  }}
-                  validate={(values) => validateForm(values, initialValues)}
-                  btnClass="w-40 h-10"
-                  validator={() => {}}
-                  fields={[
-                    {
-                      type: "text",
-                      name: "name",
-                      label: "Name",
-                      placeholder: "Role Name",
-                    },
-                    {
-                      type: "textarea",
-                      name: "description",
-                      label: "Description",
-                      placeholder: "Role Description",
-                    },
-                    {
-                      type: "array",
-                      name: "permissions",
-                      label: "Permissions",
-                      allValues:
-                        allPermissions?.map((permission) => {
-                          return {
-                            label: permission.label,
-                            value: permission.value,
-                            isSelected: permissions.includes(permission.value),
-                          };
-                        }) || [],
-                    },
-                  ]}
-                  buttonText="Update"
-                  isTrusted={true}
-                />
-              }
+              initialValues={initialValues}
+              onSubmit={(values) => {
+                if (!checkForSame(values, initialValues))
+                  onEditBtnClick({
+                    _id: _id,
+                    entityId: args?.entityId,
+                    ...values,
+                  });
+                else showToast("Nothing to Update", "info");
+              }}
+              fields={[
+                {
+                  type: "text",
+                  name: "name",
+                  label: "Name",
+                  placeholder: "Role Name",
+                },
+                {
+                  type: "textarea",
+                  name: "description",
+                  label: "Description",
+                  placeholder: "Role Description",
+                },
+                {
+                  type: "array",
+                  name: "permissions",
+                  label: "Permissions",
+                  allValues:
+                    allPermissions?.map((permission) => {
+                      return {
+                        label: permission.label,
+                        value: permission.value,
+                        isSelected: permissions.includes(permission.value),
+                      };
+                    }) || [],
+                },
+              ]}
+              buttonText="Update"
             />
 
             <button onClick={() => onDeleteHandler(args?._id, args?.entityId)}>

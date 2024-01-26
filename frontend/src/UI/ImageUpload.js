@@ -38,7 +38,7 @@ const ImageUpload = ({ field, form: { touched, errors, setFieldValue }, ...props
           onClick={() => fileInput.current.click()}
           className="cursor-pointer bg-primary-700 shadow-lg shadow-primary-700 w-1/2 h-36 border-2 border-dashed border-secondary-500 text-secondary-500 rounded-xl flex items-center justify-center"
         >
-          Click to Select or Drag and Drop File Here
+          <p className="flex-wrap flex p-3">Click to Select or Drag and Drop File Here</p>
           <input
             type="file"
             accept="image/*"

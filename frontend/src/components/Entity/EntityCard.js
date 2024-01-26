@@ -50,24 +50,18 @@ const EntityCard = React.forwardRef(
                   <button>
                     <MdOutlineEdit className="w-6 h-6" />
                   </button>
-                }
-                isJSX={true}
+                }                
+                isForm={true}
+                fields={updateFields}
+                initialValues={initialValues}
                 HeaderText={updateHeaderText}
-                BodyContent={
-                  <CustomForm
-                    initialValues={initialValues}
-                    onSubmit={(values) => {
-                      if (!checkForSame(values, initialValues))
-                        onEditBtnClick({ entityId: args?._id, ...values });
-                      else showToast("Nothing to Update", "info");
-                    }}
-                    validate={validateUpdate}
-                    btnClass="w-40 h-10"
-                    validator={() => {}}
-                    fields={updateFields}
-                    buttonText="Update"
-                  />
-                }
+                buttonText="Update"
+                validate={validateUpdate}
+                onSubmit={(values) => {
+                  if (!checkForSame(values, initialValues))
+                    onEditBtnClick({ entityId: args?._id, ...values });
+                  else showToast("Nothing to Update", "info");
+                }}
               />
             </div>
           </>

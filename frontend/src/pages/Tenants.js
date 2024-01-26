@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import PageNameWithDate from "../components/PageNameWithDate";
-import { IoMdAdd } from "react-icons/io";
 import EntityCard from "../components/Entity/EntityCard";
 import debounce from "lodash.debounce";
 import {
@@ -11,14 +10,12 @@ import {
 } from "../services/tenant";
 import ReactPaginate from "react-paginate";
 import FlexDiv from "../components/Wrappers/FlexDiv";
-import Modal from "../components/Modals/Modal";
-import CustomForm from "../components/forms/Form";
 import Loader from "../UI/Loaders/Loader";
 import { itemsPerPage, showToast } from "../utils/constants";
+import SearchDiv from "../components/SearchDiv";
 const Tenants = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [debouncedTerm, setDebouncedTerm] = useState("");
+  const [searchedTerm, setSearchedTerm] = useState("");
   const [
     createTenant,
     { isLoading: isCreateTenantLoading, isError: isCreateTenantError },
@@ -34,8 +31,8 @@ const Tenants = () => {
   const {
     data,
     isError: isGetAllTenantsError,
-    isLoading: isGetAllTenantsLoading
-  } = useGetAllTenantsQuery({ name: debouncedTerm, page: page });
+    isLoading: isGetAllTenantsLoading,
+  } = useGetAllTenantsQuery({ name: searchedTerm, page: page });
   const totalItems = data?.totalItems ?? 0;
   const tenants = data?.tenants ?? [];
   const isLoading =
@@ -53,19 +50,6 @@ const Tenants = () => {
     description: "",
     image: "",
   };
-  useEffect(() => {
-    const debouncer = debounce((newTerm) => {
-      setDebouncedTerm(newTerm);
-    }, 1000);
-    if (searchTerm) {
-      debouncer(searchTerm);
-    } else {
-      setDebouncedTerm("");
-    }
-    return () => {
-      debouncer.cancel();
-    };
-  }, [searchTerm]);
   const onSubmit = async (values) => {
     try {
       const formData = new FormData();
@@ -122,55 +106,33 @@ const Tenants = () => {
           <Loader />
         ) : (
           <>
-            <div className=" items-center gap-x-3 mx-3 my-5 flex h-fit">
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-gray-600 text-white font-sans p-2 rounded-lg outline-none w-[80%]"
-                placeholder="Search Tenants"
-              />
-              <Modal
-                PopUpButton={
-                  <button className="flex gap-x-1 items-center bg-secondary-500 p-3 rounded-lg">
-                    <IoMdAdd />
-                    <p>Tenant</p>
-                  </button>
-                }
-                isJSX={true}
-                HeaderText={() => <h3>Add New Tenant</h3>}
-                BodyContent={
-                  <CustomForm
-                    initialValues={initialValues}
-                    onSubmit={onSubmit}
-                    validate={validate}
-                    btnClass="w-40 h-10"
-                    validator={() => {}}
-                    fields={[
-                      {
-                        type: "text",
-                        name: "name",
-                        label: "Name",
-                        placeholder: "Tenant Name",
-                      },
-                      {
-                        type: "textarea",
-                        name: "description",
-                        label: "Description",
-                        placeholder: "Tenant Description",
-                      },
-                      {
-                        type: "file",
-                        name: "image",
-                        label: "Image",
-                        placeholder: "Tenant Image",
-                      },
-                    ]}
-                    buttonText="Create"
-                    isTrusted={true}
-                  />
-                }
-              />
-            </div>
+            <SearchDiv
+              name={"Tenant"}
+              setSearchedTerm={setSearchedTerm}
+              initialValues={initialValues}
+              onSubmit={onSubmit}
+              validate={validate}
+              fields={[
+                {
+                  type: "text",
+                  name: "name",
+                  label: "Name",
+                  placeholder: "Tenant Name",
+                },
+                {
+                  type: "textarea",
+                  name: "description",
+                  label: "Description",
+                  placeholder: "Tenant Description",
+                },
+                {
+                  type: "file",
+                  name: "image",
+                  label: "Image",
+                  placeholder: "Tenant Image",
+                },
+              ]}
+            />
             <div className="mx-3">
               {tenants?.length ? (
                 <>

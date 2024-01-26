@@ -43,7 +43,6 @@ const Taxes = () => {
               },
             ]}
             buttonText="Add"
-            isTrusted={true}
           />
         </div>
         <div className="px-5 py-6 w-full overflow-y-auto hide-scrollbar flex flex-col gap-y-3">

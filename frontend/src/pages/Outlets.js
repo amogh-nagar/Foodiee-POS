@@ -8,23 +8,19 @@ import {
 } from "../services/outlet";
 import { useGetAllBrandsQuery } from "../services/brand";
 import EntityCard from "../components/Entity/EntityCard";
-import debounce from "lodash.debounce";
 import { itemsPerPage, selectCustomStyle, showToast } from "../utils/constants";
 import Select from "react-select";
-import Modal from "../components/Modals/Modal";
-import { IoMdAdd } from "react-icons/io";
-import CustomForm from "../components/forms/Form";
 import FlexDiv from "../components/Wrappers/FlexDiv";
 import Loader from "../UI/Loaders/Loader";
 import ReactPaginate from "react-paginate";
 import CustomDropdownIndicator from "../components/CustomDropdownIndicator";
+import SearchDiv from "../components/SearchDiv";
 
 const Outlets = () => {
   const location = useLocation();
   const [selectedBrand, setSelectedBrand] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [debouncedTerm, setDebouncedTerm] = useState("");
+  const [searchedTerm, setSearchedTerm] = useState("");
   const [
     createOutlet,
     { isLoading: isCreateOutletLoading, isError: isCreateOutletError },
@@ -45,7 +41,7 @@ const Outlets = () => {
     refetch,
   } = useGetAllOutletsQuery(
     {
-      name: debouncedTerm,
+      name: searchedTerm,
       page: page,
       brandId: selectedBrand?.value,
     },
@@ -84,19 +80,6 @@ const Outlets = () => {
     address: "",
     image: "",
   };
-  useEffect(() => {
-    const debouncer = debounce((newTerm) => {
-      setDebouncedTerm(newTerm);
-    }, 1000);
-    if (searchTerm) {
-      debouncer(searchTerm);
-    } else {
-      setDebouncedTerm("");
-    }
-    return () => {
-      debouncer.cancel();
-    };
-  }, [searchTerm]);
   const onSubmit = async (values) => {
     try {
       const formData = new FormData();
@@ -184,55 +167,33 @@ const Outlets = () => {
           <Loader />
         ) : (
           <>
-            <div className=" items-center gap-x-3 mx-3 my-5 flex h-fit">
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-gray-600 text-white font-sans p-2 rounded-lg outline-none w-[80%]"
-                placeholder="Search Outlets"
-              />
-              <Modal
-                PopUpButton={
-                  <button className="flex gap-x-1 items-center bg-secondary-500 p-3 rounded-lg">
-                    <IoMdAdd />
-                    <p>Outlet</p>
-                  </button>
-                }
-                isJSX={true}
-                HeaderText={() => <h3>Add New Outlet</h3>}
-                BodyContent={
-                  <CustomForm
-                    initialValues={initialValues}
-                    onSubmit={onSubmit}
-                    validate={validate}
-                    btnClass="w-40 h-10"
-                    validator={() => {}}
-                    fields={[
-                      {
-                        type: "text",
-                        name: "name",
-                        label: "Name",
-                        placeholder: "Outlet Name",
-                      },
-                      {
-                        type: "textarea",
-                        name: "address",
-                        label: "Address",
-                        placeholder: "Outlet Address",
-                      },
-                      {
-                        type: "file",
-                        name: "image",
-                        label: "Image",
-                        placeholder: "Outlet Image",
-                      },
-                    ]}
-                    buttonText="Create"
-                    isTrusted={true}
-                  />
-                }
-              />
-            </div>
+            <SearchDiv
+              setSearchedTerm={setSearchedTerm}
+              name={"Outlet"}
+              initialValues={initialValues}
+              onSubmit={onSubmit}
+              validate={validate}
+              fields={[
+                {
+                  type: "text",
+                  name: "name",
+                  label: "Name",
+                  placeholder: "Outlet Name",
+                },
+                {
+                  type: "textarea",
+                  name: "address",
+                  label: "Address",
+                  placeholder: "Outlet Address",
+                },
+                {
+                  type: "file",
+                  name: "image",
+                  label: "Image",
+                  placeholder: "Outlet Image",
+                },
+              ]}
+            />
             <div className="mx-3">
               {outlets?.length ? (
                 <>

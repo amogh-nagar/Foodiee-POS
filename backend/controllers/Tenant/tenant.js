@@ -31,7 +31,7 @@ exports.getTenants = function (req, res, next) {
   ];
   if (req.query.getAll) {
     aggPipeline = aggPipeline.slice(0, 2);
-    aggPipeline[1]["$project"] = { name: 1 };
+    aggPipeline[1]["$project"] = { name: 1, tenantId: 1 };
   }
   let parallelArr = [
     function (cb) {

@@ -96,7 +96,6 @@ const Auth = () => {
                   },
                 ]}
                 buttonText="Login"
-                isTrusted={true}
               />
             </div>
           </div>

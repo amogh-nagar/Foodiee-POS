@@ -12,18 +12,15 @@ import {
 import EntityCard from "../components/Entity/EntityCard";
 import debounce from "lodash.debounce";
 import { itemsPerPage, selectCustomStyle, showToast } from "../utils/constants";
-import Modal from "../components/Modals/Modal";
-import { IoMdAdd } from "react-icons/io";
-import CustomForm from "../components/forms/Form";
 import FlexDiv from "../components/Wrappers/FlexDiv";
 import ReactPaginate from "react-paginate";
 import CustomDropdownIndicator from "../components/CustomDropdownIndicator";
+import SearchDiv from "../components/SearchDiv";
 const Brands = () => {
   const location = useLocation();
   const [selectedTenant, setSelectedTenant] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [debouncedTerm, setDebouncedTerm] = useState("");
+  const [searchedTerm, setSearchedTerm] = useState("");
   const [
     createBrand,
     { isLoading: isCreateBrandLoading, isError: isCreateBrandError },
@@ -44,7 +41,7 @@ const Brands = () => {
     refetch,
   } = useGetAllBrandsQuery(
     {
-      name: debouncedTerm,
+      name: searchedTerm,
       page: page,
       tenantId: selectedTenant?.value,
     },
@@ -81,19 +78,6 @@ const Brands = () => {
     description: "",
     image: "",
   };
-  useEffect(() => {
-    const debouncer = debounce((newTerm) => {
-      setDebouncedTerm(newTerm);
-    }, 1000);
-    if (searchTerm) {
-      debouncer(searchTerm);
-    } else {
-      setDebouncedTerm("");
-    }
-    return () => {
-      debouncer.cancel();
-    };
-  }, [searchTerm]);
   const onSubmit = async (values) => {
     try {
       const formData = new FormData();
@@ -104,7 +88,7 @@ const Brands = () => {
         );
       }
       formData.append("tenantId", selectedTenant.value);
-      await createBrand(formData).unwrap()
+      await createBrand(formData).unwrap();
       showToast("Brand Created Successfully", "success");
     } catch (err) {
       console.log("Some error occurred", err);
@@ -165,6 +149,9 @@ const Brands = () => {
             components={{ DropdownIndicator: CustomDropdownIndicator }}
             defaultValue={selectedTenant}
             onChange={handleSelectChange}
+            onMenuScrollToBottom={(e) => console.log("bottom", e)}
+            onMenuScrollToTop={(e) => console.log("top", e)}
+            onInputChange={(e) => console.log("change", e)}
             name="colors"
             options={tenants}
             placeholder="Select Tenants"
@@ -178,55 +165,33 @@ const Brands = () => {
           <Loader />
         ) : (
           <>
-            <div className=" items-center gap-x-3 mx-3 my-5 flex h-fit">
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-gray-600 text-white font-sans p-2 rounded-lg outline-none w-[80%]"
-                placeholder="Search Brands"
-              />
-              <Modal
-                PopUpButton={
-                  <button className="flex gap-x-1 items-center bg-secondary-500 p-3 rounded-lg">
-                    <IoMdAdd />
-                    <p>Brand</p>
-                  </button>
-                }
-                isJSX={true}
-                HeaderText={() => <h3>Add New Brand</h3>}
-                BodyContent={
-                  <CustomForm
-                    initialValues={initialValues}
-                    onSubmit={onSubmit}
-                    validate={validate}
-                    btnClass="w-40 h-10"
-                    validator={() => {}}
-                    fields={[
-                      {
-                        type: "text",
-                        name: "name",
-                        label: "Name",
-                        placeholder: "Brand Name",
-                      },
-                      {
-                        type: "textarea",
-                        name: "description",
-                        label: "Description",
-                        placeholder: "Brand Description",
-                      },
-                      {
-                        type: "file",
-                        name: "image",
-                        label: "Image",
-                        placeholder: "Brand Image",
-                      },
-                    ]}
-                    buttonText="Create"
-                    isTrusted={true}
-                  />
-                }
-              />
-            </div>
+            <SearchDiv
+              name={"Brand"}
+              setSearchedTerm={setSearchedTerm}
+              initialValues={initialValues}
+              onSubmit={onSubmit}
+              validate={validate}
+              fields={[
+                {
+                  type: "text",
+                  name: "name",
+                  label: "Name",
+                  placeholder: "Brand Name",
+                },
+                {
+                  type: "textarea",
+                  name: "description",
+                  label: "Description",
+                  placeholder: "Brand Description",
+                },
+                {
+                  type: "file",
+                  name: "image",
+                  label: "Image",
+                  placeholder: "Brand Image",
+                },
+              ]}
+            />
             <div className="mx-3">
               {brands?.length ? (
                 <>

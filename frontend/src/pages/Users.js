@@ -274,7 +274,6 @@ const Users = () => {
           },
         ]}
         buttonText="Create"
-        isTrusted={true}
       />
     );
   }
