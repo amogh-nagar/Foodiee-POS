@@ -79,7 +79,26 @@ const Users = () => {
       rolesMappedToPermissions.outletUser) ||
     [];
   let displayUser = activeTab === "Users";
-  const addUser = async (values) => {};
+  const addUser = async (values) => {
+    try{
+      values.permissions = values.roles.reduce((res, role)=>{
+        return res.concat(role.permissions ?? [])
+      },[])
+      values.roles = values.roles.map((role) => {
+        return { roleId: role.value, roleName: role.label };
+      });
+      values.entityDetails = [
+        {
+          entityName: activeEntityItem.label,
+          entityId: activeEntityItem.value
+        }
+      ]
+      await createUser(values);
+      showToast("User Created Succesfully", "success");
+    } catch(err){
+      showToast(err?.data?.message || "Some error occurred!"); 
+    }
+  };
   const addRole = async (values) => {
     try {
       let payload = {
@@ -149,10 +168,11 @@ const Users = () => {
       },
       {
         isMultiSelect: true,
+        customFields: { permissions: 1 },
         useOptionsQuery: useGetAllRolesQuery,
         inputQuery: {
           entityId: activeEntityItem.value,
-          getAll: true,
+          page: 1,
         },
         initialValues: [],
         key: "roles",

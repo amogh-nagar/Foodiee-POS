@@ -8,7 +8,7 @@ import { logout } from "../store/authSlice";
 import { FaRegUser } from "react-icons/fa";
 const Header = () => {
   const dispatch = useDispatch();
-  const permissions = useSelector((state) => state.auth.permissions);
+  const auth = useSelector((state) => state.auth);
   const logoutHandler = () => {
     dispatch(logout());
   };
@@ -19,51 +19,52 @@ const Header = () => {
           <img src={StoreIcon} alt="logo" className="w-16 h-16" />
         </div>
         <div className="h-[93%] flex flex-col justify-between items-center">
-        <div className="h-[77%] no-scrollbar hide-scrollbar overflow-y-auto">
-          <ul className="hide-scrollbar overflow-y-auto">
-            {routesList.map((item, index) => {
-              return !item.onlyRoute ? (
-                !item.permissions.length ||
-                item.permissions.every(
-                  (permission) => permissions?.indexOf(permission) !== -1
-                ) ? (
-                  <li key={index} className="mb-5">
-                    {item.exact ? (
-                      <NavLink
-                        exact
-                        to={item.path}
-                        activeClassName="active-class"
-                      >
-                        <div className="outer-div w-16 h-16 flex justify-center items-center rounded-lg transition-all">
-                          {item.icon}
-                        </div>
-                      </NavLink>
-                    ) : (
-                      <NavLink to={item.path} activeClassName="active-class">
-                        <div className="outer-div w-16 h-16 flex justify-center items-center rounded-lg transition-all">
-                          {item.icon}
-                        </div>
-                      </NavLink>
-                    )}
-                  </li>
-                ) : null
-              ) : null;
-            })}
-          </ul>
-        </div>
+          <div className="h-[77%] no-scrollbar hide-scrollbar overflow-y-auto">
+            <ul className="hide-scrollbar overflow-y-auto">
+              {routesList.map((item, index) => {
+                return !item.onlyRoute ? (
+                  auth.isSuperAdmin ||
+                  !item.permissions.length ||
+                  item.permissions.every(
+                    (permission) => auth.permissions?.indexOf(permission) !== -1
+                  ) ? (
+                    <li key={index} className="mb-5">
+                      {item.exact ? (
+                        <NavLink
+                          exact
+                          to={item.path}
+                          activeClassName="active-class"
+                        >
+                          <div className="outer-div w-16 h-16 flex justify-center items-center rounded-lg transition-all">
+                            {item.icon}
+                          </div>
+                        </NavLink>
+                      ) : (
+                        <NavLink to={item.path} activeClassName="active-class">
+                          <div className="outer-div w-16 h-16 flex justify-center items-center rounded-lg transition-all">
+                            {item.icon}
+                          </div>
+                        </NavLink>
+                      )}
+                    </li>
+                  ) : null
+                ) : null;
+              })}
+            </ul>
+          </div>
 
-        <div>
-          <NavLink exact to="/profile" activeClassName="active-class">
-            <div className="w-16 mb-3 h-16 flex text-secondary-300 justify-center items-center rounded-lg transition-all hover:bg-secondary-300 hover:text-white">
-              <FaRegUser className="w-10 h-10" />
-            </div>
-          </NavLink>
-          <button className="" onClick={logoutHandler}>
-            <div className="w-16 h-16 flex text-secondary-300 justify-center items-center rounded-lg transition-all hover:bg-secondary-300 hover:text-white">
-              <CiLogout className="w-10 h-10" />
-            </div>
-          </button>
-        </div>
+          <div>
+            <NavLink exact to="/profile" activeClassName="active-class">
+              <div className="w-16 mb-3 h-16 flex text-secondary-300 justify-center items-center rounded-lg transition-all hover:bg-secondary-300 hover:text-white">
+                <FaRegUser className="w-10 h-10" />
+              </div>
+            </NavLink>
+            <button className="" onClick={logoutHandler}>
+              <div className="w-16 h-16 flex text-secondary-300 justify-center items-center rounded-lg transition-all hover:bg-secondary-300 hover:text-white">
+                <CiLogout className="w-10 h-10" />
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </>

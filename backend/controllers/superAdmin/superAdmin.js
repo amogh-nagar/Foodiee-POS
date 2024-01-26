@@ -12,7 +12,7 @@ const { deleteImageFromS3, addImageToS3, commaSeparatedString, projectUser } = r
 
 
 exports.createSuperAdmin = function (req, res, next) {
-  let { name, email, password } = req.body;
+  let { name, email, password, mobile } = req.body;
   User.findOne({ email: req.body.email }).then(function (user) {
     if (user) {
       var error = new HttpError("User already exists", 401);
@@ -21,7 +21,8 @@ exports.createSuperAdmin = function (req, res, next) {
     var newUser = new User({
       name: name,
       email: email,
-      password: hashSync(password, 10),
+      password: password,
+      mobile: mobile,
       roles: [
         {
           entity: "",

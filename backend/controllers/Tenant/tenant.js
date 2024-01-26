@@ -14,7 +14,7 @@ var itemsPerPage = 20;
 
 exports.getTenants = function (req, res, next) {
   var skip = (req.query.page - 1) * itemsPerPage;
-  let query = { superAdminId: req.user._id };
+  let query = { };
   if (req.query.tenantIds) {
     query = {
       _id: {
@@ -91,7 +91,6 @@ exports.getTenant = function (req, res, next) {
 
 exports.createTenant = function (req, res, next) {
   Tenant.findOne({
-    superAdminId: req.user._id,
     name: req.body.name,
   }).then(function (tenant) {
     if (tenant) {
@@ -116,8 +115,7 @@ exports.createTenant = function (req, res, next) {
       var tenant = new Tenant({
         name: name,
         image: fileName,
-        description: description,
-        superAdminId: req.user._id,
+        description: description
       });
       tenant
         .save()
@@ -136,7 +134,6 @@ exports.createTenant = function (req, res, next) {
 
 exports.updateTenant = function (req, res, next) {
   Tenant.findOne({
-    superAdminId: req.user._id,
     name: req.body.name,
     _id: {
       $ne: req.body.entityId,

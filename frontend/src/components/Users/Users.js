@@ -1,6 +1,22 @@
 import React from "react";
 import UserCard from "./UserTableCard";
-const User = ({ users }) => {
+import { useUpdateUserMutation } from "../../services/user";
+import { showToast } from "../../utils/constants";
+const User = ({ users, entityId }) => {
+  const [
+    updateUser,
+    { isLoading: isUpdateUserLoading, isError: isUpdateUserError },
+  ] = useUpdateUserMutation();
+  const onEditBtnClick = async (values) => {
+    try {
+      console.log("values", values)
+      // await updateUser(values).unwrap();
+      showToast("User Updated Successfully", "success");
+    } catch (err) {
+      console.log("Some error occurred", err);
+      showToast(err?.data?.message || "Some error occurred!");
+    }
+  };
   return (
     <div className="w-full p-7 mt-3 bg-primary-700 rounded-md">
       {users && users.length ? (
@@ -16,8 +32,8 @@ const User = ({ users }) => {
             </tr>
           </thead>
           <tbody className="">
-            {users.map((user) => (
-              <UserCard user={user} />
+            {users.map((user, index) => (
+              <UserCard key={index} entityId={entityId} onEditBtnClick={onEditBtnClick} user={user} />
             ))}
           </tbody>
         </table>

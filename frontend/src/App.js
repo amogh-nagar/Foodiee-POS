@@ -5,7 +5,7 @@ import { routesList } from "./utils/routes";
 import { useSelector } from "react-redux";
 
 const App = () => {
-  const permissions = useSelector((state) => state.auth.permissions);
+  const auth = useSelector((state) => state.auth);
   return (
     <div className="flex">
       <Header />
@@ -13,9 +13,10 @@ const App = () => {
         <Switch>
           {routesList.map((route, index) => {
             if (
+              auth.isSuperAdmin ||
               !route.permissions.length ||
               route.permissions.every(
-                (permission) => permissions?.indexOf(permission) !== -1
+                (permission) => auth.permissions?.indexOf(permission) !== -1
               )
             )
               return route.exact ? (

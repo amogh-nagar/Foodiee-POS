@@ -7,15 +7,15 @@ var user = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   mobile: {
-    type: String,
+    type: Number,
     required: true,
-    match: [/^\+[1-9]\d{1,14}$/, "Please fill a valid mobile number"],
   },
-  password: { type: String, required: true },
+  password: { type: String },
   image: { type: String },
   roles: [
     {
-      roleId: { type: mongoose.Types.ObjectId, required: true },
+      roleId: { type: mongoose.Types.ObjectId },
+      roleName: { type: String, required: true },
     },
   ],
   entityDetails: [

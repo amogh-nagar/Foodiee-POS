@@ -1,6 +1,7 @@
 const HttpError = require("./models/http-error");
 var s3 = require("./aws-services/aws");
 const { default: mongoose } = require("mongoose");
+const crypto = require("crypto");
 require("dotenv").config();
 let async = require("async");
 exports.handleError = (res, err) => {
@@ -56,6 +57,13 @@ exports.deleteImageFromS3 = function (data) {
     }
     console.log("Successfully deleted image from s3");
   });
+};
+
+exports.generateSecureRandomPassword = (length) => {
+  return crypto
+    .randomBytes(Math.ceil(length / 2))
+    .toString("hex")
+    .slice(0, length);
 };
 
 exports.addImageToS3 = function (req, details) {
@@ -140,6 +148,7 @@ var mongooseIdFields = [
   "entityId",
   "orderId",
   "roleId",
+  "userId"
 ];
 var mongooseIdArrayFields = [
   "brandIds",

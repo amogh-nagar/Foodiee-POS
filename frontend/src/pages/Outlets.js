@@ -170,19 +170,23 @@ const Outlets = () => {
     <div>
       <PageNameWithDate
         name="Outlets"
-        MultiSelect={() => (
-          <Select
-            components={{ DropdownIndicator: CustomDropdownIndicator }}
-            defaultValue={selectedBrand}
-            onChange={handleSelectChange}
-            name="colors"
-            onInputChange={(e) => setSearchBrands(e)}
-            options={brands}
-            placeholder="Select Brands"
-            className="basic-multi-select w-96 bg-primary-700 rounded-lg text-secondary-600"
-            styles={selectCustomStyle}
-          />
-        )}
+        MultiSelect={() =>
+          brands && brands.length ? (
+            <Select
+              components={{ DropdownIndicator: CustomDropdownIndicator }}
+              defaultValue={selectedBrand}
+              onChange={handleSelectChange}
+              name="colors"
+              onInputChange={(e) => setSearchBrands(e)}
+              options={brands}
+              placeholder="Select Brands"
+              className="basic-multi-select w-96 bg-primary-700 rounded-lg text-secondary-600"
+              styles={selectCustomStyle}
+            />
+          ) : (
+            ""
+          )
+        }
       />
       <div>
         {isLoading ? (

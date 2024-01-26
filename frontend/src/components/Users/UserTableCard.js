@@ -1,22 +1,40 @@
 import React from "react";
-import { getColor } from "../../utils/constants";
+import { checkForSame, getColor, showToast } from "../../utils/constants";
 import ActiveBtn from "../Buttons/ActiveBtn";
 import InActiveBtn from "../Buttons/InActiveBtn";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
-const UserCard = ({ user }) => {
-  let img = user.img,
+import MultiStepModal from "../Modals/MultiStepModal";
+import { useGetAllRolesQuery } from "../../services/role";
+const UserCard = ({ user, entityId, onEditBtnClick }) => {
+  let image = user.image,
     name = user.name,
     email = user.email,
     mobile = user.mobile,
-    status = user.isActive;
+    status = user.isActive,
+    roles = user.roles;
   let styleObj;
-  if (img && img.length) styleObj = getColor(img, name);
+  if (image && image.length) styleObj = getColor(image, name);
+  const newRoles = roles.map((role) => {
+    return {
+      value: role.roleId,
+      label: role.roleName,
+      isSelected: true
+    };
+  })
+  let initialValues = {
+    name: name,
+    email: email,
+    mobile: mobile,
+    roles: newRoles,
+    permissions: [],
+    image: image,
+  };
   return (
     <tr className="">
       <td className="py-3">
         <div className="flex items-center justify-center">
-          {img && img.length ? (
+          {image && image.length ? (
             <div
               className="w-12 h-12 rounded-full bg-secondary-500"
               style={styleObj}
@@ -48,9 +66,67 @@ const UserCard = ({ user }) => {
       </td>
       <td className="py-3">
         <div className="flex items-center justify-center gap-3 text-secondary-200">
-          <button>
-            <MdOutlineEdit className="w-6 h-6" />
-          </button>
+          <MultiStepModal
+            steps={[
+              {
+                isForm: true,
+                initialValues: {
+                  name,
+                  email,
+                  mobile,
+                },
+                fields: [
+                  {
+                    type: "text",
+                    name: "name",
+                    label: "Name",
+                    placeholder: "User Name",
+                  },
+                  {
+                    type: "email",
+                    name: "email",
+                    label: "Email",
+                    placeholder: "User Email",
+                  },
+                  {
+                    type: "number",
+                    name: "mobile",
+                    label: "Mobile",
+                    placeholder: "User Mobile",
+                  },
+                ],
+              },
+              {
+                isMultiSelect: true,
+                customFields: { permissions: 1 },
+                useOptionsQuery: useGetAllRolesQuery,
+                inputQuery: {
+                  entityId: entityId,
+                  page: 1,
+                },
+                initialValues: newRoles,
+                key: "roles",
+                skipIfNull: entityId,
+              },
+            ]}
+            initialValues={initialValues}
+            HeaderText={() => "Update User"}
+            onSubmitForm={(values) => {
+              if (!checkForSame(values, initialValues))
+                onEditBtnClick({
+                  userId: user._id,
+                  entityId,
+                  ...values,
+                });
+              else showToast("Nothing to Update", "info");
+            }}
+            PopUpButton={
+              <button>
+                <MdOutlineEdit className="w-6 h-6" />
+              </button>
+            }
+          />
+
           <button>
             <MdDeleteOutline className="w-6 h-6" />
           </button>

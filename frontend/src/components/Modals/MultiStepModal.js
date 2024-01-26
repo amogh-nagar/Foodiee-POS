@@ -4,6 +4,10 @@ import { GrCaretNext, GrCaretPrevious } from "react-icons/gr";
 import CustomForm from "../forms/Form";
 import { checkForSame, showToast, validateForm } from "../../utils/constants";
 import MultiSelect from "../Select/MultiSelect";
+function validatePhoneNumber(phone) {
+    const pattern = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+    return pattern.test(phone);
+}
 const MultiStepModal = ({
   PopUpButton,
   HeaderText,
@@ -11,6 +15,7 @@ const MultiStepModal = ({
   onSubmitForm,
   initialValues,
 }) => {
+    console.log("hgvgh", initialValues)
   const [allFields, setAllFields] = useState(initialValues);
   const [stepIndex, setStepIndex] = useState(0);
   const [reachedIndex, setReachedIndex] = useState(0);
@@ -19,27 +24,6 @@ const MultiStepModal = ({
     setAllFields(initialValues);
     setReachedIndex(0);
     close();
-  };
-  const onMultiSelectChange = (options, key) => {
-    setAllFields((prev) => {
-      return {
-        ...prev,
-        [key]: options.map((option) => {
-          return {
-            ...option,
-            isSelected: true,
-          };
-        }),
-      };
-    });
-  };
-  const onRemoveItem = (option, key) => {
-    setAllFields((prev) => {
-      return {
-        ...prev,
-        [key]: prev[key].filter((opt) => opt.value != option.value),
-      };
-    });
   };
   return (
     <Popup
@@ -70,10 +54,14 @@ const MultiStepModal = ({
               {steps.map(
                 (Step, index) =>
                   stepIndex === index && (
-                    <>
+                    <div className="w-full" key={index}>
                       {Step.isForm && (
                         <CustomForm
                           onSubmit={(values) => {
+                            if(values.mobile && !validatePhoneNumber(values.mobile)){
+                                showToast("Please enter valid mobile number", "info");
+                                return;
+                            }
                             if (
                               !checkForSame(
                                 values,
@@ -82,11 +70,11 @@ const MultiStepModal = ({
                               )
                             ) {
                               if (reachedIndex >= steps.length - 1) {
-                                resetState(close);
                                 onSubmitForm({
                                   ...allFields,
                                   ...values,
                                 });
+                                resetState(close);
                               } else {
                                 setAllFields((prev) => {
                                   return {
@@ -99,7 +87,6 @@ const MultiStepModal = ({
                               }
                             } else showToast("Nothing to Create", "info");
                           }}
-                          key={index}
                           initialValues={allFields}
                           onRender={Step.onRender}
                           fields={Step.fields}
@@ -118,23 +105,22 @@ const MultiStepModal = ({
                       {Step.isMultiSelect && (
                         <MultiSelect
                           initialValues={allFields[Step.key]}
-                          onChange={(options) =>
-                            onMultiSelectChange(options, Step.key)
-                          }
                           btnClass="w-40 h-10"
                           buttonText={
                             reachedIndex === steps.length - 1
                               ? "Submit"
                               : "Next"
                           }
+                          customFields={Step.customFields}
                           onSubmit={(options) => {
                             if (!checkForSame(options, Step.initialValues)) {
                               if (reachedIndex >= steps.length - 1) {
+                                const newFields = {
+                                    ...allFields
+                                }
+                                newFields[Step.key] = options;
+                                onSubmitForm(newFields);
                                 resetState(close);
-                                onSubmitForm({
-                                  ...allFields,
-                                  [Step.key]: [...options],
-                                });
                               } else {
                                 setAllFields((prev) => {
                                   return {
@@ -148,17 +134,14 @@ const MultiStepModal = ({
                             } else
                               showToast("Please Select " + Step.key, "info");
                           }}
-                          onRemoveItem={onRemoveItem}
                           skipIfNull={Step.skipIfNull}
                           title={`Search ${Step.key}`}
-                          key={index}
                           field={Step.key}
                           inputQuery={Step.inputQuery}
                           useOptionsQuery={Step.useOptionsQuery}
-                          value={allFields[Step.key]}
                         />
                       )}
-                    </>
+                    </div>
                   )
               )}
             </div>

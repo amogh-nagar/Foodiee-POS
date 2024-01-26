@@ -3,7 +3,6 @@ var tenant = new mongoose.Schema({
   name: { type: String, required: true },
   image: { type: String },
   description: { type: String },
-  superAdminId: { type: mongoose.Types.ObjectId, required: true },
   isDeleted: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
 });

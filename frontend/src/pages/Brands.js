@@ -163,8 +163,8 @@ const Brands = () => {
         name="Brands"
         MultiSelect={() => {
           return (
-            tenants &&
-            tenants.length && (
+            (tenants &&
+            tenants.length) ? (
               <Select
                 components={{ DropdownIndicator: CustomDropdownIndicator }}
                 defaultValue={selectedTenant}
@@ -176,7 +176,7 @@ const Brands = () => {
                 className="basic-multi-select w-96 bg-primary-700 rounded-lg text-secondary-600"
                 styles={selectCustomStyle}
               />
-            )
+            ) : ""
           );
         }}
       />

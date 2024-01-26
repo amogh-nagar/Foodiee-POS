@@ -15,7 +15,7 @@ const SearchDiv = ({
   useEffect(() => {
     const debouncer = debounce((newTerm) => {
       setSearchedTerm(newTerm);
-    }, 1000);
+    }, 500);
     if (searchTerm) {
       debouncer(searchTerm);
     } else {
