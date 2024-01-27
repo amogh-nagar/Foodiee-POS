@@ -15,15 +15,17 @@ import Loader from "../UI/Loaders/Loader";
 import ReactPaginate from "react-paginate";
 import CustomDropdownIndicator from "../components/CustomDropdownIndicator";
 import SearchDiv from "../components/Containers/SearchDiv";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { alterFilters } from "../store/uiSlice";
 
 const Outlets = () => {
   const location = useLocation();
-  const [selectedBrand, setSelectedBrand] = useState({});
+  let selectedBrand = useSelector((state) => state.ui.filters.selectedBrand);
+  const dispatch = useDispatch();
+  selectedBrand = selectedBrand ?? {};
   const [page, setPage] = useState(1);
   const [searchedTerm, setSearchedTerm] = useState("");
   const auth = useSelector((state) => state.auth);
-  const [searchBrands, setSearchBrands] = useState("");
   const [
     createOutlet,
     { isLoading: isCreateOutletLoading, isError: isCreateOutletError },
@@ -33,7 +35,6 @@ const Outlets = () => {
     { isLoading: isUpdateOutletLoading, isError: isUpdateOutletError },
   ] = useUpdateOutletMutation();
   const brandsQuery = {
-    name: searchBrands,
     page: 1,
   };
   if (auth.isSuperAdmin) {
@@ -45,13 +46,6 @@ const Outlets = () => {
   if (auth.brandIds) {
     brandsQuery.brandIds = auth.brandIds;
   }
-  const {
-    data: brandsData,
-    isError: isGetAllBrandsError,
-    isLoading: isGetAllBrandsLoading,
-  } = useGetAllBrandsQuery(brandsQuery, {
-    skip: !auth.isSuperAdmin && !auth.tenantIds && !auth.brandIds,
-  });
   const outletsQuery = {
     name: searchedTerm,
     page: page,
@@ -65,35 +59,32 @@ const Outlets = () => {
   const {
     data,
     isError: isGetAllOutletsError,
-    isLoading: isGetAllOutletsLoading,
-    refetch,
+    isLoading: isGetAllOutletsLoading
   } = useGetAllOutletsQuery(outletsQuery, {
     skip: !selectedBrand.value && !auth.outletIds,
   });
   useEffect(() => {
     if (location.state?.selectedEntity)
-      setSelectedBrand({
-        label: location.state?.selectedEntity?.name,
-        value: location.state?.selectedEntity?._id,
-        tenantId: location.state?.selectedEntity?.entityId,
-      });
-    else if (brandsData?.brands?.length)
-      setSelectedBrand({
-        label: brandsData?.brands[0]?.name,
-        value: brandsData?.brands[0]?._id,
-        tenantId: brandsData?.brands[0]?.tenantId,
-      });
-  }, [brandsData?.brands]);
+      dispatch(
+        alterFilters({
+          type: "SET_FILTER",
+          name: "selectedBrand",
+          value: {
+            label: location.state?.selectedEntity?.name,
+            value: location.state?.selectedEntity?._id,
+            tenantId: location.state?.selectedEntity?.entityId,
+          },
+        })
+      );
+  }, []);
   const totalItems = data?.totalItems ?? 0;
   let outlets = data?.outlets ?? [];
   const isLoading =
     isCreateOutletLoading ||
-    isGetAllBrandsLoading ||
     isUpdateOutletLoading ||
     isGetAllOutletsLoading;
   const isError =
     isCreateOutletError ||
-    isGetAllBrandsError ||
     isUpdateOutletError ||
     isGetAllOutletsError;
   const initialValues = {
@@ -153,40 +144,28 @@ const Outlets = () => {
       showToast(err?.data?.message || "Some error occurred!");
     }
   };
-  let brands =
-    brandsData?.brands?.map((brand) => {
-      return {
-        label: brand.name,
-        value: brand._id,
-        tenantId: brand.tenantId,
-      };
-    }) ?? [];
 
   const handleSelectChange = (option) => {
-    setSelectedBrand(option);
-    refetch();
+    dispatch(
+      alterFilters({
+        type: "SET_FILTER",
+        name: "selectedBrand",
+        value: option,
+      })
+    );
   };
   return (
     <div>
       <PageNameWithDate
         name="Outlets"
-        MultiSelect={() =>
-          brands && brands.length ? (
-            <Select
-              components={{ DropdownIndicator: CustomDropdownIndicator }}
-              defaultValue={selectedBrand}
-              onChange={handleSelectChange}
-              name="colors"
-              onInputChange={(e) => setSearchBrands(e)}
-              options={brands}
-              placeholder="Select Brands"
-              className="basic-multi-select w-96 bg-primary-700 rounded-lg text-secondary-600"
-              styles={selectCustomStyle}
-            />
-          ) : (
-            ""
-          )
-        }
+        isMultiSelect={true}
+        defaultValue={selectedBrand}
+        handleSelectChange={handleSelectChange}
+        useGetOptionsQuery={useGetAllBrandsQuery}
+        skip={!auth.isSuperAdmin && !auth.tenantIds && !auth.brandIds}
+        inputQuery={brandsQuery}
+        field={"brands"}
+        customField={["tenantId"]}
       />
       <div>
         {isLoading ? (

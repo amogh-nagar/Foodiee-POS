@@ -148,7 +148,8 @@ var mongooseIdFields = [
   "entityId",
   "orderId",
   "roleId",
-  "userId"
+  "userId",
+  "dishId",
 ];
 var mongooseIdArrayFields = [
   "brandIds",
@@ -157,12 +158,13 @@ var mongooseIdArrayFields = [
   "outletIds",
   "entityIds",
   "orderIds",
+  "dishIds",
 ];
 var boolFields = ["isActive", "isDeleted", "getAll", "notIncludeTotal"];
 let itemsPerPage = 10;
 exports.itemsPerPage = itemsPerPage;
 exports.checkAndValidateReq = (req, res, next) => {
-  console.log("validating req...", req.query, req.body);
+  console.log("validating req...", req.query, req.body, req.params);
   try {
     mongooseIdFields.forEach((entry) => {
       if (req.query[entry]) {

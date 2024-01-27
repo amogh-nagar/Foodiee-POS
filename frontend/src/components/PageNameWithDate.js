@@ -1,11 +1,11 @@
 import React from "react";
 import moment from "moment";
-const PageNameWithDate = ({ name, searchBox, MultiSelect }) => {
+import CustomSelect from "./Select/CustomSelect";
+const PageNameWithDate = ({ name, searchBox, isMultiSelect, ...args }) => {
   return (
     <div className="border-b-gray-400 border-b-2 w-full px-7 py-3 flex justify-between">
       <div className="w-6/12 flex items-end gap-x-4">
-        <h2 className="text-4xl">{name}
-        </h2>
+        <h2 className="text-4xl">{name}</h2>
         <span className="py-2 text-sm">({moment().format("DD/MM/YYYY")})</span>
       </div>
       {searchBox && (
@@ -16,7 +16,7 @@ const PageNameWithDate = ({ name, searchBox, MultiSelect }) => {
           />
         </div>
       )}
-      {MultiSelect && <MultiSelect/>}
+      {isMultiSelect && <CustomSelect name={name} {...args} />}
     </div>
   );
 };

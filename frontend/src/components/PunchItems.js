@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import CtgNdSuperCtgCard from "./categories/CtgNdSuperCtgCardBilling";
+import CtgNdSuperCtgCard from "./categories/BillingCtgNdSuperCtgCard";
 import ItemCard from "./dish/dishBillingCard";
 const superCategories = [
   {

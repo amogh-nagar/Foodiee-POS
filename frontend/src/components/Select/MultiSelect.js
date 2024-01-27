@@ -96,7 +96,6 @@ const MultiSelect = ({
     onSubmit(selectedOptions);
   };
   if (isLoading) return <Loader />;
-  console.log("initialValues", initialValues)
   return (
     <div className="w-full">
       <div className="flex flex-col w-full items-start justify-start">

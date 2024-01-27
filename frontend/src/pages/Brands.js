@@ -15,10 +15,13 @@ import FlexDiv from "../components/Wrappers/FlexDiv";
 import ReactPaginate from "react-paginate";
 import CustomDropdownIndicator from "../components/CustomDropdownIndicator";
 import SearchDiv from "../components/Containers/SearchDiv";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { alterFilters } from "../store/uiSlice";
 const Brands = () => {
   const location = useLocation();
-  const [selectedTenant, setSelectedTenant] = useState({});
+  let selectedTenant = useSelector((state) => state.ui.filters.selectedTenant);
+  const dispatch = useDispatch();
+  selectedTenant = selectedTenant ?? {};
   const [page, setPage] = useState(1);
   const [searchedTerm, setSearchedTerm] = useState("");
   const [
@@ -30,9 +33,7 @@ const Brands = () => {
     { isLoading: isUpdateBrandLoading, isError: isUpdateBrandError },
   ] = useUpdateBrandMutation();
   const auth = useSelector((state) => state.auth);
-  const [searchTenants, setSearchTenants] = useState("");
   const tenantsQuery = {
-    name: searchTenants,
     page: 1,
   };
   if (auth.isSuperAdmin) {
@@ -41,13 +42,6 @@ const Brands = () => {
   if (auth.tenantIds) {
     tenantsQuery.tenantIds = auth.tenantIds;
   }
-  const {
-    data: tenantsData,
-    isError: isGetAllTenantsError,
-    isLoading: isGetAllTenantsLoading,
-  } = useGetAllTenantsQuery(tenantsQuery, {
-    skip: !auth.isSuperAdmin && !auth.tenantIds,
-  });
   const brandsQuery = {
     name: searchedTerm,
     page: page,
@@ -62,32 +56,30 @@ const Brands = () => {
     data,
     isError: isGetAllBrandsError,
     isLoading: isGetAllBrandsLoading,
-    refetch,
   } = useGetAllBrandsQuery(brandsQuery, {
     skip: !selectedTenant.value && !auth.brandIds,
   });
   useEffect(() => {
     if (location.state?.selectedEntity)
-      setSelectedTenant({
-        label: location.state?.selectedEntity?.name,
-        value: location.state?.selectedEntity?._id,
-      });
-    else if (tenantsData?.tenants?.length)
-      setSelectedTenant({
-        label: tenantsData?.tenants[0]?.name,
-        value: tenantsData?.tenants[0]?._id,
-      });
-  }, [tenantsData?.tenants]);
+      dispatch(
+        alterFilters({
+          type: "SET_FILTER",
+          name: "selectedTenant",
+          value: {
+            label: location.state?.selectedEntity?.name,
+            value: location.state?.selectedEntity?._id,
+          },
+        })
+      );
+  }, []);
   const totalItems = data?.totalItems ?? 0;
   let brands = data?.brands ?? [];
   const isLoading =
     isCreateBrandLoading ||
-    isGetAllTenantsLoading ||
     isUpdateBrandLoading ||
     isGetAllBrandsLoading;
   const isError =
     isCreateBrandError ||
-    isGetAllTenantsError ||
     isUpdateBrandError ||
     isGetAllBrandsError;
   const initialValues = {
@@ -145,40 +137,27 @@ const Brands = () => {
       showToast(err?.data?.message || "Some error occurred!");
     }
   };
-  let tenants =
-    tenantsData?.tenants?.map((tenant) => {
-      return {
-        label: tenant.name,
-        value: tenant._id,
-      };
-    }) ?? [];
 
   const handleSelectChange = (option) => {
-    setSelectedTenant(option);
-    refetch();
+    dispatch(
+      alterFilters({
+        type: "SET_FILTER",
+        name: "selectedTenant",
+        value: option,
+      })
+    );
   };
   return (
     <div>
       <PageNameWithDate
         name="Brands"
-        MultiSelect={() => {
-          return (
-            (tenants &&
-            tenants.length) ? (
-              <Select
-                components={{ DropdownIndicator: CustomDropdownIndicator }}
-                defaultValue={selectedTenant}
-                onChange={handleSelectChange}
-                onInputChange={(e) => setSearchTenants(e)}
-                name="colors"
-                options={tenants}
-                placeholder="Select Tenants"
-                className="basic-multi-select w-96 bg-primary-700 rounded-lg text-secondary-600"
-                styles={selectCustomStyle}
-              />
-            ) : ""
-          );
-        }}
+        isMultiSelect={true}
+        defaultValue={selectedTenant}
+        handleSelectChange={handleSelectChange}
+        useGetOptionsQuery={useGetAllTenantsQuery}
+        skip={!auth.isSuperAdmin && !auth.tenantIds}
+        inputQuery={tenantsQuery}
+        field={"tenants"}
       />
       <div>
         {isLoading ? (

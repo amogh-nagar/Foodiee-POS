@@ -4,15 +4,18 @@ const { check, query } = require("express-validator");
 var passport = require("passport");
 var checkRole = require("../middleware/check-role");
 var checkPermission = require("../middleware/check-permission");
+const { getDishes, getDish, updateDish, createDish, createCategory, createSuperCategory, getCategories, getSuperCategories } = require("../controllers/Dish/dish");
+const { checkAndValidateReq } = require("../common");
 
 router.get(
-  "/dishes/:brandId",
+  "/getDishes/:brandId/:page",
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitDishesPage"),
+  checkAndValidateReq,
   getDishes
 );
 router.get(
-  "/dish/:dishId",
+  "/getDish/:dishId",
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitDishesPage"),
   getDish
@@ -55,25 +58,25 @@ router.post(
   checkPermission("isCreateDishes"),
   createDish
 );
-router.get(
-  "/taxes/:brandId",
-  passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisitTaxPage"),
-  taxes
-);
-router.post(
-  "/createTax",
-  passport.authenticate("jwt", { session: false }),
-  checkPermission("isCreateTax"),
-  createTax
-);
+// router.get(
+//   "/taxes/:brandId",
+//   passport.authenticate("jwt", { session: false }),
+//   checkPermission("isVisitTaxPage"),
+//   taxes
+// );
+// router.post(
+//   "/createTax",
+//   passport.authenticate("jwt", { session: false }),
+//   checkPermission("isCreateTax"),
+//   createTax
+// );
 
-router.post(
-  "/updateTax",
-  passport.authenticate("jwt", { session: false }),
-  checkPermission("isUpdateTax"),
-  updateTax
-);
+// router.post(
+//   "/updateTax",
+//   passport.authenticate("jwt", { session: false }),
+//   checkPermission("isUpdateTax"),
+//   updateTax
+// );
 
 router.delete(
   "/deleteTax",

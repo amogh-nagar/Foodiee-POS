@@ -10,6 +10,8 @@ const SearchDiv = ({
   validate,
   fields,
   setSearchedTerm,
+  cntClass = "",
+  buttonClass = ""
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
@@ -26,16 +28,16 @@ const SearchDiv = ({
     };
   }, [searchTerm]);
   return (
-    <div className=" items-center gap-x-3 mx-3 my-5 flex h-fit">
+    <div className={`items-center gap-x-3 mx-3 my-5 flex h-fit ${cntClass}`}>
       <input
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="bg-gray-600 text-white font-sans p-2 rounded-lg outline-none w-[80%]"
-        placeholder="Search Outlets"
+        placeholder={`Search ${name}`}
       />
       <Modal
         PopUpButton={
-          <button className="flex gap-x-1 items-center bg-secondary-500 p-3 rounded-lg">
+          <button className={`flex ${buttonClass} gap-x-1 items-center bg-secondary-500 p-3 rounded-lg`}>
             <IoMdAdd />
             <p>{name}</p>
           </button>

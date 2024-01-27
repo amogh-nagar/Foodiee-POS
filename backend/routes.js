@@ -7,4 +7,5 @@ router.use("/users", require("./routes/user"))
 router.use("/roles", require("./routes/role"))
 router.use("/outlets", require("./routes/outlet"))
 router.use("/auth", require("./routes/auth"));
+router.use("/dishes", require("./routes/dish"))
 module.exports = router;
