@@ -8,7 +8,7 @@ const { getDishes, getDish, updateDish, createDish, createCategory, createSuperC
 const { checkAndValidateReq } = require("../common");
 
 router.get(
-  "/getDishes/:brandId/:page",
+  "/getDishes",
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitDishesPage"),
   checkAndValidateReq,
@@ -19,18 +19,6 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitDishesPage"),
   getDish
-);
-router.get(
-  "/getCategories/:superCategoryId",
-  passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisitDishesPage"),
-  getCategories
-);
-router.get(
-  "/getSuperCategories/:brandId",
-  passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisitDishesPage"),
-  getSuperCategories
 );
 router.patch(
   "/updateDish",
@@ -47,7 +35,7 @@ router.post(
   "/createDish",
   [
     check("name").not().isEmpty().withMessage("Name is required."),
-    check("price").not().isEmpty().withMessage("Price is required."),
+    check("rate").not().isEmpty().withMessage("rate is required."),
     check("category").not().isEmpty().withMessage("Category is required."),
     check("superCategory")
       .not()
@@ -56,6 +44,7 @@ router.post(
   ],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isCreateDishes"),
+  checkAndValidateReq,
   createDish
 );
 // router.get(
@@ -82,20 +71,6 @@ router.delete(
   "/deleteTax",
   passport.authenticate("jwt", { session: false }),
   checkPermission("isDeleteTax")
-);
-
-router.post(
-  "/createSuperCategory",
-  passport.authenticate("jwt", { session: false }),
-  checkPermission("isCreateDishes"),
-  createSuperCategory
-);
-
-router.post(
-  "/createCategory",
-  passport.authenticate("jwt", { session: false }),
-  checkPermission("isCreateDishes"),
-  createCategory
 );
 
 module.exports = router;

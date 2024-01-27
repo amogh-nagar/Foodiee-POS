@@ -1,16 +1,92 @@
-import React, { useState } from "react";
-import { IoMdAdd } from "react-icons/io";
+import React, { useEffect, useState } from "react";
 import CategoryCard from "./CategoryCard";
 import SearchDiv from "../Containers/SearchDiv";
+import {
+  useCreateCategoryMutation,
+  useGetAllCategoriesQuery,
+  useUpdateCategoryMutation,
+} from "../../services/category";
+import { useSelector } from "react-redux";
+import debounce from "lodash.debounce";
+import { showToast } from "../../utils/constants";
 
 const CategoriesContainer = () => {
   const [searchedTerm, setSearchedTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const selectedSuperCategory = useSelector(
+    (state) => state.ui.filters.selectedSuperCategory
+  );
+  useEffect(() => {
+    const debouncer = debounce((newTerm) => {
+      setDebouncedSearch(newTerm);
+    }, 500);
+    if (searchedTerm) {
+      debouncer(searchedTerm);
+    } else {
+      setDebouncedSearch("");
+    }
+    return () => {
+      debouncer.cancel();
+    };
+  }, [searchedTerm]);
+  const { data, isLoading, isError } = useGetAllCategoriesQuery(
+    {
+      page: 1,
+      name: debouncedSearch,
+      superCategoryId: selectedSuperCategory?.value,
+    },
+    {
+      skip: !selectedSuperCategory || !selectedSuperCategory?.value,
+    }
+  );
+
+  const [
+    createCategory,
+    { isLoading: isCreateCategoryLoading, isError: isCreateCategoryError },
+  ] = useCreateCategoryMutation();
+  const [
+    updateCategory,
+    { isLoading: isUpdateCategoryLoading, isError: isUpdateCategoryError },
+  ] = useUpdateCategoryMutation();
   const initialValues = {
     name: "",
     description: "",
     image: "",
   };
-  const onSubmit = () => {};
+  const onSubmit = async (values) => {
+    try {
+      const formData = new FormData();
+      for (var key in values) {
+        formData.append(
+          key,
+          typeof values[key] === "string" ? values[key]?.trim() : values[key]
+        );
+      }
+      formData.append("superCategoryId", selectedSuperCategory.value);
+      await createCategory(formData).unwrap();
+      showToast("Category Created Successfully", "success");
+    } catch (err) {
+      console.log("Some error occurred", err);
+      showToast(err?.data?.message || "Some error occurred!");
+    }
+  };
+  const onEditHandler = async (values) => {
+    try {
+      const formData = new FormData();
+      for (var key in values) {
+        formData.append(
+          key,
+          typeof values[key] === "string" ? values[key]?.trim() : values[key]
+        );
+      }
+      formData.append("superCategoryId", selectedSuperCategory.value);
+      await updateCategory(formData).unwrap();
+      showToast("Category Updated Successfully", "success");
+    } catch (err) {
+      console.log("Some error occurred", err);
+      showToast(err?.data?.message || "Some error occurred!");
+    }
+  };
   const validate = () => {};
   return (
     <div className="h-full w-4/6 p-2">
@@ -21,29 +97,38 @@ const CategoriesContainer = () => {
         initialValues={initialValues}
         onSubmit={onSubmit}
         validate={validate}
+        isDisabled={!selectedSuperCategory || !selectedSuperCategory?.value}
         fields={[
           {
             type: "text",
             name: "name",
             label: "Name",
-            placeholder: "Brand Name",
+            placeholder: "Category Name",
           },
           {
             type: "textarea",
             name: "description",
             label: "Description",
-            placeholder: "Brand Description",
+            placeholder: "Category Description",
           },
           {
             type: "file",
             name: "image",
             label: "Image",
-            placeholder: "Brand Image",
+            placeholder: "Category Image",
           },
         ]}
       />
       <div className="overflow-y-auto hide-scrollbar bg-slate-900 h-[90%] flex flex-col gap-y-2 p-3">
-        <CategoryCard />
+        {data && data.categories.length ? (
+          data?.categories?.map((ctg, index) => (
+            <CategoryCard onSubmit={onEditHandler} key={index} {...ctg} />
+          ))
+        ) : (
+          <div className="w-full h-96 flex items-center justify-center">
+            <p>No Category Found</p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -69,6 +69,7 @@ const Outlets = () => {
         alterFilters({
           type: "SET_FILTER",
           name: "selectedBrand",
+          resetFields:["selectedSuperCategory", "selectedCategory"],
           value: {
             label: location.state?.selectedEntity?.name,
             value: location.state?.selectedEntity?._id,
@@ -151,6 +152,7 @@ const Outlets = () => {
         type: "SET_FILTER",
         name: "selectedBrand",
         value: option,
+        resetFields:["selectedSuperCategory", "selectedCategory"]
       })
     );
   };

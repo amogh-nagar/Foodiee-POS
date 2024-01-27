@@ -3,7 +3,7 @@ import { useLazyGetAllTenantsQuery } from "../../services/tenant";
 import { useLazyGetAllBrandsQuery } from "../../services/brand";
 import { useLazyGetAllOutletsQuery } from "../../services/outlet";
 import { useSelector } from "react-redux";
-import Breadcrumbs from "../Wrappers/BreadCrmbs";
+import EntityBreadCrumbsWrapper from "../Wrappers/EntityBreadCrumbs";
 
 const EntityBreadCrumbs = ({setEntity}) => {
   const auth = useSelector((state) => state.auth);
@@ -101,7 +101,7 @@ const EntityBreadCrumbs = ({setEntity}) => {
   }
   return (
     <div>
-      <Breadcrumbs options={breadcrumbItems} />
+      <EntityBreadCrumbsWrapper options={breadcrumbItems} />
     </div>
   );
 };

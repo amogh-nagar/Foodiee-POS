@@ -32,6 +32,7 @@ const DishesPage = () => {
         type: "SET_FILTER",
         name: "selectedBrand",
         value: option,
+        resetFields: ["selectedSuperCategory", "selectedCategory"],
       })
     );
   };
@@ -40,7 +41,9 @@ const DishesPage = () => {
       <PageNameWithDate
         name="Dishes"
         isMultiSelect={true}
-        defaultValue={selectedBrand}
+        defaultValue={
+          selectedBrand && selectedBrand.value ? selectedBrand.value : ""
+        }
         handleSelectChange={handleSelectChange}
         useGetOptionsQuery={useGetAllBrandsQuery}
         skip={!auth.isSuperAdmin && !auth.tenantIds && !auth.brandIds}
@@ -69,25 +72,13 @@ const DishesPage = () => {
               Categories
             </NavLink>
           </li>
-          <li className="w-[67px] h-9 mr-4">
-            <NavLink
-              to={`${url}/taxes`}
-              className="text-gray-300"
-              activeClassName="active-dish-btn"
-            >
-              Taxes
-            </NavLink>
-          </li>
         </ul>
         <Switch>
           <Route path={url} exact>
-            <Dishes selectedBrand={selectedBrand} />
+            <Dishes />
           </Route>
           <Route path={`${url}/categories`}>
-            <Categories selectedBrand={selectedBrand} />
-          </Route>
-          <Route path={`${url}/taxes`}>
-            <Taxes selectedBrand={selectedBrand}/>
+            <Categories />
           </Route>
         </Switch>
       </div>

@@ -15,7 +15,11 @@ export const dishApi = createApi({
     //get all Dishs
     getAllDishes: builder.query({
       query: (query) => {
-        return "/getDishes/" + query.brandId + "/" + query.page;
+        const params = new URLSearchParams();
+        Object.keys(query).forEach((key) => {
+          params.append(key, query[key] ?? "");
+        });
+        return `/getDishes?${params}`;
       },
       providesTags: (result, error, arg) =>
         result

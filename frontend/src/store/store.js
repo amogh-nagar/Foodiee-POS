@@ -11,6 +11,8 @@ import { outletApi } from "../services/outlet";
 import { roleApi } from "../services/role";
 import { userApi } from "../services/user";
 import { dishApi } from "../services/dish";
+import { superCategoryApi } from "../services/superCategory";
+import { categoryApi } from "../services/category";
 const appStore = configureStore({
   reducer: {
     auth: authReducer,
@@ -23,16 +25,22 @@ const appStore = configureStore({
     [roleApi.reducerPath]: roleApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [dishApi.reducerPath]: dishApi.reducer,
+    [superCategoryApi.reducerPath]: superCategoryApi.reducer,
+    [categoryApi.reducerPath]: categoryApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(authApi.middleware, redirectMiddleware)
-      .concat(tenantApi.middleware)
-      .concat(brandApi.middleware)
-      .concat(outletApi.middleware)
-      .concat(userApi.middleware)
-      .concat(roleApi.middleware)
-      .concat(dishApi.middleware),
+      .concat([
+        tenantApi.middleware,
+        brandApi.middleware,
+        outletApi.middleware,
+        userApi.middleware,
+        roleApi.middleware,
+        dishApi.middleware,
+        superCategoryApi.middleware,
+        categoryApi.middleware,
+      ]),
 });
 setupListeners(appStore.dispatch);
 function redirectMiddleware(store) {

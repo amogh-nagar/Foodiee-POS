@@ -10,8 +10,9 @@ const SearchDiv = ({
   validate,
   fields,
   setSearchedTerm,
+  isDisabled = false,
   cntClass = "",
-  buttonClass = ""
+  buttonClass = "",
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
@@ -21,12 +22,32 @@ const SearchDiv = ({
     if (searchTerm) {
       debouncer(searchTerm);
     } else {
-        setSearchedTerm("");
+      setSearchedTerm("");
     }
     return () => {
       debouncer.cancel();
     };
   }, [searchTerm]);
+  let popUpButton = (
+    <button
+      className={`flex ${buttonClass} gap-x-1 items-center bg-secondary-500 p-3 rounded-lg`}
+    >
+      <IoMdAdd />
+      <p>{name}</p>
+    </button>
+  );
+
+  if (isDisabled) {
+    popUpButton = (
+      <button
+        disabled
+        className={`flex ${buttonClass} items-center justify-between w-28 rounded-md opacity-50 bg-secondary-500 text-white px-3 py-2`}
+      >
+        <IoMdAdd />
+        <p>{name}</p>
+      </button>
+    );
+  }
   return (
     <div className={`items-center gap-x-3 mx-3 my-5 flex h-fit ${cntClass}`}>
       <input
@@ -36,12 +57,7 @@ const SearchDiv = ({
         placeholder={`Search ${name}`}
       />
       <Modal
-        PopUpButton={
-          <button className={`flex ${buttonClass} gap-x-1 items-center bg-secondary-500 p-3 rounded-lg`}>
-            <IoMdAdd />
-            <p>{name}</p>
-          </button>
-        }
+        PopUpButton={popUpButton}
         validate={validate}
         isForm={true}
         HeaderText={() => <h3>Add New {name}</h3>}

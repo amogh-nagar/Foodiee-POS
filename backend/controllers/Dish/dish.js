@@ -14,8 +14,12 @@ const {
 } = require("../../common");
 exports.getDishes = function (req, res, next) {
   let query = {};
-  var skip = (req.params.page - 1) * itemsPerPage;
-  if (req.params.brandId) query["brandId"] = req.params.brandId;
+  var skip = (req.query.page - 1) * itemsPerPage;
+  if (req.query.brandId) query["brandId"] = req.query.brandId;
+  if (req.query.superCategoryId != "all")
+    query["superCategory.id"] = req.query.superCategoryId;
+  if (req.query.categoryId != "all")
+    query["category.id"] = req.query.categoryId;
   let aggPipeline = [
     { $match: query },
     {
@@ -24,14 +28,18 @@ exports.getDishes = function (req, res, next) {
         name: 1,
         description: 1,
         image: 1,
+        rate: 1,
         isActive: 1,
-        tenantId: 1,
+        taxes: 1,
+        category: 1,
+        superCategory: 1,
+        brandId: 1,
       },
     },
     { $skip: skip },
     { $limit: itemsPerPage },
   ];
-  if (req.params.getAll) {
+  if (req.query.getAll) {
     aggPipeline = aggPipeline.slice(0, 2);
     aggPipeline[1]["$project"] = { name: 1, tenantId: 1 };
   }
@@ -47,7 +55,7 @@ exports.getDishes = function (req, res, next) {
       });
     },
   ];
-  if (!req.params.notIncludeTotal) {
+  if (!req.query.notIncludeTotal) {
     parallelArr.push(function (cb) {
       Dish.aggregate(
         [{ $match: query }, { $count: "totalItems" }],
@@ -76,41 +84,127 @@ exports.getDishes = function (req, res, next) {
   });
 };
 exports.getCategories = function (req, res, next) {
-  DishCategory.aggregate(
-    [
-      {
-        $match: {
-          dishSuperCategoryId: req.params.superCategoryId,
-        },
+  let query = {};
+  var skip = (req.params.page - 1) * itemsPerPage;
+  if (req.params.superCategoryId)
+    query["dishSuperCategoryId"] = req.params.superCategoryId;
+  let aggPipeline = [
+    { $match: query },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        description: 1,
+        image: 1,
       },
-    ],
-    function (err, data) {
-      if (err)
-        return handleError(res, {
-          message: "Some error occurred",
-          statusCode: 500,
-          error: err,
+    },
+    { $skip: skip },
+    { $limit: itemsPerPage },
+  ];
+  if (req.params.getAll) {
+    aggPipeline = aggPipeline.slice(0, 2);
+    aggPipeline[1]["$project"] = { name: 1, dishSuperCategoryId: 1 };
+  }
+  let parallelArr = [
+    function (callback) {
+      DishCategory.aggregate(aggPipeline, function (err, data) {
+        if (err) {
+          return callback(err);
+        }
+        callback(null, {
+          categories: data.length == 0 ? [] : data,
         });
-      res.status(200).json({
-        message: "Categories Fetched",
-        categories: data,
+      });
+    },
+  ];
+  if (!req.params.notIncludeTotal) {
+    parallelArr.push(function (cb) {
+      DishCategory.aggregate(
+        [{ $match: query }, { $count: "totalItems" }],
+        function (err, data) {
+          if (err) return cb(err);
+          cb(null, {
+            totalItems: data.length == 0 ? 0 : data[0].totalItems,
+          });
+        }
+      );
+    });
+  }
+  async.parallel(parallelArr, function (err, data) {
+    if (err) {
+      return handleError(res, {
+        message: "Some error occurred",
+        statusCode: 500,
+        error: err,
       });
     }
-  );
+    res.status(200).json({
+      message: "Categories Fetched",
+      categories: data[0].length == 0 ? [] : data[0].categories,
+      totalItems: data[1].length == 0 ? 0 : data[1].totalItems,
+    });
+  });
 };
 exports.getSuperCategories = function (req, res, next) {
-  DishSuperCategory.aggregate(
-    [{ $match: { brandId: req.params.brandId } }],
-    function (err, data) {
-      if (err)
-        return handleError(res, {
-          message: "Some error occurred",
-          statusCode: 500,
-          error: err,
+  let query = {};
+  var skip = (req.params.page - 1) * itemsPerPage;
+  if (req.params.brandId) query["brandId"] = req.params.brandId;
+  let aggPipeline = [
+    { $match: query },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        description: 1,
+        image: 1,
+      },
+    },
+    { $skip: skip },
+    { $limit: itemsPerPage },
+  ];
+  if (req.params.getAll) {
+    aggPipeline = aggPipeline.slice(0, 2);
+    aggPipeline[1]["$project"] = { name: 1, brandId: 1 };
+  }
+  let parallelArr = [
+    function (callback) {
+      DishSuperCategory.aggregate(aggPipeline, function (err, data) {
+        if (err) {
+          return callback(err);
+        }
+        callback(null, {
+          superCategories: data.length == 0 ? [] : data,
         });
-      res.status(200).json({ superCategories: data });
+      });
+    },
+  ];
+  if (!req.params.notIncludeTotal) {
+    parallelArr.push(function (cb) {
+      DishSuperCategory.aggregate(
+        [{ $match: query }, { $count: "totalItems" }],
+        function (err, data) {
+          if (err) return cb(err);
+          cb(null, {
+            totalItems: data.length == 0 ? 0 : data[0].totalItems,
+          });
+        }
+      );
+    });
+  }
+  async.parallel(parallelArr, function (err, data) {
+    if (err) {
+      return handleError(res, {
+        message: "Some error occurred",
+        statusCode: 500,
+        error: err,
+      });
     }
-  );
+    res.status(200).json({
+      message: "superCategories Fetched",
+      superCategories: data[0].length == 0 ? [] : data[0].superCategories,
+      totalItems: data[1].length == 0 ? 0 : data[1].totalItems,
+    });
+  });
 };
 exports.getDish = function (req, res, next) {
   Dish.find({ _id: req.params.dishId })
@@ -131,59 +225,75 @@ exports.getDish = function (req, res, next) {
 };
 exports.createDish = function (req, res, next) {
   var { name, rate, description } = req.body;
-  var fileName = "";
-  if (req.files) {
-    if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
-      var error = new HttpError("Invalid image type", 401);
+  Dish.findOne({
+    "superCategory.id": req.body.superCategoryId,
+    "category.id": req.body.categoryId,
+    brandId: req.body.brandId,
+    name: name,
+  }).then(function (result) {
+    if (result) {
+      const error = new HttpError("Duplicate Dish Found", 400);
       return next(error);
     }
-    fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
-  }
-  addImageToS3(req, {
-    fileName: fileName,
-    data: req.files ? req.files.image.data : "",
-  })
-    .then(function () {
-      req.body.taxes = req.body.taxes?.map((tax) => {
-        return {
-          id: new mongoose.Types.ObjectId(tax.id),
-          name: tax.name,
-          taxAmount: +tax.taxAmount,
-        };
-      });
-      var newDish = new Dish({
-        name: name,
-        rate: +rate,
-        description: description,
-        superCategory: {
-          id: req.body.superCategoryId,
-          name: req.body.superCategoryName,
-        },
-        category: { id: req.body.categoryId, name: req.body.categoryName },
-        image: fileName,
-        taxes: req.body.taxes,
-        brandId: req.body.brandId,
-      });
-      newDish
-        .save()
-        .then(function (newDish) {
-          res.status(200).json({
-            message: "Dish Created",
-            dish: newDish,
-          });
-        })
-        .catch(function (err) {
-          console.log(err);
-          next(err);
-        });
+
+    var fileName = "";
+    if (req.files) {
+      if (!MIME_TYPE_MAP[req.files.image.mimetype]) {
+        var error = new HttpError("Invalid image type", 401);
+        return next(error);
+      }
+      fileName = uuidv4() + "." + MIME_TYPE_MAP[req.files.image.mimetype];
+    }
+    addImageToS3(req, {
+      fileName: fileName,
+      data: req.files ? req.files.image.data : "",
     })
-    .catch(function (err) {
-      console.log(err);
-      next(err);
-    });
+      .then(function () {
+        req.body.taxes =
+          req.body.taxes?.map((tax) => {
+            return {
+              id: new mongoose.Types.ObjectId(tax.id),
+              name: tax.name,
+              taxAmount: +tax.taxAmount,
+            };
+          }) || [];
+        var newDish = new Dish({
+          name: name,
+          rate: +rate,
+          description: description,
+          superCategory: {
+            id: req.body.superCategoryId,
+            name: req.body.superCategoryName,
+          },
+          category: {
+            id: req.body.categoryId,
+            name: req.body.categoryName,
+          },
+          image: fileName,
+          taxes: req.body.taxes,
+          brandId: req.body.brandId,
+        });
+        newDish
+          .save()
+          .then(function (newDish) {
+            res.status(200).json({
+              message: "Dish Created",
+              dish: newDish,
+            });
+          })
+          .catch(function (err) {
+            console.log(err);
+            next(err);
+          });
+      })
+      .catch(function (err) {
+        console.log(err);
+        next(err);
+      });
+  });
 };
 exports.updateDish = function (req, res, next) {
-  Dish.findOne({ _id: req.query.dishId }).then(function (founddish) {
+  Dish.findOne({ _id: req.body.dishId }).then(function (founddish) {
     if (!founddish) {
       var error = new HttpError("Dish not found", 404);
       return next(error);
@@ -244,42 +354,96 @@ exports.updateDish = function (req, res, next) {
   });
 };
 exports.createSuperCategory = function (req, res, next) {
-  var newSuperCategory = new DishSuperCategory({
+  DishSuperCategory.findOne({
     name: req.body.name,
-    description: req.body.description,
     brandId: req.body.brandId,
-  });
-  newSuperCategory
-    .save()
-    .then(function (newSuperCategory) {
-      res.status(200).json({
-        message: "Dish Super Category Created",
-        dishSuperCategory: newSuperCategory,
-      });
-    })
-    .catch(function (err) {
-      console.log(err);
-      next(err);
+  }).then(function (newSuperCtg) {
+    if (newSuperCtg) {
+      var err = new HttpError("Duplicate Super Category Found", 400);
+      return next(err);
+    }
+
+    var newSuperCategory = new DishSuperCategory({
+      name: req.body.name,
+      description: req.body.description,
+      image: req.body.image,
+      brandId: req.body.brandId,
     });
+    newSuperCategory
+      .save()
+      .then(function (newSuperCategory) {
+        res.status(200).json({
+          message: "Dish Super Category Created",
+          dishSuperCategory: newSuperCategory,
+        });
+      })
+      .catch(function (err) {
+        console.log(err);
+        next(err);
+      });
+  });
 };
 exports.createCategory = function (req, res, next) {
-  var newCategory = new DishCategory({
-    name: req.body.name,
-    description: req.body.description,
+  DishCategory.findOne({
     dishSuperCategoryId: req.body.superCategoryId,
-  });
-  newCategory
-    .save()
-    .then(function (newCategory) {
-      res.status(200).json({
-        message: "Dish Category Created",
-        dishCategory: newCategory,
-      });
-    })
-    .catch(function (err) {
-      console.log(err);
-      next(err);
+    name: req.body.name,
+  }).then(function (result) {
+    if (result) {
+      var err = new HttpError("Duplicate Category Found!", 400);
+      return next(err);
+    }
+
+    var newCategory = new DishCategory({
+      name: req.body.name,
+      description: req.body.description,
+      dishSuperCategoryId: req.body.superCategoryId,
     });
+    newCategory
+      .save()
+      .then(function (newCategory) {
+        res.status(200).json({
+          message: "Dish Category Created",
+          dishCategory: newCategory,
+        });
+      })
+      .catch(function (err) {
+        console.log(err);
+        next(err);
+      });
+  });
+};
+exports.updateCategory = function (req, res, next) {
+  DishCategory.findOne({
+    _id: {
+      $ne: req.body.categoryId,
+    },
+    dishSuperCategoryId: req.body.superCategoryId,
+    name: req.body.name,
+  }).then(function (result) {
+    if (result) {
+      var err = new HttpError("Duplicate Category Found!", 400);
+      return next(err);
+    }
+    DishCategory.findById(req.body.categoryId).then(function (ctg) {
+      if (!ctg) {
+        var err = new HttpError("Category Not Found!", 400);
+        return next(err);
+      }
+      ctg.name = req.body.name ?? ctg.name;
+      ctg.description = req.body.description ?? ctg.description;
+      ctg
+        .save()
+        .then(function (newCtg) {
+          res.status(200).json({
+            message: "Dish Category Updated Succesfully",
+            category: newCtg,
+          });
+        })
+        .catch(function (err) {
+          next(err);
+        });
+    });
+  });
 };
 exports.updateSuperCategory = async function (req, res, next) {
   try {
@@ -297,25 +461,6 @@ exports.updateSuperCategory = async function (req, res, next) {
     res.status(200).json({
       message: "Dish Super Category Created",
       dishSuperCategory: superCategory,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-exports.createCategory = async function (req, res, next) {
-  try {
-    let category = await DishCategory.findById(req.body.categoryId);
-    category.name = req.body.name ? req.body.name : category.name;
-    category.description = req.body.description
-      ? req.body.description
-      : category.description;
-    category.dishSuperCategoryId = req.body.dishSuperCategoryId
-      ? req.body.dishSuperCategoryId
-      : category.dishSuperCategoryId;
-    await category.save();
-    res.status(200).json({
-      message: "Dish Category Created",
-      dishCategory: category,
     });
   } catch (err) {
     next(err);

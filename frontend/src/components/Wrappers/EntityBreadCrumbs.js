@@ -1,9 +1,8 @@
-import Select from "react-select";
-import BreadcrumbItem from "./BreadcrumbItem";
-const Breadcrumbs = ({ options: breadcrumbOptions }) => (
+import EntityBreadcrumbItem from "./EntityBreadCrumbItem";
+const EntityBreadCrumbsWrapper = ({ options: breadcrumbOptions }) => (
   <ul className="flex items-center gap-x-1 w-full">
     {breadcrumbOptions.map((item, index) => (
-      <BreadcrumbItem
+      <EntityBreadcrumbItem
         key={index}
         item={item}
         isLast={index === breadcrumbOptions.length - 1}
@@ -12,4 +11,4 @@ const Breadcrumbs = ({ options: breadcrumbOptions }) => (
   </ul>
 );
 
-export default Breadcrumbs;
+export default EntityBreadCrumbsWrapper;

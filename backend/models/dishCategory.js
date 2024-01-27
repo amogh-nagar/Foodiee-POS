@@ -3,6 +3,7 @@ var dishCategory = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String },
+    image: { type: String },
     dishSuperCategoryId: { type: mongoose.Types.ObjectId, required: true },
     isDeleted: { type: Boolean, default: false },
   },

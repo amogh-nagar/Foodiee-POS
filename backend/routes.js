@@ -8,4 +8,6 @@ router.use("/roles", require("./routes/role"))
 router.use("/outlets", require("./routes/outlet"))
 router.use("/auth", require("./routes/auth"));
 router.use("/dishes", require("./routes/dish"))
+router.use("/superCategories", require("./routes/superCategories"))
+router.use("/categories", require("./routes/categories"))
 module.exports = router;

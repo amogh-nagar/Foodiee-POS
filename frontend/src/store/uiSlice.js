@@ -13,6 +13,9 @@ const uiSlice = createSlice({
       switch (payload.type) {
         case "SET_FILTER": {
           state.filters[payload.name] = payload.value;
+          payload?.resetFields?.forEach((field) => {
+            state.filters[field] = null;
+          });
           return state;
         }
         case "UNSET_FILTER": {
