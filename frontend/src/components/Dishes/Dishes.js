@@ -1,19 +1,20 @@
 import React from "react";
-import DishCard from "./dish/dishCard";
+import DishCard from "../dish/dishCard";
 import { IoMdAdd } from "react-icons/io";
-import Modal from "./Modals/Modal";
-import MultiStepModal from "./Modals/MultiStepModal";
+import Modal from "../Modals/Modal";
 import {
   useCreateDishMutation,
   useGetAllDishesQuery,
   useUpdateDishMutation,
-} from "../services/dish";
+} from "../../services/dish";
 import { useSelector } from "react-redux";
-import Breadcrumbs from "./Wrappers/BreadCrumbs";
-import { useGetAllSuperCategoriesQuery } from "../services/superCategory";
-import { useGetAllCategoriesQuery } from "../services/category";
-import { alterFilters } from "../store/uiSlice";
-import { showToast } from "../utils/constants";
+import Breadcrumbs from "../Wrappers/BreadCrumbs/BreadCrumbs";
+import { useGetAllSuperCategoriesQuery } from "../../services/superCategory";
+import { useGetAllCategoriesQuery } from "../../services/category";
+import { alterFilters } from "../../store/uiSlice";
+import { showToast } from "../../utils/constants";
+import useRTKQuery from "../../hooks/useRTKQuery";
+import useRTKMutation from "../../hooks/useRTKMutation";
 const Dishes = () => {
   let selectedBrand =
     useSelector((state) => state.ui.filters.selectedBrand) ?? {};
@@ -21,8 +22,8 @@ const Dishes = () => {
     useSelector((state) => state.ui.filters.selectedSuperCategory) ?? {};
   let selectedCategory =
     useSelector((state) => state.ui.filters.selectedCategory) ?? {};
-
-  const { data, isLoading, isError } = useGetAllDishesQuery(
+  const { data } = useRTKQuery(
+    useGetAllDishesQuery,
     {
       page: 1,
       brandId: selectedBrand?.value,
@@ -33,14 +34,8 @@ const Dishes = () => {
       skip: !selectedBrand.value,
     }
   );
-  const [
-    createDish,
-    { isLoading: isCreateDishLoading, isError: isCreateDishError },
-  ] = useCreateDishMutation();
-  const [
-    updateDish,
-    { isLoading: isUpdateDishLoading, isError: isUpdateDishError },
-  ] = useUpdateDishMutation();
+  const { trigger: createDish } = useRTKMutation(useCreateDishMutation);
+  const { trigger: updateDish } = useRTKMutation(useUpdateDishMutation);
 
   const validate = () => {};
   const onSubmit = async (values) => {

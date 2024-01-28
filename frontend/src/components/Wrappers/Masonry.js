@@ -2,7 +2,6 @@ import React from 'react'
 import Measure from 'react-measure';
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 const CustomMasonry = ({ items, Component, colsCount = 3, gutter = '15px', className, colsCountBreakPoints = { 350: 1, 450: 2, 620: 3, 810: 4, 950: 5, 1150: 6, 1500: 8 } }) => {
-    // { 350: 1,450:2,620:3, 810: 4,950:5, 1150: 6, 1500: 8 }
     return (
         <ResponsiveMasonry
             columnsCountBreakPoints={colsCountBreakPoints} className='cursor-pointer'

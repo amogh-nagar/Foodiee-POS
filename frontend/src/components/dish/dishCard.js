@@ -1,7 +1,6 @@
 import { CiEdit } from "react-icons/ci";
 import { checkForSame, getColor, showToast } from "../../utils/constants";
 import Modal from "../Modals/Modal";
-import { useUpdateDishMutation } from "../../services/dish";
 const DishCard = ({ image, name, rate, description, onSubmit, _id }) => {
   let styleObj = getColor(image, name);
   const initialValues = {

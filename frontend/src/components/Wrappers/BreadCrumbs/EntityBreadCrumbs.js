@@ -1,52 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { useLazyGetAllTenantsQuery } from "../../services/tenant";
-import { useLazyGetAllBrandsQuery } from "../../services/brand";
-import { useLazyGetAllOutletsQuery } from "../../services/outlet";
+import { useLazyGetAllTenantsQuery } from "../../../services/tenant";
+import { useLazyGetAllBrandsQuery } from "../../../services/brand";
+import { useLazyGetAllOutletsQuery } from "../../../services/outlet";
 import { useSelector } from "react-redux";
-import EntityBreadCrumbsWrapper from "../Wrappers/EntityBreadCrumbs";
+import EntityBreadCrumbsWrapper from "./EntityBreadCrumbsWrapper";
+import useRTKMutation from "../../../hooks/useRTKMutation";
 
-const EntityBreadCrumbs = ({setEntity}) => {
+const EntityBreadCrumbs = ({ setEntity }) => {
   const auth = useSelector((state) => state.auth);
-  const [getTenants, { data: tenants, isLoadingTenants, isErrorTenants }] =
-    useLazyGetAllTenantsQuery();
-  const [getBrands, { data: brands, isLoadingBrands, isErrorBrands }] =
-    useLazyGetAllBrandsQuery();
-  const [getOutlets, { data: outlets, isLoadingOutlets, isErrorOutlets }] =
-    useLazyGetAllOutletsQuery();
-
-  const [accessibleEntities, setAccessibleEntities] = useState([]);
+  const { trigger: getTenants, data: tenants } = useRTKMutation(
+    useLazyGetAllTenantsQuery
+  );
+  const { trigger: getBrands, data: brands } = useRTKMutation(
+    useLazyGetAllBrandsQuery
+  );
+  const { trigger: getOutlets, data: outlets } = useRTKMutation(
+    useLazyGetAllTenantsQuery
+  );
+  const accessibleEntities = auth.accessibleEntities;
   const [activeEntity, setActiveEntity] = useState("");
   let entities = [];
   if (activeEntity == "Tenant") entities = tenants?.tenants || [];
   if (activeEntity == "Brand") entities = brands?.brands || [];
   if (activeEntity == "Outlet") entities = outlets?.outlets || [];
-  useEffect(() => {
-    const newEntityArr = [];
-    if (auth.isSuperAdmin || auth.tenantIds) {
-      newEntityArr.push({
-        label: "Tenant",
-        value: "Tenant",
-      });
-    }
-    if (auth.isSuperAdmin || auth.tenantIds || auth.brandIds) {
-      newEntityArr.push({
-        label: "Brand",
-        value: "Brand",
-      });
-    }
-    if (
-      auth.isSuperAdmin ||
-      auth.tenantIds ||
-      auth.brandIds ||
-      auth.outletIds
-    ) {
-      newEntityArr.push({
-        label: "Outlet",
-        value: "Outlet",
-      });
-    }
-    setAccessibleEntities(newEntityArr);
-  }, [auth.entityDetails]);
   const breadcrumbItems = [
     { title: "Entity Type" },
     {
@@ -93,9 +69,9 @@ const EntityBreadCrumbs = ({setEntity}) => {
       type: "array",
       onChange: (value) => {
         setEntity({
-            value: value.value,
-            label: activeEntity
-        })
+          value: value.value,
+          label: activeEntity,
+        });
       },
     });
   }

@@ -1,10 +1,10 @@
 import React from "react";
-import StoreIcon from "../assets/bx_bxs-store-alt.svg";
+import StoreIcon from "../../assets/bx_bxs-store-alt.svg";
 import { NavLink } from "react-router-dom";
-import { routesList } from "../utils/routes";
+import { routesList } from "../../utils/routes";
 import { CiLogout } from "react-icons/ci";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../store/authSlice";
+import { logout } from "../../store/authSlice";
 import { FaRegUser } from "react-icons/fa";
 const Header = () => {
   const dispatch = useDispatch();

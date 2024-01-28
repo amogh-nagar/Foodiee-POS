@@ -14,6 +14,7 @@ const authSlice = createSlice({
     tenantsQuery: {},
     brandsQuery: {},
     outletsQuery: {},
+    accessibleEntities: [],
   },
   reducers: {
     login: (state, action) => {
@@ -43,20 +44,67 @@ const authSlice = createSlice({
         state.tenantsQuery.tenantIds = "";
         state.brandsQuery.tenantIds = "";
         state.outletsQuery.tenantIds = "";
+        state.accessibleEntities = [
+          {
+            label: "Tenant",
+            value: "Tenant",
+          },
+          {
+            label: "Brand",
+            value: "Brand",
+          },
+          {
+            label: "Outlet",
+            value: "Outlet",
+          },
+        ];
       }
       if (state.tenantIds) {
         state.tenantsQuery.tenantIds = state.tenantIds;
         state.brandsQuery.tenantIds = state.tenantIds;
         state.outletsQuery.tenantIds = state.tenantIds;
+        state.accessibleEntities = [
+          {
+            label: "Tenant",
+            value: "Tenant",
+          },
+          {
+            label: "Brand",
+            value: "Brand",
+          },
+          {
+            label: "Outlet",
+            value: "Outlet",
+          },
+        ];
       }
       if (state.brandIds) {
         state.brandsQuery.brandIds = state.brandIds;
         state.outletsQuery.brandIds = state.brandIds;
+        state.accessibleEntities = [
+          {
+            label: "Brand",
+            value: "Brand",
+          },
+          {
+            label: "Outlet",
+            value: "Outlet",
+          },
+        ];
       }
       if (state.outletIds) {
         state.outletsQuery.outletIds = state.outletIds;
+        state.accessibleEntities = [
+          {
+            label: "Outlet",
+            value: "Outlet",
+          },
+        ];
       }
-      state.tenantsQuery.page = state.brandsQuery.page = state.outletsQuery.page = 1;
+      state.tenantsQuery.page =
+        state.brandsQuery.page =
+        state.outletsQuery.page =
+          1;
     },
     logout: (state) => {
       localStorage.removeItem("token");

@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
 import { useState } from "react";
 import Select from "react-select";
-import CustomDropdownIndicator from "../CustomDropdownIndicator";
-import { selectCustomStyle } from "../../utils/constants";
+import CustomDropdownIndicator from "../../Select/CustomDropdownIndicator";
+import { selectCustomStyle } from "../../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import debounce from "lodash.debounce";
+import useDebouncer from "../../../hooks/useDebouncer";
+import useRTKQuery from "../../../hooks/useRTKQuery";
 const BreadCrumbItem = ({ item }) => {
   const fieldSubscribed = useSelector(
     (state) => state.ui.filters[item.fieldToSubscribe]
@@ -13,23 +13,10 @@ const BreadCrumbItem = ({ item }) => {
     (state) => state.ui.filters[item.detailsToDispatch.args.name]
   );
   const [debouncedTerm, setDebouncedTerm] = useState("");
-  const [searchedTerm, setSearchTerm] = useState("");
-
+  const setSearchTerm = useDebouncer(setDebouncedTerm)[1];
   const dispatch = useDispatch();
-  useEffect(() => {
-    const debouncer = debounce((newTerm) => {
-      setDebouncedTerm(newTerm);
-    }, 500);
-    if (searchedTerm) {
-      debouncer(searchedTerm);
-    } else {
-      setDebouncedTerm("");
-    }
-    return () => {
-      debouncer.cancel();
-    };
-  }, [searchedTerm]);
-  const { data, isLoading, isError } = item.useGetOptionsQuery(
+  const { data } = useRTKQuery(
+    item.useGetOptionsQuery,
     {
       name: debouncedTerm,
       page: 1,

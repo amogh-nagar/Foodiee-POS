@@ -1,6 +1,6 @@
 import React from "react";
 import CategoriesContainer from "./CategoriesContainer";
-import SuperCategoryContainer from "../superCategory/SuperCategoryContainer";
+import SuperCategoryContainer from "../SuperCategory/SuperCategoryContainer";
 const Categories = () => {
   return (
     <div className="py-2 px-5 h-full">

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Select from "react-select";
-import CustomDropdownIndicator from "../CustomDropdownIndicator";
-import { selectCustomStyle } from "../../utils/constants";
+import CustomDropdownIndicator from "../../Select/CustomDropdownIndicator";
+import { selectCustomStyle } from "../../../utils/constants";
 
 const EntityBreadcrumbItem = ({ item, isLast }) => {
   const dropdownOptions = item.values;

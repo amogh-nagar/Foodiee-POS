@@ -8,52 +8,38 @@ import { useGetUsersQuery, useCreateUserMutation } from "../services/user";
 import { useGetAllRolesQuery, useCreateRoleMutation } from "../services/role";
 import Loader from "../UI/Loaders/Loader";
 import Modal from "../components/Modals/Modal";
-import {
-  rolesMappedToPermissions,
-  showToast,
-} from "../utils/constants";
+import { rolesMappedToPermissions, showToast } from "../utils/constants";
 import MultiStepModal from "../components/Modals/MultiStepModal";
-import EntityBreadCrumbs from "../components/Containers/EntityBreadCrumbs";
+import EntityBreadCrumbs from "../components/Wrappers/BreadCrumbs/EntityBreadCrumbs";
+import useRTKQuery from "../hooks/useRTKQuery";
+import useRTKMutation from "../hooks/useRTKMutation";
 const Users = () => {
   const [activeTab, setActiveTab] = useState("Users");
   const [activeEntityItem, setActiveEntityItem] = useState("");
-  const [
-    createRole,
-    { isLoading: isCreateRoleLoading, isError: isCreateRoleError },
-  ] = useCreateRoleMutation();
-  const [
-    createUser,
-    { isLoading: isCreateUserLoading, isError: isCreateUserError },
-  ] = useCreateUserMutation();
-
-  const {
-    data: users,
-    isLoadingUsers,
-    isErrorUsers,
-  } = useGetUsersQuery(
+  const { trigger: createUser } = useRTKMutation(useCreateUserMutation);
+  const { trigger: createRole } = useRTKMutation(useCreateRoleMutation);
+  const { data: users } = useRTKQuery(
+    useGetUsersQuery,
     {
       entityIds: activeEntityItem.value,
       page: 1,
     },
     {
       skip: !activeEntityItem.value || activeTab !== "Users",
-    }
+    },
+    Loader
   );
-  const {
-    data: roles,
-    isLoadingRoles,
-    isErrorRoles,
-  } = useGetAllRolesQuery(
+  const { data: roles } = useRTKQuery(
+    useGetAllRolesQuery,
     {
       entityId: activeEntityItem.value,
       page: 1,
     },
     {
       skip: !activeEntityItem.value || activeTab !== "Roles",
-    }
+    },
+    Loader
   );
-  const isLoadingEntity = isLoadingUsers || isLoadingRoles;
-
   const auth = useSelector((state) => state.auth);
   let permissionAvailableForUserCreation =
     (activeEntityItem.label === "Tenant" &&
@@ -73,23 +59,23 @@ const Users = () => {
     [];
   let displayUser = activeTab === "Users";
   const addUser = async (values) => {
-    try{
-      values.permissions = values.roles.reduce((res, role)=>{
-        return res.concat(role.permissions ?? [])
-      },[])
+    try {
+      values.permissions = values.roles.reduce((res, role) => {
+        return res.concat(role.permissions ?? []);
+      }, []);
       values.roles = values.roles.map((role) => {
         return { roleId: role.value, roleName: role.label };
       });
       values.entityDetails = [
         {
           entityName: activeEntityItem.label,
-          entityId: activeEntityItem.value
-        }
-      ]
+          entityId: activeEntityItem.value,
+        },
+      ];
       await createUser(values);
       showToast("User Created Succesfully", "success");
-    } catch(err){
-      showToast(err?.data?.message || "Some error occurred!"); 
+    } catch (err) {
+      showToast(err?.data?.message || "Some error occurred!");
     }
   };
   const addRole = async (values) => {
@@ -238,44 +224,40 @@ const Users = () => {
           </li>
         </ul>
         <div className="py-4 px-5 flex flex-wrap gap-x-4 gap-y-3">
-          {isLoadingEntity ? (
-            <Loader />
-          ) : (
-            <>
-              <div className="flex justify-between items-center w-full gap-4">
-                <EntityBreadCrumbs setEntity={setActiveEntityItem} />
-                <div className="flex justify-end items-center gap-4">
-                  <input
-                    className="bg-gray-600 w-2/3 text-white font-sans p-2 rounded-lg outline-none"
-                    placeholder={`Search ${displayUser ? "User" : "Role"}`}
-                  />
-                  {activeEntityItem.value ? (
-                    <Component {...attributes} />
-                  ) : (
-                    <button
-                      disabled
-                      className="flex items-center justify-between w-28 rounded-md opacity-50 bg-secondary-500 text-white px-3 py-2"
-                    >
-                      <IoMdAdd />
-                      <p>Add {displayUser ? "User" : "Role"}</p>
-                    </button>
-                  )}
-                </div>
+          <>
+            <div className="flex justify-between items-center w-full gap-4">
+              <EntityBreadCrumbs setEntity={setActiveEntityItem} />
+              <div className="flex justify-end items-center gap-4">
+                <input
+                  className="bg-gray-600 w-2/3 text-white font-sans p-2 rounded-lg outline-none"
+                  placeholder={`Search ${displayUser ? "User" : "Role"}`}
+                />
+                {activeEntityItem.value ? (
+                  <Component {...attributes} />
+                ) : (
+                  <button
+                    disabled
+                    className="flex items-center justify-between w-28 rounded-md opacity-50 bg-secondary-500 text-white px-3 py-2"
+                  >
+                    <IoMdAdd />
+                    <p>Add {displayUser ? "User" : "Role"}</p>
+                  </button>
+                )}
               </div>
-              {displayUser ? (
-                <User
-                  entityId={activeEntityItem.value}
-                  users={users?.users ?? []}
-                />
-              ) : (
-                <Roles
-                  entityId={activeEntityItem.value}
-                  allPermissions={permissionAvailableForUserCreation}
-                  roles={roles?.roles ?? []}
-                />
-              )}
-            </>
-          )}
+            </div>
+            {displayUser ? (
+              <User
+                entityId={activeEntityItem.value}
+                users={users?.users ?? []}
+              />
+            ) : (
+              <Roles
+                entityId={activeEntityItem.value}
+                allPermissions={permissionAvailableForUserCreation}
+                roles={roles?.roles ?? []}
+              />
+            )}
+          </>
         </div>
       </div>
     </div>

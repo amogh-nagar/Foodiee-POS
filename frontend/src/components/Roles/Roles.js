@@ -1,13 +1,10 @@
-import React, { useState } from "react";
 import RoleCard from "./RoleCard";
 import { useUpdateRoleMutation } from "../../services/role";
-import { useUpdateUserMutation } from "../../services/user";
 import { showToast } from "../../utils/constants";
+import Loader from "../../UI/Loaders/Loader";
+import useRTKMutation from "../../hooks/useRTKMutation";
 const Roles = ({ roles, allPermissions, entityId }) => {
-  const [
-    updateRole,
-    { isLoading: isUpdateRoleLoading, isError: isUpdateRoleError },
-  ] = useUpdateRoleMutation();
+  const { trigger: updateRole } = useRTKMutation(useUpdateRoleMutation, Loader);
   const onEditBtnClick = async (values) => {
     try {
       await updateRole(values).unwrap();

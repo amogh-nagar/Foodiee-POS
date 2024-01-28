@@ -7,29 +7,20 @@ import {
   useUpdateCategoryMutation,
 } from "../../services/category";
 import { useSelector } from "react-redux";
-import debounce from "lodash.debounce";
 import { showToast } from "../../utils/constants";
+import useDebouncer from "../../hooks/useDebouncer";
+import Loader from "../../UI/Loaders/Loader";
+import useRTKQuery from "../../hooks/useRTKQuery";
+import useRTKMutation from "../../hooks/useRTKMutation";
 
 const CategoriesContainer = () => {
-  const [searchedTerm, setSearchedTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const setSearchedTerm = useDebouncer(setDebouncedSearch)[1];
   const selectedSuperCategory = useSelector(
     (state) => state.ui.filters.selectedSuperCategory
   );
-  useEffect(() => {
-    const debouncer = debounce((newTerm) => {
-      setDebouncedSearch(newTerm);
-    }, 500);
-    if (searchedTerm) {
-      debouncer(searchedTerm);
-    } else {
-      setDebouncedSearch("");
-    }
-    return () => {
-      debouncer.cancel();
-    };
-  }, [searchedTerm]);
-  const { data, isLoading, isError } = useGetAllCategoriesQuery(
+  const { data } = useRTKQuery(
+    useGetAllCategoriesQuery,
     {
       page: 1,
       name: debouncedSearch,
@@ -37,17 +28,11 @@ const CategoriesContainer = () => {
     },
     {
       skip: !selectedSuperCategory || !selectedSuperCategory?.value,
-    }
+    },
+    Loader
   );
-
-  const [
-    createCategory,
-    { isLoading: isCreateCategoryLoading, isError: isCreateCategoryError },
-  ] = useCreateCategoryMutation();
-  const [
-    updateCategory,
-    { isLoading: isUpdateCategoryLoading, isError: isUpdateCategoryError },
-  ] = useUpdateCategoryMutation();
+  const { trigger: createCategory } = useRTKMutation(useCreateCategoryMutation);
+  const { trigger: updateCategory } = useRTKMutation(useUpdateCategoryMutation);
   const initialValues = {
     name: "",
     description: "",

@@ -1,6 +1,6 @@
 import PageNameWithDate from "../components/PageNameWithDate";
-import Cart from "../components/Cart";
-import PunchItems from "../components/PunchItems";
+import Cart from "../components/Cart/Cart";
+import PunchItems from "../components/Billing/PunchItems";
 const Billing = () => {
   return (
     <div className="w-full h-full hide-scrollbar nonScrollable-div">

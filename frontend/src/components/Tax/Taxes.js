@@ -1,5 +1,5 @@
 import React from "react";
-import CustomForm from "./forms/Form";
+import CustomForm from "../forms/Form";
 import TaxCard from "./TaxCard";
 
 const Taxes = () => {

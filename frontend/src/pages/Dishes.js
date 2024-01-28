@@ -1,9 +1,9 @@
 import React from "react";
 import PageNameWithDate from "../components/PageNameWithDate";
 import { Switch, NavLink, Route, useRouteMatch } from "react-router-dom";
-import Dishes from "../components/Dishes";
+import Dishes from "../components/Dishes/Dishes";
 import Categories from "../components/categories/Categories";
-import Taxes from "../components/Taxes";
+import Taxes from "../components/Tax/Taxes";
 import { alterFilters } from "../store/uiSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetAllBrandsQuery } from "../services/brand";

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Modal from "../Modals/Modal";
 import { IoMdAdd } from "react-icons/io";
 import debounce from "lodash.debounce";
+import useDebouncer from "../../hooks/useDebouncer";
 
 const SearchDiv = ({
   name,
@@ -14,20 +15,7 @@ const SearchDiv = ({
   cntClass = "",
   buttonClass = "",
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  useEffect(() => {
-    const debouncer = debounce((newTerm) => {
-      setSearchedTerm(newTerm);
-    }, 500);
-    if (searchTerm) {
-      debouncer(searchTerm);
-    } else {
-      setSearchedTerm("");
-    }
-    return () => {
-      debouncer.cancel();
-    };
-  }, [searchTerm]);
+  const [searchTerm, setSearchTerm] = useDebouncer(setSearchedTerm);
   let popUpButton = (
     <button
       className={`flex ${buttonClass} gap-x-1 items-center bg-secondary-500 p-3 rounded-lg`}

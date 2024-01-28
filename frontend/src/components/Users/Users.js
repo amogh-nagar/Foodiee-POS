@@ -2,15 +2,13 @@ import React from "react";
 import UserCard from "./UserTableCard";
 import { useUpdateUserMutation } from "../../services/user";
 import { showToast } from "../../utils/constants";
+import Loader from "../../UI/Loaders/Loader";
+import useRTKMutation from "../../hooks/useRTKMutation";
 const User = ({ users, entityId }) => {
-  const [
-    updateUser,
-    { isLoading: isUpdateUserLoading, isError: isUpdateUserError },
-  ] = useUpdateUserMutation();
+  const { trigger: updateUser } = useRTKMutation(useUpdateUserMutation, Loader);
   const onEditBtnClick = async (values) => {
     try {
-      console.log("values", values)
-      // await updateUser(values).unwrap();
+      await updateUser(values).unwrap();
       showToast("User Updated Successfully", "success");
     } catch (err) {
       console.log("Some error occurred", err);
@@ -33,7 +31,12 @@ const User = ({ users, entityId }) => {
           </thead>
           <tbody className="">
             {users.map((user, index) => (
-              <UserCard key={index} entityId={entityId} onEditBtnClick={onEditBtnClick} user={user} />
+              <UserCard
+                key={index}
+                entityId={entityId}
+                onEditBtnClick={onEditBtnClick}
+                user={user}
+              />
             ))}
           </tbody>
         </table>

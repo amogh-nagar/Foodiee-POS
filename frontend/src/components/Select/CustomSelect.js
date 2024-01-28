@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Select from "react-select";
-import CustomDropdownIndicator from "../CustomDropdownIndicator";
+import CustomDropdownIndicator from "./CustomDropdownIndicator";
 import { selectCustomStyle } from "../../utils/constants";
-import debounce from "lodash.debounce";
+import useDebouncer from "../../hooks/useDebouncer";
+import useRTKQuery from "../../hooks/useRTKQuery";
+import Loader from "../../UI/Loaders/Loader";
 const CustomSelect = ({
   defaultValue,
   handleSelectChange,
@@ -13,29 +15,18 @@ const CustomSelect = ({
   customField,
   name,
 }) => {
-  const [searchedText, setSearchedText] = useState("");
   const [debouncedText, setDebouncedText] = useState("");
-  useEffect(() => {
-    const debouncer = debounce((newTerm) => {
-      setDebouncedText(newTerm);
-    }, 500);
-    if (searchedText) {
-      debouncer(searchedText);
-    } else {
-      setDebouncedText("");
-    }
-    return () => {
-      debouncer.cancel();
-    };
-  }, [searchedText]);
-  const { data, isError, isLoading } = useGetOptionsQuery(
+  const setSearchedText = useDebouncer(setDebouncedText)[1];
+  const { data, isLoading } = useRTKQuery(
+    useGetOptionsQuery,
     {
       ...inputQuery,
       name: debouncedText,
     },
     {
       skip: skip,
-    }
+    },
+    Loader
   );
   const options =
     data && data[field]

@@ -11,27 +11,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { alterFilters } from "../../store/uiSlice";
 import debounce from "lodash.debounce";
 import { showToast } from "../../utils/constants";
+import useDebouncer from "../../hooks/useDebouncer";
 
 const SuperCategoryContainer = () => {
-  const [searchedTerm, setSearchedTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const setSearchedTerm = useDebouncer(setDebouncedSearch)[1];
   let selectedBrand =
     useSelector((state) => state.ui.filters.selectedBrand) ?? {};
 
   const dispatch = useDispatch();
-  useEffect(() => {
-    const debouncer = debounce((newTerm) => {
-      setDebouncedSearch(newTerm);
-    }, 500);
-    if (searchedTerm) {
-      debouncer(searchedTerm);
-    } else {
-      setDebouncedSearch("");
-    }
-    return () => {
-      debouncer.cancel();
-    };
-  }, [searchedTerm]);
   const { data, isLoading, isError } = useGetAllSuperCategoriesQuery(
     {
       page: 1,

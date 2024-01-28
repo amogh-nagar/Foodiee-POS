@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import CtgNdSuperCtgCard from "./categories/BillingCtgNdSuperCtgCard";
-import ItemCard from "./dish/dishBillingCard";
+import CtgNdSuperCtgCard from "./BillingCtgNdSuperCtgCard";
+import ItemCard from "./dishBillingCard";
 const superCategories = [
   {
     name: "Breakfast",

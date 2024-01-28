@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "./components/Header";
+import Header from "./components/Header/Header";
 import { Route, Switch } from "react-router-dom";
 import { routesList } from "./utils/routes";
 import { useSelector } from "react-redux";

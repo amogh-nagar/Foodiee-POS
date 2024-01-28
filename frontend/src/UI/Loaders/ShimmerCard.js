@@ -1,11 +1,7 @@
-import React from 'react'
-import "./Shimmer.css"
+import React from "react";
+import "./Shimmer.css";
 const ShimmerCard = () => {
-  return (
-    <div className='shimmer-container'>
-        <div className='shimmer'></div>
-    </div>
-  )
-}
+  return <div className="h-72 shimmer w-56 rounded-lg"></div>;
+};
 
-export default ShimmerCard
+export default ShimmerCard;

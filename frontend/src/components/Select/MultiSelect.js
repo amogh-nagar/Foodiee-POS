@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import CustomDropdownIndicator from "../CustomDropdownIndicator";
+import CustomDropdownIndicator from "./CustomDropdownIndicator";
 import Loader from "../../UI/Loaders/Loader";
 import { selectCustomStyle } from "../../utils/constants";
 import Select from "react-select";
 import { MdOutlineCancel } from "react-icons/md";
 import { debounce } from "lodash";
+import useDebouncer from "../../hooks/useDebouncer";
+import useRTKQuery from "../../hooks/useRTKQuery";
 const MultiValueContainer = ({ children, ...props }) => {
   return null;
 };
@@ -39,30 +41,19 @@ const MultiSelect = ({
   customFields,
 }) => {
   const [selectedOptions, setSelectedOptions] = useState(initialValues);
-  const [searchTerm, setSearchTerm] = useState("");
+  const setSearchTerm = useDebouncer(setDebouncedSearch)[1];
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const { data, isLoading, isError } = useOptionsQuery(
+  const { data, isLoading } = useRTKQuery(
+    useOptionsQuery,
     {
       ...inputQuery,
       name: debouncedSearch,
     },
     {
       skip: !skipIfNull,
-    }
+    },
+    Loader
   );
-  useEffect(() => {
-    const debouncer = debounce((newTerm) => {
-      setDebouncedSearch(newTerm);
-    }, 500);
-    if (searchTerm) {
-      debouncer(searchTerm);
-    } else {
-      setDebouncedSearch("");
-    }
-    return () => {
-      debouncer.cancel();
-    };
-  }, [searchTerm]);
   const onRemoveItem = (option) => {
     setSelectedOptions((prev) =>
       prev.filter((opt) => opt.value != option.value)

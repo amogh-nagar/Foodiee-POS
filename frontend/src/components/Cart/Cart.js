@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { currencyMap } from "../utils/constants";
+import { currencyMap } from "../../utils/constants";
 import { BsCashStack } from "react-icons/bs";
 import { FaCcMastercard } from "react-icons/fa";
 import { IoWalletOutline } from "react-icons/io5";
