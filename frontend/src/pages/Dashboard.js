@@ -155,7 +155,7 @@ const Dashboard = () => {
   return (
     <div>
       <PageNameWithDate name="Dashboard" />
-      <div className="flex justify-between items-center m-8">
+      <div className="flex gap-3 flex-wrap justify-between items-center m-8">
         <ChartWrapper Chart={Pie} data={InActiveActive} />
         <ChartWrapper Chart={Bar} height={300} width={300} data={Top3Tenants} />
         <ChartWrapper Chart={Bar} height={300} width={300} data={Top3Tenants} />

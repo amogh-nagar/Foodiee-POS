@@ -26,7 +26,7 @@ exports.loginUser = function (req, res, next) {
         permissions: user.permissions,
       };
       var token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "1m",
+        expiresIn: "1h",
       });
       return res.status(200).json({
         message: "Logged In!",
@@ -63,7 +63,9 @@ exports.reLoginUser = function (req, res, next) {
             userId: user._id,
             permissions: user.permissions,
           };
-          token = jwt.sign(payload, process.env.JWT_SECRET);
+          token = jwt.sign(payload, process.env.JWT_SECRET, {
+            expiresIn: "1h"
+          });
           return res.status(200).json({
             message: "ReLogged In!",
             user: payload,

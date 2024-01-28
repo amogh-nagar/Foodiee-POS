@@ -1,11 +1,10 @@
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
-import authReducer from "./authSlice";
+import authReducer, { login, logout } from "./authSlice";
 import cartReducer from "./cartSlice";
 import uiReducer from "./uiSlice";
 import { setupListeners } from "@reduxjs/toolkit/dist/query";
 import { authApi } from "../services/auth";
 import { tenantApi } from "../services/tenant";
-import { createBrowserHistory } from "history";
 import { brandApi } from "../services/brand";
 import { outletApi } from "../services/outlet";
 import { roleApi } from "../services/role";
@@ -29,33 +28,28 @@ const appStore = configureStore({
     [categoryApi.reducerPath]: categoryApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
-      .concat(authApi.middleware, redirectMiddleware)
-      .concat([
-        tenantApi.middleware,
-        brandApi.middleware,
-        outletApi.middleware,
-        userApi.middleware,
-        roleApi.middleware,
-        dishApi.middleware,
-        superCategoryApi.middleware,
-        categoryApi.middleware,
-      ]),
+    getDefaultMiddleware().concat([
+      authApi.middleware,
+      tenantApi.middleware,
+      brandApi.middleware,
+      outletApi.middleware,
+      userApi.middleware,
+      roleApi.middleware,
+      dishApi.middleware,
+      superCategoryApi.middleware,
+      categoryApi.middleware,
+      redirectMiddleware,
+    ]),
 });
 setupListeners(appStore.dispatch);
-function redirectMiddleware(store) {
+function redirectMiddleware() {
   return function (next) {
-    return function (action) {
-      if (authApi.endpoints.login.matchRejected(action)) {
-        if (action.error && action.error.code === "401") {
-          if (localStorage.getItem("trustedDevice")) {
-            store.dispatch(authApi.endpoints.login());
-          } else {
-            const history = createBrowserHistory();
-            localStorage.clear();
-            history.push("/auth");
-          }
-        }
+    return async function (action) {
+      if (
+        (action.error && action.error.code === "401") ||
+        (action.payload && action.payload.originalStatus === 401)
+      ) {
+        window.location.reload();
       }
       return next(action);
     };

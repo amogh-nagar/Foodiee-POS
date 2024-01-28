@@ -3,10 +3,13 @@ import { login, logout } from "../store/authSlice";
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
+import Loader from "../UI/Loaders/Loader";
+import { showToast } from "../utils/constants";
 const useRefreshToken = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const [reloginApi, { isError, isLoading, isSuccess, data }] = useReloginMutation();
+  const [reloginApi, { isError, isLoading, isSuccess, data, error }] =
+    useReloginMutation();
   async function reAttemptLogin() {
     const trustedDevice =
       localStorage.getItem("trustedDevice") === "true" ? true : false;
@@ -17,7 +20,7 @@ const useRefreshToken = () => {
         localStorage.setItem("token", response?.token);
         dispatch(
           login({
-            user: response.user
+            user: response.user,
           })
         );
         history.push("/");
@@ -34,7 +37,13 @@ const useRefreshToken = () => {
       console.error(e);
     }
   }, []);
-  return {isLoading, isError, isSuccess, data};
+  if (isLoading) {
+    return <Loader />;
+  }
+  if (isError) {
+    showToast(error?.data?.message || "Some error occurred");
+  }
+  return { isLoading, isError, isSuccess, data };
 };
 
 export default useRefreshToken;
