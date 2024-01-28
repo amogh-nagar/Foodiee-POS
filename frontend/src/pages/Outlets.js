@@ -8,12 +8,10 @@ import {
 } from "../services/outlet";
 import { useGetAllBrandsQuery } from "../services/brand";
 import EntityCard from "../components/Entity/EntityCard";
-import { itemsPerPage, selectCustomStyle, showToast } from "../utils/constants";
-import Select from "react-select";
+import { itemsPerPage, showToast } from "../utils/constants";
 import FlexDiv from "../components/Wrappers/FlexDiv";
 import Loader from "../UI/Loaders/Loader";
 import ReactPaginate from "react-paginate";
-import CustomDropdownIndicator from "../components/CustomDropdownIndicator";
 import SearchDiv from "../components/Containers/SearchDiv";
 import { useDispatch, useSelector } from "react-redux";
 import { alterFilters } from "../store/uiSlice";
@@ -34,32 +32,15 @@ const Outlets = () => {
     updateOutlet,
     { isLoading: isUpdateOutletLoading, isError: isUpdateOutletError },
   ] = useUpdateOutletMutation();
-  const brandsQuery = {
-    page: 1,
-  };
-  if (auth.isSuperAdmin) {
-    brandsQuery.tenantIds = "";
-  }
-  if (auth.tenantIds) {
-    brandsQuery.tenantIds = auth.tenantIds;
-  }
-  if (auth.brandIds) {
-    brandsQuery.brandIds = auth.brandIds;
-  }
   const outletsQuery = {
+    ...auth.outletsQuery,
     name: searchedTerm,
     page: page,
   };
-  if (auth.outletIds) {
-    outletsQuery.outletIds = auth.outletIds;
-  }
-  if (selectedBrand?.value) {
-    outletsQuery.brandId = selectedBrand?.value;
-  }
   const {
     data,
     isError: isGetAllOutletsError,
-    isLoading: isGetAllOutletsLoading
+    isLoading: isGetAllOutletsLoading,
   } = useGetAllOutletsQuery(outletsQuery, {
     skip: !selectedBrand.value && !auth.outletIds,
   });
@@ -69,7 +50,7 @@ const Outlets = () => {
         alterFilters({
           type: "SET_FILTER",
           name: "selectedBrand",
-          resetFields:["selectedSuperCategory", "selectedCategory"],
+          resetFields: ["selectedSuperCategory", "selectedCategory"],
           value: {
             label: location.state?.selectedEntity?.name,
             value: location.state?.selectedEntity?._id,
@@ -81,13 +62,9 @@ const Outlets = () => {
   const totalItems = data?.totalItems ?? 0;
   let outlets = data?.outlets ?? [];
   const isLoading =
-    isCreateOutletLoading ||
-    isUpdateOutletLoading ||
-    isGetAllOutletsLoading;
+    isCreateOutletLoading || isUpdateOutletLoading || isGetAllOutletsLoading;
   const isError =
-    isCreateOutletError ||
-    isUpdateOutletError ||
-    isGetAllOutletsError;
+    isCreateOutletError || isUpdateOutletError || isGetAllOutletsError;
   const initialValues = {
     name: "",
     address: "",
@@ -114,14 +91,12 @@ const Outlets = () => {
   };
   const validate = (values) => {
     const errors = {};
-
     if (!values.name || !values.name.length) {
       errors.name = "Name is required";
     }
     if (!values.address || !values.address.length) {
       errors.address = "Address is required";
     }
-
     return errors;
   };
   const pageCount = Math.ceil(totalItems / itemsPerPage);
@@ -152,7 +127,7 @@ const Outlets = () => {
         type: "SET_FILTER",
         name: "selectedBrand",
         value: option,
-        resetFields:["selectedSuperCategory", "selectedCategory"]
+        resetFields: ["selectedSuperCategory", "selectedCategory"],
       })
     );
   };
@@ -165,7 +140,7 @@ const Outlets = () => {
         handleSelectChange={handleSelectChange}
         useGetOptionsQuery={useGetAllBrandsQuery}
         skip={!auth.isSuperAdmin && !auth.tenantIds && !auth.brandIds}
-        inputQuery={brandsQuery}
+        inputQuery={auth.brandsQuery}
         field={"brands"}
         customField={["tenantId"]}
       />

@@ -9,10 +9,8 @@ import { useGetAllRolesQuery, useCreateRoleMutation } from "../services/role";
 import Loader from "../UI/Loaders/Loader";
 import Modal from "../components/Modals/Modal";
 import {
-  checkForSame,
   rolesMappedToPermissions,
   showToast,
-  validateForm,
 } from "../utils/constants";
 import MultiStepModal from "../components/Modals/MultiStepModal";
 import EntityBreadCrumbs from "../components/Containers/EntityBreadCrumbs";

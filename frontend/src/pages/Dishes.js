@@ -14,18 +14,6 @@ const DishesPage = () => {
   let selectedBrand = useSelector((state) => state.ui.filters.selectedBrand);
   const dispatch = useDispatch();
   selectedBrand = selectedBrand ?? {};
-  const brandsQuery = {
-    page: 1,
-  };
-  if (auth.isSuperAdmin) {
-    brandsQuery.tenantIds = "";
-  }
-  if (auth.tenantIds) {
-    brandsQuery.tenantIds = auth.tenantIds;
-  }
-  if (auth.brandIds) {
-    brandsQuery.brandIds = auth.brandIds;
-  }
   const handleSelectChange = (option) => {
     dispatch(
       alterFilters({
@@ -47,7 +35,7 @@ const DishesPage = () => {
         handleSelectChange={handleSelectChange}
         useGetOptionsQuery={useGetAllBrandsQuery}
         skip={!auth.isSuperAdmin && !auth.tenantIds && !auth.brandIds}
-        inputQuery={brandsQuery}
+        inputQuery={auth.brandsQuery}
         field={"brands"}
         customField={["tenantId"]}
       />

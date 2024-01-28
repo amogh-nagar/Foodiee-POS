@@ -2,6 +2,7 @@ import { useReloginMutation } from "../services/auth";
 import { login, logout } from "../store/authSlice";
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import { useDispatch } from "react-redux";
+import { useEffect } from "react";
 const useRefreshToken = () => {
   const history = useHistory();
   const dispatch = useDispatch();
@@ -26,7 +27,14 @@ const useRefreshToken = () => {
       }
     }
   }
-  return {reAttemptLogin, reLogin : {isLoading, isError, isSuccess, data}};
+  useEffect(() => {
+    try {
+      reAttemptLogin();
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+  return {isLoading, isError, isSuccess, data};
 };
 
 export default useRefreshToken;

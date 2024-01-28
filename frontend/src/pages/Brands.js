@@ -10,10 +10,9 @@ import {
   useUpdateBrandMutation,
 } from "../services/brand";
 import EntityCard from "../components/Entity/EntityCard";
-import { itemsPerPage, selectCustomStyle, showToast } from "../utils/constants";
+import { itemsPerPage, showToast } from "../utils/constants";
 import FlexDiv from "../components/Wrappers/FlexDiv";
 import ReactPaginate from "react-paginate";
-import CustomDropdownIndicator from "../components/CustomDropdownIndicator";
 import SearchDiv from "../components/Containers/SearchDiv";
 import { useDispatch, useSelector } from "react-redux";
 import { alterFilters } from "../store/uiSlice";
@@ -33,25 +32,11 @@ const Brands = () => {
     { isLoading: isUpdateBrandLoading, isError: isUpdateBrandError },
   ] = useUpdateBrandMutation();
   const auth = useSelector((state) => state.auth);
-  const tenantsQuery = {
-    page: 1,
-  };
-  if (auth.isSuperAdmin) {
-    tenantsQuery.tenantIds = "";
-  }
-  if (auth.tenantIds) {
-    tenantsQuery.tenantIds = auth.tenantIds;
-  }
   const brandsQuery = {
+    ...auth.brandsQuery,
     name: searchedTerm,
     page: page,
   };
-  if (auth.brandIds) {
-    brandsQuery.brandIds = auth.brandIds;
-  }
-  if (selectedTenant?.value) {
-    brandsQuery.tenantIds = selectedTenant?.value;
-  }
   const {
     data,
     isError: isGetAllBrandsError,
@@ -156,7 +141,7 @@ const Brands = () => {
         handleSelectChange={handleSelectChange}
         useGetOptionsQuery={useGetAllTenantsQuery}
         skip={!auth.isSuperAdmin && !auth.tenantIds}
-        inputQuery={tenantsQuery}
+        inputQuery={auth.tenantsQuery}
         field={"tenants"}
       />
       <div>

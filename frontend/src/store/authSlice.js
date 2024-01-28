@@ -11,6 +11,9 @@ const authSlice = createSlice({
     isSuperAdmin: false,
     outletIds: null,
     isAuthenticated: false,
+    tenantsQuery: {},
+    brandsQuery: {},
+    outletsQuery: {},
   },
   reducers: {
     login: (state, action) => {
@@ -36,6 +39,24 @@ const authSlice = createSlice({
         if (entity.entityName === "Outlet")
           state.outletIds.push(entity.entityId);
       });
+      if (state.isSuperAdmin) {
+        state.tenantsQuery.tenantIds = "";
+        state.brandsQuery.tenantIds = "";
+        state.outletsQuery.tenantIds = "";
+      }
+      if (state.tenantIds) {
+        state.tenantsQuery.tenantIds = state.tenantIds;
+        state.brandsQuery.tenantIds = state.tenantIds;
+        state.outletsQuery.tenantIds = state.tenantIds;
+      }
+      if (state.brandIds) {
+        state.brandsQuery.brandIds = state.brandIds;
+        state.outletsQuery.brandIds = state.brandIds;
+      }
+      if (state.outletIds) {
+        state.outletsQuery.outletIds = state.outletIds;
+      }
+      state.tenantsQuery.page = state.brandsQuery.page = state.outletsQuery.page = 1;
     },
     logout: (state) => {
       localStorage.removeItem("token");
