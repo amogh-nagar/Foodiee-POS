@@ -9,7 +9,7 @@ const TaxCard = ({ name = "XYZ", value = 0 }) => {
         <p>@ {value}%</p>
       </div>
       <div className="flex items-center gap-x-1 text-secondary-200">
-        <button>
+        <button className="outline-none">
           <MdOutlineEdit className="w-6 h-6" />
         </button>
         <button>

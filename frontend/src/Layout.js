@@ -5,8 +5,8 @@ import App from "./App";
 import useRefreshToken from "./hooks/useRefreshToken";
 import Loader from "./UI/Loaders/Loader";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
 import useFireBaseInitialise from "./hooks/useFireBaseInitialise";
+import { Toaster } from "react-hot-toast";
 function Layout() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const refreshToken = useRefreshToken();
@@ -32,9 +32,23 @@ function Layout() {
             <Redirect to={isAuthenticated ? "/" : "/auth"} />
           </Route>
         </Switch>
-        <ToastContainer
-          pauseOnFocusLoss={false}
-          toastStyle={{ backgroundColor: "#1e2130" }}
+        <Toaster
+          toastOptions={{
+            style: {
+              padding: "16px",
+              color: "white",
+            },
+            success: {
+              style: {
+                background: "#00b300",
+              },
+            },
+            error: {
+              style: {
+                background: "red",
+              },
+            },
+          }}
         />
       </div>
     </div>

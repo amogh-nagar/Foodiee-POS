@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import {
   useGetAllBrandsSalesQuery,
   useGetAllOutletsSalesQuery,
@@ -11,12 +10,12 @@ import {
   useGetTop3DishesQuery,
   useGetTop3OutletsQuery,
 } from "../services/analysis";
-import { useReloginMutation } from "../services/auth";
 import {
   useGetAllBrandsDetailsQuery,
   useGetAllOutletsDetailsQuery,
   useGetAllTenantsDetailsQuery,
 } from "../services/dashboard";
+import toast from "react-hot-toast";
 export const currencyMap = {
   USD: "$",
   EUR: "€",
@@ -110,14 +109,14 @@ export const getColor = function (img, name, isDisabled) {
 
 export const showToast = (message, type = "error") => {
   toast[type](message, {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "dark",
+    duration: 3000,
+    position: "top-center",
+    style: {},
+    className: "",
+    ariaProps: {
+      role: "status",
+      "aria-live": "polite",
+    },
   });
 };
 

@@ -1,7 +1,6 @@
 import React from "react";
 import "./EntityCard.css";
 import { checkForSame, getColor, showToast } from "../../utils/constants";
-import { Link } from "react-router-dom";
 import { MdOutlineEdit } from "react-icons/md";
 import Modal from "../Modals/Modal";
 const EntityCard = ({
@@ -41,7 +40,7 @@ const EntityCard = ({
           <div className="flex py-1 px-2 items-center justify-end gap-x-3 text-slate-100">
             <Modal
               PopUpButton={
-                <button>
+                <button className="outline-none">
                   <MdOutlineEdit className="w-6 h-6" />
                 </button>
               }

@@ -23,7 +23,7 @@ const RoleCard = ({
           <div className="flex items-center gap-2 text-secondary-200">
             <Modal
               PopUpButton={
-                <button>
+                <button className="outline-none">
                   <MdOutlineEdit className="w-5 h-5" />
                 </button>
               }

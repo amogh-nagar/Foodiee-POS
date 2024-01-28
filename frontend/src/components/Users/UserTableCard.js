@@ -121,7 +121,7 @@ const UserCard = ({ user, entityId, onEditBtnClick }) => {
               else showToast("Nothing to Update", "info");
             }}
             PopUpButton={
-              <button>
+              <button className="outline-none">
                 <MdOutlineEdit className="w-6 h-6" />
               </button>
             }
