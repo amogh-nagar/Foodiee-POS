@@ -4,7 +4,7 @@ import { login } from "../store/authSlice";
 import CustomForm from "../components/forms/Form";
 import { useLoginMutation } from "../services/auth";
 import AuthImage from "../assets/AuthImage.jpg";
-import Loader from "../UI/Loaders/Loader";
+import Loader from "../components/Loaders/Loader";
 const Auth = () => {
   const [loginApi, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();

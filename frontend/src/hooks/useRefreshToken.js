@@ -3,7 +3,7 @@ import { login, logout } from "../store/authSlice";
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import Loader from "../UI/Loaders/Loader";
+import Loader from "../components/Loaders/Loader";
 import { showToast } from "../utils/constants";
 const useRefreshToken = () => {
   const history = useHistory();

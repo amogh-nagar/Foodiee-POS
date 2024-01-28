@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CustomDropdownIndicator from "./CustomDropdownIndicator";
-import Loader from "../../UI/Loaders/Loader";
+import Loader from "../Loaders/Loader";
 import { selectCustomStyle } from "../../utils/constants";
 import Select from "react-select";
 import { MdOutlineCancel } from "react-icons/md";

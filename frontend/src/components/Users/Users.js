@@ -2,7 +2,7 @@ import React from "react";
 import UserCard from "./UserTableCard";
 import { useUpdateUserMutation } from "../../services/user";
 import { showToast } from "../../utils/constants";
-import Loader from "../../UI/Loaders/Loader";
+import Loader from "../Loaders/Loader";
 import useRTKMutation from "../../hooks/useRTKMutation";
 const User = ({ users, entityId }) => {
   const { trigger: updateUser } = useRTKMutation(useUpdateUserMutation, Loader);

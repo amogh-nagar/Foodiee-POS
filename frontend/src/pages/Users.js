@@ -6,7 +6,7 @@ import { IoMdAdd } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { useGetUsersQuery, useCreateUserMutation } from "../services/user";
 import { useGetAllRolesQuery, useCreateRoleMutation } from "../services/role";
-import Loader from "../UI/Loaders/Loader";
+import Loader from "../components/Loaders/Loader";
 import Modal from "../components/Modals/Modal";
 import { rolesMappedToPermissions, showToast } from "../utils/constants";
 import MultiStepModal from "../components/Modals/MultiStepModal";

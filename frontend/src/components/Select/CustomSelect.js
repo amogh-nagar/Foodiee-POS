@@ -4,7 +4,7 @@ import CustomDropdownIndicator from "./CustomDropdownIndicator";
 import { selectCustomStyle } from "../../utils/constants";
 import useDebouncer from "../../hooks/useDebouncer";
 import useRTKQuery from "../../hooks/useRTKQuery";
-import Loader from "../../UI/Loaders/Loader";
+import Loader from "../Loaders/Loader";
 const CustomSelect = ({
   defaultValue,
   handleSelectChange,

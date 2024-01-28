@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import CategoryCard from "./CategoryCard";
 import SearchDiv from "../Containers/SearchDiv";
 import {
@@ -9,7 +9,7 @@ import {
 import { useSelector } from "react-redux";
 import { showToast } from "../../utils/constants";
 import useDebouncer from "../../hooks/useDebouncer";
-import Loader from "../../UI/Loaders/Loader";
+import Loader from "../Loaders/Loader";
 import useRTKQuery from "../../hooks/useRTKQuery";
 import useRTKMutation from "../../hooks/useRTKMutation";
 

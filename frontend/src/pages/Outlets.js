@@ -10,7 +10,7 @@ import { useGetAllBrandsQuery } from "../services/brand";
 import EntityCard from "../components/Entity/EntityCard";
 import { itemsPerPage, showToast } from "../utils/constants";
 import FlexDiv from "../components/Wrappers/FlexDiv";
-import Loader from "../UI/Loaders/Loader";
+import Loader from "../components/Loaders/Loader";
 import ReactPaginate from "react-paginate";
 import SearchDiv from "../components/Containers/SearchDiv";
 import { useDispatch, useSelector } from "react-redux";

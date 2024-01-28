@@ -1,5 +1,5 @@
 import React from "react";
-import ShimmerCards from "../UI/Loaders/ShimmerCards";
+import ShimmerCards from "../components/Loaders/ShimmerCards";
 import { showToast } from "../utils/constants";
 
 const useRTKQuery = (useMethod, inputQuery = {}, skipQuery = {}, Loader = ShimmerCards) => {

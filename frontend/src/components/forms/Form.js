@@ -1,7 +1,7 @@
 import { Field, Form, Formik, FieldArray } from "formik";
-import Input from "../../UI/Input";
-import TextArea from "../../UI/TextArea";
-import ImageUpload from "../../UI/ImageUpload";
+import Input from "../CustomInputs/Input";
+import TextArea from "../CustomInputs/TextArea";
+import ImageUpload from "../CustomInputs/ImageUpload";
 import ToggleBtn from "../Buttons/ToggleBtn";
 import { IoIosCheckmark } from "react-icons/io";
 

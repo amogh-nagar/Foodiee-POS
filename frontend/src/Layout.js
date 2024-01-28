@@ -3,7 +3,7 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import Auth from "./pages/Auth";
 import App from "./App";
 import useRefreshToken from "./hooks/useRefreshToken";
-import Loader from "./UI/Loaders/Loader";
+import Loader from "./components/Loaders/Loader";
 import "react-toastify/dist/ReactToastify.css";
 import useFireBaseInitialise from "./hooks/useFireBaseInitialise";
 import { Toaster } from "react-hot-toast";
