@@ -46,13 +46,13 @@ const CustomSelect = ({
   return (
     <Select
       components={{ DropdownIndicator: CustomDropdownIndicator }}
-      defaultValue={defaultValue}
+      defaultValue={defaultValue && defaultValue.label ? defaultValue : null}
       onChange={handleSelectChange}
       name={name}
       isLoading={isLoading}
       onInputChange={(e) => setSearchedText(e)}
       options={options}
-      placeholder={`Select ${name}`}
+      placeholder={`Select Entity`}
       className="basic-multi-select w-96 bg-primary-700 rounded-lg text-secondary-600"
       styles={selectCustomStyle}
     />
