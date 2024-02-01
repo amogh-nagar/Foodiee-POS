@@ -11,10 +11,8 @@ import FlexDiv from "../components/Wrappers/FlexDiv";
 import { itemsPerPage, showToast } from "../utils/constants";
 import SearchDiv from "../components/Containers/SearchDiv";
 import { useSelector } from "react-redux";
-import useQuery from "../hooks/useRTKQuery";
 import useRTKMutation from "../hooks/useRTKMutation";
 import useRTKQuery from "../hooks/useRTKQuery";
-import { enqueueSnackbar } from "notistack";
 const Tenants = () => {
   const auth = useSelector((state) => state.auth);
   const [page, setPage] = useState(1);

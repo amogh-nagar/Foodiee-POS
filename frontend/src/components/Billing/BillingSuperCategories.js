@@ -1,6 +1,7 @@
 import React from "react";
 import SuperCategoryCard from "./SuperCategoryCard";
 import { FaCaretRight } from "react-icons/fa";
+import SearchModal from "../Modals/SearchModal";
 const BillingSuperCategories = ({ superCategories }) => {
   // border-b-secondary-500 bg-gray-600 text-secondary-400 border-b-2
   superCategories = [
@@ -36,18 +37,26 @@ const BillingSuperCategories = ({ superCategories }) => {
     },
     {
       name: "Samosa",
-    },{
-        name: "Samosa",
-      },
+    },
+    {
+      name: "Samosa",
+    },
   ];
   return (
     <div className="w-full flex flex-col gap-3">
       <div className="flex items-center justify-between text-orange-400">
         <p>Super Categories</p>
-        <button className="flex items-center justify-between text-secondary-500">
-          <p>View All</p>
-          <FaCaretRight className="w-5 h-5" />
-        </button>
+        <SearchModal
+          elements={superCategories}
+          Card={SuperCategoryCard}
+          PopUpButton={
+            <button className="flex items-center justify-between text-secondary-500">
+              <p>View All</p>
+              <FaCaretRight className="w-5 h-5" />
+            </button>
+          }
+          searchText={"Super Categories"}
+        />
       </div>
       {superCategories?.length ? (
         <div className="flex hide-scrollbar items-center gap-2 overflow-x-auto">

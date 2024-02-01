@@ -1,6 +1,7 @@
 import React from "react";
 import { FaCaretRight } from "react-icons/fa";
 import DishBillingCard from "./DishBillingCard";
+import SearchModal from "../Modals/SearchModal";
 
 const BillingItems = ({ dishes }) => {
   dishes = [
@@ -58,10 +59,17 @@ const BillingItems = ({ dishes }) => {
     <div className="w-full flex flex-col gap-3">
       <div className="flex items-center justify-between text-orange-400">
         <p>Dishes</p>
-        <button className="flex items-center justify-between text-secondary-500">
-          <p>View All</p>
-          <FaCaretRight className="w-6 h-6" />
-        </button>
+        <SearchModal
+          elements={dishes}
+          Card={DishBillingCard}
+          PopUpButton={
+            <button className="flex items-center justify-between text-secondary-500">
+              <p>View All</p>
+              <FaCaretRight className="w-5 h-5" />
+            </button>
+          }
+          searchText={"Dishes"}
+        />
       </div>
       {dishes?.length ? (
         <div className="flex items-center gap-2 flex-wrap">

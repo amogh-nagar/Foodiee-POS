@@ -19,7 +19,7 @@ const Modal = ({
       trigger={PopUpButton}
       modal
       nested
-      overlayStyle={{ backgroundColor: "rgba(0,0,0,0.2)" }}
+      overlayStyle={{ backgroundColor: "rgba(0,0,0,0.5)" }}
     >
       {(close) => (
         <div className="modal bg-slate-900 text-white w-full">
