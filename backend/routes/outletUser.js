@@ -1,18 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { check } = require("express-validator");
-var checkRole = require("../middleware/check-role");
-const {
-  createUser,
-  updateUser,
-  getUsersOfARole,
-  getUser,
-} = require("../controllers/outlet/outletAdmin/getUserOfARole");
-const {
-  getRolesOfAOutlet,
-  getAllOutletsOfAdmin,
-} = require("../controllers/outlet/outletAdmin/getAllRoles");
 const {
   createOrder,
   getOrders,
@@ -22,15 +10,6 @@ const {
   getRecommendedDishes,
 } = require("../controllers/outlet/outletUser/outletOrder");
 const checkPermission = require("../middleware/check-permission");
-const {
-  getDishes,
-  getCategories,
-} = require("../controllers/outlet/outletUser/outletDish");
-const {
-  getOutlet,
-  updateOutlet,
-} = require("../controllers/brand/brandUser/brandOutlet");
-
 //Order
 router.post(
   "/createOrder",

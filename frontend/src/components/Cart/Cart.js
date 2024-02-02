@@ -6,7 +6,7 @@ const Cart = ({ currency = "INR" }) => {
   var cart = useSelector((state) => state.cart);
   const cartItems = cart.items ?? [];
   let popUpButton = (
-    <button className="rounded-2xl text-lg font-bold bg-white text-primary-600 w-full h-12">
+    <button className="rounded-2xl text-lg font-bold bg-slate-200 hover:bg-white text-primary-600 w-full h-12">
       Checkout
     </button>
   );

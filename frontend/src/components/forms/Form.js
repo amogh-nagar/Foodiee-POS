@@ -29,7 +29,7 @@ const CustomForm = ({
       render={(props) => {
         const { values } = props;
         return (
-          <Form className="w-full px-5">
+        <Form className="w-full px-5">
             {fields.map((field, index) => {
               let Component = fieldsType[field.type] ?? Input;
               if (field.type === "checkbox") {
