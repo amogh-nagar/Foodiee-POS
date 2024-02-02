@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { currencyMap } from "../../utils/constants";
 import { BsCashStack } from "react-icons/bs";
 import { FaCcMastercard } from "react-icons/fa";
 import { IoWalletOutline } from "react-icons/io5";
+import { AiOutlineDelete } from "react-icons/ai";
+import { deleteItemFromCart } from "../../store/cartSlice";
 var checkoutMethods = [
   {
     name: "Cash",
@@ -18,33 +20,63 @@ var checkoutMethods = [
     icon: <IoWalletOutline />,
   },
 ];
-const Cart = ({ orderId = 123 }) => {
+const Cart = ({ currency = "INR" }) => {
   const [checkoutMethod, setCheckoutMethod] = useState("Cash");
-  const cartItems = useSelector((state) => state.cart);
+  var cart = useSelector((state) => state.cart);
+  const cartItems = cart.items ?? [];
+  const dispatch = useDispatch();
+  const onDeleteHandler = (itemId) => {
+    dispatch(deleteItemFromCart(itemId));
+  };
   return (
     <div className="w-3/12 h-full p-5">
       <div className="w-full h-5">
-        <h3 className="text-xl font-semibold">Order - {orderId}</h3>
+        <h3 className="text-xl font-semibold">Cart</h3>
       </div>
       <div className="flex flex-col justify-between items-center h-[90%]">
         <div className="w-full overflow-auto my-4">
           <ul className="w-full h-full overflow-auto hide-scrollbar">
-            {cartItems && cartItems.length > 0 ? (
-              cartItems.map((item, index) => {
+            {cartItems && Object.keys(cartItems).length > 0 ? (
+              Object.entries(cartItems).map(([index, item]) => {
                 return (
-                  <li className="bg-gray-700 p-4 rounded-lg flex justify-between text-white w-full mb-3">
-                    <div className="flex gap-x-3">
-                      <p className="rounded-full bg-white text-black w-6 text-center">
-                        {index + 1}
-                      </p>
-                      <h4>{item.name}</h4>
-                      <span className="text-gray-500"> x {item.quantity}</span>
+                  <li
+                    key={index}
+                    className="bg-primary-700 p-4 rounded-lg flex gap-x-3 justify-between text-white w-full mb-3"
+                  >
+                    <div className="w-full flex gap-y-2 flex-col justify-between items-center ">
+                      <div className="w-full flex justify-between items-center">
+                        <div className="flex flex-col gap-x-3">
+                          <h4 className="text-base">{item.name}</h4>
+                          <p className="text-xs">
+                            {currencyMap[currency]}
+                            {item.rate}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between gap-x-2">
+                          <p className="text-gray-400">X</p>
+                          <div className=" bg-gray-600 w-9 h-9 rounded-xl flex items-center justify-center">
+                            <p>{item.quantity}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="w-full">
+                        <input
+                          placeholder="Dish Note...."
+                          className="w-full px-2 h-11 rounded-lg bg-gray-600 outline-none"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <h4>
-                        {currencyMap[item.currency]}
-                        {item.subtotal}
+                    <div className="px-2 flex flex-col gap-y-4 justify-between items-center text-secondary-500">
+                      <h4 className="text-lg h-10 flex items-center justify-center">
+                        {currencyMap[currency]}
+                        {item.quantity * item.rate}
                       </h4>
+                      <button
+                        onClick={() => onDeleteHandler(item.id)}
+                        className="border-2 hover:bg-secondary-500 hover:text-primary-500  border-secondary-600 rounded-xl p-2"
+                      >
+                        <AiOutlineDelete className="w-5 h-5" />
+                      </button>
                     </div>
                   </li>
                 );
@@ -61,7 +93,7 @@ const Cart = ({ orderId = 123 }) => {
         <div className="bg-gray-700 w-full p-8 rounded-md">
           <div className="h-44">
             <div className="text-md flex mb-1 justify-between">
-              <h3>SubTotal</h3>
+              <h3>rate</h3>
               <p>0</p>
             </div>
             <div className="text-2xl flex justify-between">

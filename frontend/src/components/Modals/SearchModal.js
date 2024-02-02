@@ -12,7 +12,7 @@ const SearchModal = ({ PopUpButton, searchText, elements, Card }) => {
     >
       {(close) => (
         <div className="modal relative bg-slate-900 text-white w-full">
-          <div className="header px-5 py-3 bg-orange-950 rounded-t-lg flex items-center gap-x-2">
+          <div className="header px-5 py-3 bg-secondary-dark rounded-t-lg flex items-center gap-x-2">
             <TbListSearch className="w-7 h-7 text-secondary-600" />
             <input
               className="w-full bg-transparent outline-none"

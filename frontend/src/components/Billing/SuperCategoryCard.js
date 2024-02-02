@@ -1,10 +1,25 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { alterFilters } from "../../store/uiSlice";
 
 const SuperCategoryCard = ({ item }) => {
+  const dispatch = useDispatch();
+  const selectSuperCategory = () => {
+    dispatch(
+      alterFilters({
+        type: "SET_FILTER",
+        name: "selectedSuperCategory",
+        value: {
+          label: item.name,
+          value: item._id
+        },
+      })
+    );
+  };
   return (
     <div
-      onClick={() => {}}
-      className="font-sans bg-slate-400 px-2 py-1 w-20 h-10 flex items-center justify-center rounded-2xl text-white"
+      onClick={selectSuperCategory}
+      className="cursor-pointer font-sans bg-gray-700 border-l-2 border-secondary-500 px-2 py-1 w-20 h-10 flex items-center justify-center rounded-2xl text-white"
     >
       <p>{item.name}</p>
     </div>

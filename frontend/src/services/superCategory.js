@@ -27,6 +27,22 @@ export const superCategoryApi = createApi({
             ]
           : ["SuperCategory"],
     }),
+    getAllOutletSuperCategories: builder.query({
+      query: (query) => {
+        console.log("query is", query);
+        return "/getOutletSuperCategories/" + query.outletId + "/" + query.page;
+      },
+      providesTags: (result, error, arg) =>
+        result
+          ? [
+              ...result.superCategories.map(({ _id }) => ({
+                type: "SuperCategory",
+                id: _id,
+              })),
+              "SuperCategory",
+            ]
+          : ["SuperCategory"],
+    }),
     getSuperCategory: builder.query({
       query: (superCategoryId) => "/getSuperCategory/" + superCategoryId,
       providesTags: (result, error, arg) => [
@@ -65,6 +81,7 @@ export const {
   useCreateSuperCategoryMutation,
   useDeleteSuperCategoryMutation,
   useGetAllSuperCategoriesQuery,
+  useGetAllOutletSuperCategoriesQuery,
   useGetSuperCategoryQuery,
   useLazyGetAllSuperCategoriesQuery,
   useLazyGetSuperCategoryQuery,

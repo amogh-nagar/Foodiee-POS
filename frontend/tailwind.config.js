@@ -27,6 +27,7 @@ module.exports = {
           100: "#d98677",
           50: "#ad7d74",
           25: "#7A605B",
+          'dark': 'rgb(67 20 7)',
           'light': '#673b34'
         },
         warning: {

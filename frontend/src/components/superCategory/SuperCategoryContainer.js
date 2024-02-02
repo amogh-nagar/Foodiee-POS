@@ -12,6 +12,7 @@ import { alterFilters } from "../../store/uiSlice";
 import debounce from "lodash.debounce";
 import { showToast } from "../../utils/constants";
 import useDebouncer from "../../hooks/useDebouncer";
+import useRTKQuery from "../../hooks/useRTKQuery";
 
 const SuperCategoryContainer = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -20,7 +21,8 @@ const SuperCategoryContainer = () => {
     useSelector((state) => state.ui.filters.selectedBrand) ?? {};
 
   const dispatch = useDispatch();
-  const { data, isLoading, isError } = useGetAllSuperCategoriesQuery(
+  const { data } = useRTKQuery(
+    useGetAllSuperCategoriesQuery,
     {
       page: 1,
       name: debouncedSearch,
