@@ -223,6 +223,74 @@ exports.getDish = function (req, res, next) {
       next(err);
     });
 };
+
+exports.getOutletSuperCategories = async function (req, res, next) {
+  let query = {};
+  var skip = (req.params.page - 1) * itemsPerPage;
+  if (req.params.outletId) {
+    var olt = await outlet.findOne({
+      _id: req.params.outletId,
+    });
+    query["brandId"] = olt.brandDetails.id;
+  }
+  let aggPipeline = [
+    { $match: query },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        description: 1,
+        image: 1,
+      },
+    },
+    { $skip: skip },
+    { $limit: itemsPerPage },
+  ];
+  if (req.params.getAll) {
+    aggPipeline = aggPipeline.slice(0, 2);
+    aggPipeline[1]["$project"] = { name: 1, brandId: 1 };
+  }
+  let parallelArr = [
+    function (callback) {
+      DishSuperCategory.aggregate(aggPipeline, function (err, data) {
+        if (err) {
+          return callback(err);
+        }
+        callback(null, {
+          superCategories: data.length == 0 ? [] : data,
+        });
+      });
+    },
+  ];
+  if (!req.params.notIncludeTotal) {
+    parallelArr.push(function (cb) {
+      DishSuperCategory.aggregate(
+        [{ $match: query }, { $count: "totalItems" }],
+        function (err, data) {
+          if (err) return cb(err);
+          cb(null, {
+            totalItems: data.length == 0 ? 0 : data[0].totalItems,
+          });
+        }
+      );
+    });
+  }
+  async.parallel(parallelArr, function (err, data) {
+    if (err) {
+      return handleError(res, {
+        message: "Some error occurred",
+        statusCode: 500,
+        error: err,
+      });
+    }
+    res.status(200).json({
+      message: "superCategories Fetched",
+      superCategories: data[0].length == 0 ? [] : data[0].superCategories,
+      totalItems: data[1].length == 0 ? 0 : data[1].totalItems,
+    });
+  });
+};
+
 exports.createDish = function (req, res, next) {
   var { name, rate, description } = req.body;
   Dish.findOne({

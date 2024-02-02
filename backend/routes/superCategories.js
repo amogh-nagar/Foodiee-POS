@@ -8,6 +8,7 @@ const {
   createSuperCategory,
   getSuperCategories,
   updateSuperCategory,
+  getOutletSuperCategories,
 } = require("../controllers/Dish/dish");
 const { checkAndValidateReq } = require("../common");
 
@@ -17,6 +18,14 @@ router.get(
   checkPermission("isVisitDishesPage"),
   checkAndValidateReq,
   getSuperCategories
+);
+
+router.get(
+  "/getOutletSuperCategories/:outletId/:page",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isVisitDishesPage"),
+  checkAndValidateReq,
+  getOutletSuperCategories
 );
 
 router.post(

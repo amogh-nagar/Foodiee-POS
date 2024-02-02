@@ -166,6 +166,57 @@ exports.itemsPerPage = itemsPerPage;
 exports.checkAndValidateReq = (req, res, next) => {
   console.log("validating req...", req.query, req.body, req.params);
   try {
+    Object.keys(req.query).forEach((key) => {
+      if (key == "page") {
+        if (
+          req.query[key] === "undefined" ||
+          req.query[key] === "null" ||
+          req.query[key]?.length === 0
+        )
+          req.query[key] = 1;
+        else req.query[key] = +req.query[key];
+      } else if (
+        req.query[key] === "undefined" ||
+        req.query[key] === "null" ||
+        req.query[key]?.length === 0
+      ) {
+        req.query[key] = null;
+      }
+    });
+    Object.keys(req.params).forEach((key) => {
+      if (key == "page") {
+        if (
+          req.params[key] === "undefined" ||
+          req.params[key] === "null" ||
+          req.params[key]?.length === 0
+        )
+          req.params[key] = 1;
+        else req.params[key] = +req.params[key];
+      } else if (
+        req.params[key] === "undefined" ||
+        req.params[key] === "null" ||
+        req.params[key]?.length === 0
+      ) {
+        req.params[key] = null;
+      }
+    });
+    Object.keys(req.body).forEach((key) => {
+      if (key == "page") {
+        if (
+          req.body[key] === "undefined" ||
+          req.body[key] === "null" ||
+          req.body[key]?.length === 0
+        )
+          req.body[key] = 1;
+        else req.body[key] = +req.body[key];
+      } else if (
+        req.body[key] === "undefined" ||
+        req.body[key] === "null" ||
+        req.body[key]?.length === 0
+      ) {
+        req.body[key] = null;
+      }
+    });
     mongooseIdFields.forEach((entry) => {
       if (req.query[entry]) {
         req.query[entry] = new mongoose.Types.ObjectId(req.query[entry]);
@@ -203,23 +254,6 @@ exports.checkAndValidateReq = (req, res, next) => {
         } else {
           req.body[entry] = [new mongoose.Types.ObjectId(req.body[entry])];
         }
-      }
-    });
-    Object.keys(req.query).forEach((key) => {
-      if (key == "page") {
-        if (
-          req.query[key] === "undefined" ||
-          req.query[key] === "null" ||
-          req.query[key].length === 0
-        )
-          req.query[key] = 1;
-        else req.query[key] = +req.query[key];
-      } else if (
-        req.query[key] === "undefined" ||
-        req.query[key] === "null" ||
-        req.query[key].length === 0
-      ) {
-        req.query[key] = null;
       }
     });
     next();
