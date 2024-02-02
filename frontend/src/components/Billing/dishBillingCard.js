@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, removeFromCart } from "../../store/cartSlice";
 import { currencyMap } from "../../utils/constants";
-const DishBillingCard = ({ dish: { name, rate, _id, currency = "INR" } }) => {
+const DishBillingCard = ({
+  dish: { name, rate, _id, currency = "INR", description },
+}) => {
   const dispatch = useDispatch();
   const quantity = useSelector((state) => state.cart.items[_id]?.quantity) ?? 0;
-  console.log("quantity", quantity)
   var addItem = () => {
-    dispatch(addToCart({ name, rate, _id }));
+    dispatch(addToCart({ name, rate, _id, description }));
   };
   var subtractItem = () => {
     dispatch(removeFromCart({ _id }));

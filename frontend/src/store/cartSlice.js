@@ -18,6 +18,8 @@ const cartSlice = createSlice({
           rate: item.rate,
           quantity: 1,
           name: item.name,
+          comment: "",
+          description: item.description,
         };
       }
     },
@@ -39,6 +41,13 @@ const cartSlice = createSlice({
       state.totalPrice -= existingitem.rate * existingitem.quantity;
       delete state.items[id];
     },
+    addComment(state, action) {
+      const item = action.payload;
+      console.log("item", item)
+      const existingItem = state.items[item._id];
+      if (!existingItem) return;
+      state.items[item._id].comment = item.comment;
+    },
     replaceCart(state, action) {
       state.items = action.payload.items;
       state.totalPrice = action.payload.totalPrice;
@@ -54,6 +63,7 @@ export const {
   addToCart,
   removeFromCart,
   deleteItemFromCart,
+  addComment,
   replaceCart,
   deleteCart,
 } = cartSlice.actions;

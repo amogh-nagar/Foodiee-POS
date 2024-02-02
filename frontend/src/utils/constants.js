@@ -1,3 +1,6 @@
+import { BsCashStack } from "react-icons/bs";
+import { FaCcMastercard } from "react-icons/fa";
+import { IoWalletOutline } from "react-icons/io5";
 import {
   useGetAllBrandsSalesQuery,
   useGetAllOutletsSalesQuery,
@@ -250,3 +253,18 @@ export const validateForm = (values, initialValues) => {
   }
   return errors;
 };
+
+export const checkoutMethods = [
+  {
+    name: "Cash",
+    icon: <BsCashStack />,
+  },
+  {
+    name: "Credit",
+    icon: <FaCcMastercard />,
+  },
+  {
+    name: "EWallet",
+    icon: <IoWalletOutline />,
+  },
+];

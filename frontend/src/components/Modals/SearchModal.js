@@ -1,6 +1,5 @@
 import { TbListSearch } from "react-icons/tb";
 import Popup from "reactjs-popup";
-import ReactPaginate from "react-paginate";
 import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
 const SearchModal = ({ PopUpButton, searchText, elements, Card }) => {
   return (
