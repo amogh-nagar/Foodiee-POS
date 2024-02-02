@@ -92,13 +92,12 @@ const Cart = ({ currency = "INR" }) => {
         </div>
         <div className="bg-gray-700 w-full p-8 rounded-md">
           <div className="h-44">
-            <div className="text-md flex mb-1 justify-between">
-              <h3>rate</h3>
-              <p>0</p>
-            </div>
             <div className="text-2xl flex justify-between">
               <h2>Total</h2>
-              <p>0</p>
+              <p>
+                {currencyMap[currency]}
+                {cart.totalPrice ?? 0}
+              </p>
             </div>
           </div>
           <div>
