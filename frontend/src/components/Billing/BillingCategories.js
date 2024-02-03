@@ -50,7 +50,7 @@ const BillingCategories = () => {
         </div>
       ) : (
         <div>
-          <p className="text-secondary-200">No Categories Found</p>
+          <p className="text-slate-400">No Categories Found</p>
         </div>
       )}
     </div>

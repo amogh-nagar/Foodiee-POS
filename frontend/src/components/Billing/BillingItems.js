@@ -51,7 +51,7 @@ const BillingItems = () => {
         </div>
       ) : (
         <div>
-          <p className="text-secondary-200">No Items Found</p>
+          <p className="text-slate-400">No Dishes Found</p>
         </div>
       )}
     </div>

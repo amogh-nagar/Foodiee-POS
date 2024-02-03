@@ -4,6 +4,7 @@ import TextArea from "../CustomInputs/TextArea";
 import ImageUpload from "../CustomInputs/ImageUpload";
 import ToggleBtn from "../Buttons/ToggleBtn";
 import { IoIosCheckmark } from "react-icons/io";
+import CustomPhoneInput from "../CustomInputs/CustomPhoneInput";
 
 const CustomForm = ({
   initialValues,
@@ -18,6 +19,7 @@ const CustomForm = ({
     textarea: TextArea,
     file: ImageUpload,
     toggle: ToggleBtn,
+    mobile: CustomPhoneInput,
   };
   return (
     <Formik
@@ -29,7 +31,7 @@ const CustomForm = ({
       render={(props) => {
         const { values } = props;
         return (
-        <Form className="w-full px-5">
+          <Form className="w-full px-5">
             {fields.map((field, index) => {
               let Component = fieldsType[field.type] ?? Input;
               if (field.type === "checkbox") {
@@ -113,6 +115,7 @@ const CustomForm = ({
               return (
                 <Field
                   key={index}
+                  {...field}
                   type={field.type}
                   name={field.name}
                   id={field.name}

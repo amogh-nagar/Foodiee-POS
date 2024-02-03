@@ -4,9 +4,10 @@ import { GrCaretNext, GrCaretPrevious } from "react-icons/gr";
 import CustomForm from "../forms/Form";
 import { checkForSame, showToast, validateForm } from "../../utils/constants";
 import MultiSelect from "../Select/MultiSelect";
-function validatePhoneNumber(phone) {
-    const pattern = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-    return pattern.test(phone);
+function validatePhoneNumber(originalPhone) {
+  let phone = originalPhone.slice(3);
+  const pattern = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+  return pattern.test(phone);
 }
 const MultiStepModal = ({
   PopUpButton,
@@ -57,9 +58,15 @@ const MultiStepModal = ({
                       {Step.isForm && (
                         <CustomForm
                           onSubmit={(values) => {
-                            if(values.mobile && !validatePhoneNumber(values.mobile)){
-                                showToast("Please enter valid mobile number", "info");
-                                return;
+                            if (
+                              values.mobile &&
+                              !validatePhoneNumber(values.mobile)
+                            ) {
+                              showToast(
+                                "Please enter valid mobile number",
+                                "info"
+                              );
+                              return;
                             }
                             if (
                               !checkForSame(
@@ -84,7 +91,9 @@ const MultiStepModal = ({
                                 setStepIndex((prev) => prev + 1);
                                 setReachedIndex((prev) => prev + 1);
                               }
-                            } else showToast("Nothing to Create", "info");
+                            } else {
+                              showToast("Nothing to Create", "info");
+                            }
                           }}
                           initialValues={allFields}
                           onRender={Step.onRender}
@@ -115,8 +124,8 @@ const MultiStepModal = ({
                             if (!checkForSame(options, Step.initialValues)) {
                               if (reachedIndex >= steps.length - 1) {
                                 const newFields = {
-                                    ...allFields
-                                }
+                                  ...allFields,
+                                };
                                 newFields[Step.key] = options;
                                 onSubmitForm(newFields);
                                 resetState(close);

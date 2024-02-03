@@ -89,7 +89,7 @@ const UserCard = ({ user, entityId, onEditBtnClick }) => {
                     placeholder: "User Email",
                   },
                   {
-                    type: "number",
+                    type: "mobile",
                     name: "mobile",
                     label: "Mobile",
                     placeholder: "User Mobile",

@@ -192,7 +192,7 @@ exports.createUser = function (req, res, next) {
         name: name,
         email: email,
         password: password,
-        mobile: +mobile,
+        mobile: mobile,
         roles: [],
         entityDetails: [],
         permissions: permissions,

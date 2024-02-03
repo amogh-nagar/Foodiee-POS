@@ -3,6 +3,7 @@ import Header from "./components/Header/Header";
 import { Route, Switch } from "react-router-dom";
 import { routesList } from "./utils/routes";
 import { useSelector } from "react-redux";
+import "react-phone-input-2/lib/style.css";
 
 const App = () => {
   const auth = useSelector((state) => state.auth);

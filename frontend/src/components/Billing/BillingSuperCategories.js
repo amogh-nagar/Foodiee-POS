@@ -46,7 +46,7 @@ const BillingSuperCategories = () => {
         </div>
       ) : (
         <div>
-          <p className="text-secondary-200">No Super Categories Found</p>
+          <p className="text-slate-400">No Super Categories Found</p>
         </div>
       )}
     </div>

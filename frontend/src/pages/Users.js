@@ -138,10 +138,11 @@ const Users = () => {
             placeholder: "User Email",
           },
           {
-            type: "number",
+            type: "mobile",
             name: "mobile",
             label: "Mobile",
             placeholder: "User Mobile",
+            country : "in"
           },
         ],
       },
