@@ -1,5 +1,4 @@
 import { BsCashStack } from "react-icons/bs";
-import { FaCcMastercard } from "react-icons/fa";
 import { IoWalletOutline } from "react-icons/io5";
 import {
   useGetAllBrandsSalesQuery,
@@ -13,6 +12,7 @@ import {
   useGetTop3DishesQuery,
   useGetTop3OutletsQuery,
 } from "../services/analysis";
+import { BsFillInfoSquareFill } from "react-icons/bs";
 import {
   useGetAllBrandsDetailsQuery,
   useGetAllOutletsDetailsQuery,
@@ -123,13 +123,12 @@ export const showToast = (message, type = "error") => {
       duration: 3000,
       position: "top-center",
       style: {
-        color: "black",
+        color: "white",
       },
-      className: "text-black",
       ariaProps: {
         "aria-live": "polite",
       },
-      icon: 'ℹ️'
+      icon: <BsFillInfoSquareFill className="w-5 h-5 text-cyan-700" />,
     });
   } else
     toast[type](message, {

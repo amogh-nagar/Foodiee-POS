@@ -43,6 +43,11 @@ function Layout() {
                 background: "#00b300",
               },
             },
+            blank: {
+              style: {
+                backgroundColor: "#67d4f5",
+              }
+            },
             error: {
               style: {
                 background: "red",
