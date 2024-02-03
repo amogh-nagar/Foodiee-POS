@@ -10,4 +10,5 @@ router.use("/auth", require("./routes/auth"));
 router.use("/dishes", require("./routes/dish"))
 router.use("/superCategories", require("./routes/superCategories"))
 router.use("/categories", require("./routes/categories"))
+router.use("/orders", require("./routes/order"))
 module.exports = router;

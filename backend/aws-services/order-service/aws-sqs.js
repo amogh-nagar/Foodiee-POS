@@ -23,15 +23,18 @@ function deleteMessage(data) {
 
 function receiveMessage(message) {
   const details = JSON.parse(message.Body);
+  console.log("details", details)
   let dishes = details?.order?.dishes?.map((dish) => {
     return {
       dishDetails: {
-        id: new mongoose.Types.ObjectId(dish.dishDetails.id),
-        name: dish.dishDetails.name,
-        rate: +dish.dishDetails.rate,
+        id: new mongoose.Types.ObjectId(dish.id),
+        name: dish.name,
+        description: dish.description,
+        rate: +dish.rate,
       },
-      price: +dish.price,
+      price: +(dish.rate ?? 0) * +(dish.quantity ?? 0),
       quantity: +dish.quantity,
+      comment: dish.comment,
     };
   });
 
@@ -40,22 +43,24 @@ function receiveMessage(message) {
       name: details.order.customerName,
       email: details.order.customerEmail,
       contact: details.order.customerContact,
+      address: details.order.customerAddress,
     },
     dishes: dishes,
     totalTax: +details.order.totalTax,
     date: details.order.orderDate,
     status: details.order.status,
+    tab: details.order.type,
     outletDetails: {
       id: new mongoose.Types.ObjectId(details.order.outletDetails.id),
-      name: details.order.outletDetails.name
+      name: details.order.outletDetails.name,
     },
     brandDetails: {
       id: new mongoose.Types.ObjectId(details.order.brandDetails.id),
-      name: details.order.brandDetails.name
+      name: details.order.brandDetails.name,
     },
     tenantDetails: {
       id: new mongoose.Types.ObjectId(details.order.tenantDetails.id),
-      name: details.order.tenantDetails.name
+      name: details.order.tenantDetails.name,
     },
     price: +details.order.price + +details.order.totalTax,
   });
@@ -73,7 +78,7 @@ function receiveMessage(message) {
         email: details.order.customerEmail,
         subject: emailTemplates.ORDER_CREATED.subject,
         text: emailTemplates.ORDER_CREATED.text,
-        html: emailTemplates.ORDER_CREATED.html(order, orderDetails),
+        html: emailTemplates.ORDER_CREATED.html(details.order, orderDetails),
       });
       deleteMessage(message);
     })

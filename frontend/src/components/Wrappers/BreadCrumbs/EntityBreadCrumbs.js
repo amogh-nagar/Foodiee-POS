@@ -15,7 +15,7 @@ const EntityBreadCrumbs = ({ setEntity }) => {
     useLazyGetAllBrandsQuery
   );
   const { trigger: getOutlets, data: outlets } = useRTKMutation(
-    useLazyGetAllTenantsQuery
+    useLazyGetAllOutletsQuery
   );
   const accessibleEntities = auth.accessibleEntities;
   const [activeEntity, setActiveEntity] = useState("");

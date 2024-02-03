@@ -23,6 +23,7 @@ exports.loginUser = function (req, res, next) {
         roles: user.roles,
         name: user.name,
         userId: user._id,
+        entityDetails: user.entityDetails,
         permissions: user.permissions,
       };
       var token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -60,11 +61,12 @@ exports.reLoginUser = function (req, res, next) {
           payload = {
             roles: user.roles,
             name: user.name,
+            entityDetails: user.entityDetails,
             userId: user._id,
             permissions: user.permissions,
           };
           token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "1h"
+            expiresIn: "1h",
           });
           return res.status(200).json({
             message: "ReLogged In!",

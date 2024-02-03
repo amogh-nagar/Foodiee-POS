@@ -41,8 +41,8 @@ const MultiSelect = ({
   customFields,
 }) => {
   const [selectedOptions, setSelectedOptions] = useState(initialValues);
-  const setSearchTerm = useDebouncer(setDebouncedSearch)[1];
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const setSearchTerm = useDebouncer(setDebouncedSearch)[1];
   const { data, isLoading } = useRTKQuery(
     useOptionsQuery,
     {

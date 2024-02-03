@@ -42,6 +42,13 @@ export const currencyMap = {
   ZAR: "R",
 };
 
+export function truncate(input, length) {
+  if (input.length > length) {
+    return input.substring(0, length) + "...";
+  }
+  return input;
+}
+
 export const getRandomColors = function getRandomLightColor() {
   const red = Math.floor(Math.random() * 155) + 100;
   const green = Math.floor(Math.random() * 155) + 100;
@@ -257,14 +264,10 @@ export const validateForm = (values, initialValues) => {
 export const checkoutMethods = [
   {
     name: "Cash",
-    icon: <BsCashStack />,
+    icon: <BsCashStack className="w-6 h-6" />,
   },
   {
-    name: "Credit",
-    icon: <FaCcMastercard />,
-  },
-  {
-    name: "EWallet",
-    icon: <IoWalletOutline />,
+    name: "Others",
+    icon: <IoWalletOutline className="w-6 h-6" />,
   },
 ];

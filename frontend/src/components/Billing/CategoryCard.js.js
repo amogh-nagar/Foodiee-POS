@@ -1,5 +1,5 @@
 import React from "react";
-import { getColor, getRandomColors } from "../../utils/constants";
+import { getColor, getRandomColors, truncate } from "../../utils/constants";
 import { useDispatch } from "react-redux";
 import { alterFilters } from "../../store/uiSlice";
 
@@ -26,7 +26,7 @@ const CategoryCard = ({ item }) => {
       style={styleObj}
     >
       <div className="">
-        <h3 className="text-xl text-white">{item.name}</h3>
+        <h3 className="text-xl text-white">{truncate(item.name, 12)}</h3>
       </div>
     </div>
   );

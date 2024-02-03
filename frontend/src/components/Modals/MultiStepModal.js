@@ -15,7 +15,6 @@ const MultiStepModal = ({
   onSubmitForm,
   initialValues,
 }) => {
-    console.log("hgvgh", initialValues)
   const [allFields, setAllFields] = useState(initialValues);
   const [stepIndex, setStepIndex] = useState(0);
   const [reachedIndex, setReachedIndex] = useState(0);

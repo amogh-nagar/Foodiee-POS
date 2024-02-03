@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, removeFromCart } from "../../store/cartSlice";
-import { currencyMap } from "../../utils/constants";
+import { currencyMap, truncate } from "../../utils/constants";
 const DishBillingCard = ({
   dish: { name, rate, _id, currency = "INR", description },
 }) => {
@@ -22,7 +22,7 @@ const DishBillingCard = ({
       }`}
     >
       <div>
-        <h3 className="text-xl">{name}</h3>
+        <h3 className="text-xl">{truncate(name, 10)}</h3>
         <p className="text-base text-gray-300">
           {currencyMap[currency]}
           {rate}

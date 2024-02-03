@@ -1,11 +1,11 @@
 var Order = require("../../models/order");
 var Outlet = require("../../models/outlet");
-const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
+const Razorpay = require("razorpay");
 const { addToQueueOrder } = require("../../aws-services/order-service/aws-sqs");
 const redis = require("redis");
-// const client = redis.createClient();
 const HttpError = require("../../models/http-error");
 var async = require("async");
+const crypto = require("crypto");
 var mongoose = require("mongoose");
 exports.getOrders = function (req, res, next) {
   async.parallel(
@@ -67,8 +67,56 @@ exports.getOrder = function (req, res, next) {
     });
 };
 
+exports.validateRazorPayOrder = async (req, res, next) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+    req.body;
+  const sha = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
+  sha.update(razorpay_order_id + "|" + razorpay_payment_id);
+  const digest = sha.digest("hex");
+  if (digest !== razorpay_signature) {
+    var err = new HttpError("Invalid Signature", 400);
+    return next(err);
+  }
+  return res.status(200).json({
+    message: "Validation Succesfull",
+    razorpay_order_id,
+    razorpay_payment_id,
+  });
+};
+
+exports.getRazorPayOrderId = async (req, res, next) => {
+  try {
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+    const options = req.body;
+    const order = await razorpay.orders.create(options);
+    if (!order) {
+      let error = new HttpError("Some error occurred", 500);
+      return next(error);
+    }
+    res.status(200).json({
+      order,
+      message: "RazorPay Order Created",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.createOrder = function (req, res, next) {
-  var { name, email, contact, type, date } = req.body;
+  var {
+    name,
+    email,
+    contact,
+    address,
+    type,
+    date,
+    dishes,
+    taxAmount,
+    totalPrice,
+  } = req.body;
   Outlet.findOne({ _id: req.body.entityId })
     .then(function (outlet) {
       if (!outlet) {
@@ -79,24 +127,25 @@ exports.createOrder = function (req, res, next) {
         customerName: name,
         customerEmail: email,
         customerContact: contact,
-        dishes: req.body.cart.items,
+        customerAddress: address,
+        dishes: dishes,
         type: type ? type : "Dining",
         date: date ? date : Date.now(),
-        totalTax: +req.body.taxAmount,
+        totalTax: taxAmount ?? 0,
         status: "Pending",
         outletDetails: {
-          id: req.body.entityId,
-          name: req.body.entityName,
+          id: outlet._id,
+          name: outlet.name,
         },
         brandDetails: {
           id: outlet.brandDetails.id,
           name: outlet.brandDetails.name,
         },
-        tenatDetails: {
+        tenantDetails: {
           id: outlet.tenantDetails.id,
           name: outlet.tenantDetails.name,
         },
-        price: req.body.cart.totalCartPrice,
+        price: +totalPrice,
       };
       addToQueueOrder({
         order: orderDetails,
@@ -161,4 +210,3 @@ exports.updateOrder = function (req, res, next) {
       });
   });
 };
-

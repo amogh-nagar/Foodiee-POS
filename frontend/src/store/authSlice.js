@@ -27,9 +27,9 @@ const authSlice = createSlice({
       state.entityDetails = action.payload.user.entityDetails ?? [];
       state.roles = action.payload.user.roles;
       if (
-        action.payload.user.roles &&
-        action.payload.user.roles[0] &&
-        action.payload.user.roles[0].roleName === "superAdmin"
+        state.roles &&
+        state.roles[0] &&
+        state.roles[0].roleName === "superAdmin"
       ) {
         state.isSuperAdmin = true;
       }
@@ -59,7 +59,7 @@ const authSlice = createSlice({
           },
         ];
       }
-      if (state.tenantIds) {
+      if (state.tenantIds && state.tenantIds.length) {
         state.tenantsQuery.tenantIds = state.tenantIds;
         state.brandsQuery.tenantIds = state.tenantIds;
         state.outletsQuery.tenantIds = state.tenantIds;
@@ -78,7 +78,7 @@ const authSlice = createSlice({
           },
         ];
       }
-      if (state.brandIds) {
+      if (state.brandIds && state.brandIds.length) {
         state.brandsQuery.brandIds = state.brandIds;
         state.outletsQuery.brandIds = state.brandIds;
         state.accessibleEntities = [
@@ -92,7 +92,7 @@ const authSlice = createSlice({
           },
         ];
       }
-      if (state.outletIds) {
+      if (state.outletIds && state.outletIds.length) {
         state.outletsQuery.outletIds = state.outletIds;
         state.accessibleEntities = [
           {

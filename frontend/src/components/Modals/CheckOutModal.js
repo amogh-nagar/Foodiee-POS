@@ -2,9 +2,17 @@ import { useSelector } from "react-redux";
 import Popup from "reactjs-popup";
 import CheckOutItem from "../Cart/CheckOutItem";
 import { useState } from "react";
-import { checkoutMethods } from "../../utils/constants";
+import { checkoutMethods, showToast } from "../../utils/constants";
+import useRTKMutation from "../../hooks/useRTKMutation";
+import {
+  useCreateOrderMutation,
+  useGetRazorPayOrderIdMutation,
+  useValidateRazorPayOrderMutation,
+} from "../../services/order";
 const CheckOutModal = ({ PopUpButton, currency = "INR" }) => {
   var cart = useSelector((state) => state.cart);
+  const auth = useSelector((state) => state.auth);
+  console.log("auth is", auth);
   const cartItems = cart.items ?? [];
   const isItemsAvailable = cartItems && Object.keys(cartItems).length > 0;
   const [checkoutMethod, setCheckoutMethod] = useState("Cash");
@@ -14,7 +22,91 @@ const CheckOutModal = ({ PopUpButton, currency = "INR" }) => {
     mobile: null,
     address: "",
   });
-  const checkoutHandler = () => {};
+  const { trigger: createOrder } = useRTKMutation(useCreateOrderMutation);
+  const { trigger: getRazorPayOrderId } = useRTKMutation(
+    useGetRazorPayOrderIdMutation
+  );
+  const { trigger: validateRazorPay } = useRTKMutation(
+    useValidateRazorPayOrderMutation
+  );
+
+  const createOrderHandler = async (close) => {
+    try {
+      let payload = {
+        name: customerForm.name,
+        email: customerForm.email,
+        contact: customerForm.mobile,
+        address: customerForm.address,
+        dishes: Object.entries(cartItems).map(([key, val]) => {
+          return val;
+        }),
+        totalPrice: cart.totalPrice,
+        entityId: auth.outletsQuery?.outletIds[0],
+      };
+      await createOrder(payload);
+      showToast("Order Punched Successfully", "success");
+      close();
+    } catch (err) {
+      console.log("Some error occurred", err);
+      showToast(err?.data?.message || "Some error occurred!");
+    }
+  };
+  const handleOrderValidation = async (response, close) => {
+    try {
+      const payload = response;
+      await validateRazorPay(payload).unwrap();
+      createOrderHandler(close);
+    } catch (err) {
+      console.log("Some error occurred", err);
+      showToast(err?.data?.message || "Some error occurred!");
+    }
+  };
+  const checkoutHandler = async (close) => {
+    try {
+      let found = 0;
+      Object.keys(customerForm).forEach((key) => {
+        if (!customerForm[key] && !found) {
+          found = 1;
+          showToast(key[0].toUpperCase() + key.slice(1) + " is Required");
+        }
+      });
+      if (found) return;
+      if (checkoutMethod != "Cash") {
+        const razorPayPayload = {
+          amount: cart.totalPrice * 100,
+          currency,
+        };
+        const resp = await getRazorPayOrderId(razorPayPayload).unwrap();
+        var options = {
+          key: process.env.REACT_APP_RAZOR_PAY_KEY_ID,
+          amount: cart.totalPrice * 100,
+          currency,
+          name: "Foodiee",
+          order_id: resp.order.id,
+          handler: (resp) => handleOrderValidation(resp, close),
+          prefill: {
+            name: customerForm.name,
+            email: customerForm.email,
+            contact: customerForm.mobile,
+          },
+          notes: {
+            address: "Razorpay Corporate Office",
+          },
+          theme: {
+            color: "orange",
+          },
+        };
+        var rzp1 = new window.Razorpay(options);
+        rzp1.on("payment.failed", function (response) {
+          showToast(response.error.description || "Some error occurred");
+        });
+        rzp1.open();
+      } else createOrderHandler(close);
+    } catch (err) {
+      console.log("Some error occurred", err);
+      showToast(err?.data?.message || "Some error occurred!");
+    }
+  };
   return (
     <Popup
       trigger={PopUpButton}
@@ -124,7 +216,7 @@ const CheckOutModal = ({ PopUpButton, currency = "INR" }) => {
                   <div className="mb-2">
                     <h3 className="font-semibold text-base">Payment Methods</h3>
                   </div>
-                  <div className="flex w-full justify-between items-cente">
+                  <div className="flex w-full gap-x-2 items-cente">
                     {checkoutMethods.map((method, index) => {
                       return (
                         <div
@@ -133,10 +225,10 @@ const CheckOutModal = ({ PopUpButton, currency = "INR" }) => {
                         >
                           <button
                             onClick={() => setCheckoutMethod(method.name)}
-                            className={`border-2 w-20 h-11 justify-center flex items-center rounded-xl border-gray-500 ${
+                            className={`border-2 w-28 h-11 justify-center flex items-center rounded-xl border-gray-500 ${
                               checkoutMethod === method.name
-                                ? "hover:bg-primary-700 border-secondary-600 bg-secondary-600"
-                                : "border-gray-500 hover:border-secondary-600 hover:bg-secondary-600"
+                                ? "hover:bg-primary-700 text-primary-700 hover:text-secondary-600 border-secondary-600 bg-secondary-600"
+                                : "border-gray-500 hover:border-secondary-600 hover:text-primary-700 hover:bg-secondary-600"
                             }`}
                           >
                             {method.icon}
@@ -150,7 +242,7 @@ const CheckOutModal = ({ PopUpButton, currency = "INR" }) => {
                 <div>
                   {isItemsAvailable ? (
                     <button
-                      onClick={checkoutHandler}
+                      onClick={() => checkoutHandler(close)}
                       className="rounded-2xl text-lg font-bold bg-slate-200 hover:bg-white text-primary-600 w-full h-12"
                     >
                       Place Order

@@ -19,6 +19,7 @@ function deleteMessage(data) {
 
 function receiveMessage(message) {
   const details = JSON.parse(message.Body);
+  console.log("details", details)
   sendGridMail
     .send({
       to: details.email,

@@ -23,7 +23,7 @@ router.get(
 router.get(
   "/getOutletSuperCategories/:outletId/:page",
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisitDishesPage"),
+  checkPermission("isVisitBillingPage"),
   checkAndValidateReq,
   getOutletSuperCategories
 );

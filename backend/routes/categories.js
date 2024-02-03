@@ -9,7 +9,7 @@ const { checkAndValidateReq } = require("../common");
 router.get(
   "/getCategories/:superCategoryId/:page",
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisitDishesPage"),
+  checkPermission("isVisitDishesPage", "isVisitBillingPage"),
   checkAndValidateReq,
   getCategories
 );

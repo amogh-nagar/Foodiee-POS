@@ -187,6 +187,7 @@ exports.createUser = function (req, res, next) {
       if (!password) {
         password = generateSecureRandomPassword(6);
       }
+      console.log("password is", password)
       const newUser = new User({
         name: name,
         email: email,

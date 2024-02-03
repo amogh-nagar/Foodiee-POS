@@ -10,7 +10,7 @@ const { checkAndValidateReq } = require("../common");
 router.get(
   "/getDishes",
   passport.authenticate("jwt", { session: false }),
-  checkPermission("isVisitDishesPage"),
+  checkPermission("isVisitDishesPage", "isVisitBillingPage"),
   checkAndValidateReq,
   getDishes
 );

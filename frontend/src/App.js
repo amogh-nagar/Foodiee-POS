@@ -18,7 +18,7 @@ const App = () => {
               route.permissions.every(
                 (permission) => auth.permissions?.indexOf(permission) !== -1
               )
-            )
+            ) {
               return route.exact ? (
                 <Route key={index} path={route.path} exact>
                   {route.component}
@@ -28,6 +28,7 @@ const App = () => {
                   {route.component}
                 </Route>
               );
+            } else return null;
           })}
         </Switch>
       </div>
