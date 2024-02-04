@@ -54,32 +54,32 @@ const WithoutOTPLogin = () => {
     return errors;
   };
   return (
-    <CustomForm
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      validate={validate}
-      validator={() => {}}
-      fields={[
-        {
-          type: "email",
-          name: "email",
-          label: "Email",
-          placeholder: "Your Email",
-        },
-        {
-          type: "password",
-          name: "password",
-          label: "Password",
-          placeholder: "Your Password",
-        },
-        {
-          type: "checkbox",
-          name: "staySignedIn",
-          label: "Stay Signed In",
-        },
-      ]}
-      buttonText="Login"
-    />
+      <CustomForm
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+        validator={() => {}}
+        fields={[
+          {
+            type: "email",
+            name: "email",
+            label: "Email",
+            placeholder: "Your Email",
+          },
+          {
+            type: "password",
+            name: "password",
+            label: "Password",
+            placeholder: "Your Password",
+          },
+          {
+            type: "checkbox",
+            name: "staySignedIn",
+            label: "Stay Signed In",
+          },
+        ]}
+        buttonText="Login"
+      />
   );
 };
 

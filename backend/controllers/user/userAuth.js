@@ -4,16 +4,38 @@ const HttpError = require("../../models/http-error");
 var User = require("../../models/user");
 const sendGridMail = require("@sendgrid/mail");
 const { handleError } = require("../../common");
+const { getFirebaseAdmin } = require("../../firebase");
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
-exports.loginUser = function (req, res, next) {
-  User.findOne({ email: req.body.email }).then(function (user) {
+let fireBaseMap = {
+  "phone_number": "mobile",
+  email: "email",
+};
+exports.loginUser = async function (req, res, next) {
+  const query = {};
+  let decodedToken;
+  if (req.body.firebaseAccessToken) {
+    decodedToken = await getFirebaseAdmin()
+      .auth()
+      .verifyIdToken(req.body.firebaseAccessToken);
+    Object.entries(fireBaseMap).forEach((entry) => {
+      let ele = decodedToken[entry[0]];
+      if (ele) {
+        query[entry[1]] = ele;
+      }
+    });
+  } else {
+    query["email"] = req.body.email;
+  }
+  User.findOne(query).then(function (user) {
     if (!user) {
       var error = new HttpError("Invalid email or password", 401);
       return next(error);
     }
-    if (!user.isValidPassword(req.body.password)) {
-      var error = new HttpError("Invalid email or password", 401);
-      return next(error);
+    if (!decodedToken) {
+      if (!user.isValidPassword(req.body.password)) {
+        var error = new HttpError("Invalid email or password", 401);
+        return next(error);
+      }
     }
     req.login(user, { session: false }, function (err) {
       if (err) {

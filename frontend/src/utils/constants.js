@@ -118,6 +118,7 @@ export const getColor = function (img, name, isDisabled) {
 };
 
 export const showToast = (message, type = "error") => {
+  toast.dismiss();
   if (type == "info") {
     toast(message, {
       duration: 3000,
