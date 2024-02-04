@@ -1,21 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
+const initialState = {
+  user: null,
+  permissions: [],
+  roles: [],
+  entityDetails: null,
+  tenantIds: [],
+  brandIds: [],
+  isSuperAdmin: false,
+  outletIds: [],
+  isAuthenticated: false,
+  tenantsQuery: {},
+  brandsQuery: {},
+  outletsQuery: {},
+  accessibleEntities: [],
+};
 const authSlice = createSlice({
   name: "auth",
-  initialState: {
-    user: null,
-    permissions: [],
-    roles: [],
-    entityDetails: null,
-    tenantIds: [],
-    brandIds: [],
-    isSuperAdmin: false,
-    outletIds: [],
-    isAuthenticated: false,
-    tenantsQuery: {},
-    brandsQuery: {},
-    outletsQuery: {},
-    accessibleEntities: [],
-  },
+  initialState: initialState,
   reducers: {
     login: (state, action) => {
       if (!action.payload) {
@@ -106,21 +107,10 @@ const authSlice = createSlice({
         state.outletsQuery.page =
           1;
     },
-    logout: (state) => {
+    logout: () => {
       localStorage.removeItem("token");
       localStorage.removeItem("trustedDevice");
-      return {
-        ...state,
-        user: null,
-        permissions: [],
-        role: null,
-        isAuthenticated: false,
-        entityDetails: [],
-        brandIds: [],
-        outletIds: [],
-        roles: [],
-        tenantIds: [],
-      };
+      return initialState;
     },
   },
 });

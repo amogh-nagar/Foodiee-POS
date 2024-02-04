@@ -5,7 +5,8 @@ import CustomForm from "../forms/Form";
 import { checkForSame, showToast, validateForm } from "../../utils/constants";
 import MultiSelect from "../Select/MultiSelect";
 function validatePhoneNumber(originalPhone) {
-  let phone = originalPhone.slice(3);
+  let phone =
+    originalPhone[0] == "+" ? originalPhone.slice(3) : originalPhone.slice(2);
   const pattern = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
   return pattern.test(phone);
 }
@@ -58,6 +59,7 @@ const MultiStepModal = ({
                       {Step.isForm && (
                         <CustomForm
                           onSubmit={(values) => {
+                            values.mobile = "+" + values.mobile;
                             if (
                               values.mobile &&
                               !validatePhoneNumber(values.mobile)
