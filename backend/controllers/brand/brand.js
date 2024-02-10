@@ -38,7 +38,8 @@ exports.getBrands = function (req, res, next) {
         description: 1,
         image: 1,
         isActive: 1,
-        tenantId: 1,
+        tenantId: "$tenantDetails.id",
+        tenantName: "$tenantDetails.name",
       },
     },
     { $skip: skip },
@@ -46,7 +47,11 @@ exports.getBrands = function (req, res, next) {
   ];
   if (req.query.getAll) {
     aggPipeline = aggPipeline.slice(0, 2);
-    aggPipeline[1]["$project"] = { name: 1, tenantId: 1 };
+    aggPipeline[1]["$project"] = {
+      name: 1,
+      tenantId: "$tenantDetails.id",
+      tenantName: "$tenantDetails.name",
+    };
   }
   let parallelArr = [
     function (cb) {
@@ -135,7 +140,10 @@ exports.createBrand = function (req, res, next) {
         name: name,
         image: fileName,
         description: description,
-        tenantId: req.body.tenantId,
+        tenantDetails: {
+          id: req.body.tenantId,
+          name: req.body.tenantName,
+        },
       });
       brand
         .save()

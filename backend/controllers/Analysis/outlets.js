@@ -1,16 +1,18 @@
-var mongoose = require("mongoose");
-var Order = require("../../models/order");
-const { handleError } = require("../../common");
+exports.getTop3Outlets = async (req, res, next) => {};
 
-exports.getTenantsSalesReport = function (req, res, next) {
+exports.getOutletHourlySales = async (req, res, next) => {};
+
+exports.getAllOutletsTotalSales = async (req, res, next) => {};
+var Order = require("../../models/order");
+exports.getOutletsSalesReport = function (req, res, next) {
   let startDate = req.body.startDate;
   let endDate = req.body.endDate;
   var cursor = Order.collection.aggregate(
     [
       {
         $match: {
-          "tenantDetails.id": {
-            $in: req.body.tenantIds,
+          "outletDetails.id": {
+            $in: req.body.outletIds,
           },
           date: {
             $gte: startDate,
@@ -20,7 +22,7 @@ exports.getTenantsSalesReport = function (req, res, next) {
       },
       {
         $group: {
-          _id: "$tenantDetails.id",
+          _id: "$outletDetails.id",
           sale: {
             $sum: "$price",
           },
@@ -28,7 +30,7 @@ exports.getTenantsSalesReport = function (req, res, next) {
       },
       {
         $project: {
-          tenantId: "$_id",
+          outletId: "$_id",
           sale: "$sale",
         },
       },
@@ -51,20 +53,20 @@ exports.getTenantsSalesReport = function (req, res, next) {
   });
   cursor.on("end", function () {
     res.status(200).json({
-      message: "Tenants Report",
+      message: "Outlets Report",
       report: result,
     });
   });
 };
 
-exports.getTenantsHourlySalesReport = function (req, res, next) {
+exports.getOutletsHourlySalesReport = function (req, res, next) {
   let startDate = req.body.startDate;
   let endDate = req.body.endDate;
   var cursor = Order.collection.aggregate([
     {
       $match: {
-        "tenantDetails.id": {
-          $in: req.body.tenantIds,
+        "outletDetails.id": {
+          $in: req.body.outletIds,
         },
         date: {
           $gte: startDate,
@@ -81,15 +83,15 @@ exports.getTenantsHourlySalesReport = function (req, res, next) {
             date: "$date",
           },
         },
-        tenantDetails: 1,
+        outletDetails: 1,
         _id: 1,
         price: 1,
       },
     },
     {
       $group: {
-        _id: { orderDate: "$orderDate", tenantId: "$tenantDetails.id" },
-        tenantId: { $first: "$tenantDetails.id" },
+        _id: { orderDate: "$orderDate", outletId: "$outletDetails.id" },
+        outletId: { $first: "$outletDetails.id" },
         sale: {
           $sum: "$price",
         },
@@ -97,7 +99,7 @@ exports.getTenantsHourlySalesReport = function (req, res, next) {
     },
     {
       $group: {
-        _id: "$_id.tenantId",
+        _id: "$_id.outletId",
         sales: {
           $push: { hour: { $toInt: "$_id.orderDate" }, sale: "$sale" },
         },
@@ -105,7 +107,7 @@ exports.getTenantsHourlySalesReport = function (req, res, next) {
     },
     {
       $project: {
-        tenantId: "$_id",
+        outletId: "$_id",
         sales: 1
       },
     },
@@ -123,21 +125,21 @@ exports.getTenantsHourlySalesReport = function (req, res, next) {
   });
   cursor.on("end", function () {
     res.status(200).json({
-      message: "Tenants Report",
+      message: "Outlets Report",
       report: result,
     });
   });
 };
 
-exports.getTop3ItemsOfTenants = function (req, res, next) {
+exports.getTop3ItemsOfOutlets = function (req, res, next) {
   let startDate = req.body.startDate;
   let endDate = req.body.endDate;
   var cursor = Order.collection.aggregate(
     [
       {
         $match: {
-          "tenantDetails.id": {
-            $in: req.body.tenantIds,
+          "outletDetails.id": {
+            $in: req.body.outletIds,
           },
           date: {
             $gte: startDate,
@@ -149,7 +151,7 @@ exports.getTop3ItemsOfTenants = function (req, res, next) {
         $project: {
           dishes: "$dishes",
           _id: 1,
-          tenantDetails: 1,
+          outletDetails: 1,
         },
       },
       {
@@ -157,7 +159,7 @@ exports.getTop3ItemsOfTenants = function (req, res, next) {
       },
       {
         $group: {
-          _id: { dishId: "$dishes.dishId._id", tenantId: "$tenantDetails.id" },
+          _id: { dishId: "$dishes.dishId._id", outletId: "$outletDetails.id" },
           dishName: { $first: "$dishes.dishId.name" },
           price: { $sum: "$dishes.price" },
           quantity: { $sum: "$dishes.quantity" },
@@ -168,7 +170,7 @@ exports.getTop3ItemsOfTenants = function (req, res, next) {
       },
       {
         $group: {
-          _id: "$_id.tenantId",
+          _id: "$_id.outletId",
           dishes: {
             $push: {
               price: "$price",
@@ -180,7 +182,7 @@ exports.getTop3ItemsOfTenants = function (req, res, next) {
       },
       {
         $project: {
-          tenantId: "$_id",
+          outletId: "$_id",
           dishes: { $slice: ["$dishes", 3] },
         },
       },
@@ -194,25 +196,25 @@ exports.getTop3ItemsOfTenants = function (req, res, next) {
   cursor.on("data", function (doc) {
     result.push(doc);
   });
-  cursor.on("error", function (err) {
+  cursor.on("error", function (doc) {
     handleError(res, {
       message: "Some error occurred",
       statusCode: 500,
     });
   });
-  cursor.on("end", function () {
+  cursor.on("end", function (doc) {
     res.status(200).json(result);
   });
 };
 
-exports.getTop3ItemsofTenantsHourlyWise = function (req, res, next) {
+exports.getTop3ItemsofOutletsHourlyWise = function (req, res, next) {
   let startDate = req.body.startDate;
   let endDate = req.body.endDate;
   var cursor = Order.collection.aggregate([
     {
       $match: {
-        "tenantDetails.id": {
-          $in: req.body.tenantIds,
+        "outletDetails.id": {
+          $in: req.body.outletIds,
         },
         date: {
           $gte: startDate,
@@ -224,7 +226,7 @@ exports.getTop3ItemsofTenantsHourlyWise = function (req, res, next) {
       $project: {
         dishes: "$dishes",
         _id: 1,
-        tenantDetails: 1,
+        outletDetails: 1,
         orderDate: {
           $dateToString: {
             format: "%H",
@@ -241,7 +243,7 @@ exports.getTop3ItemsofTenantsHourlyWise = function (req, res, next) {
       $group: {
         _id: {
           orderDate: "$orderDate",
-          tenantId: "$tenantDetails.id",
+          outletId: "$outletDetails.id",
           dishId: "$dishes.dishId._id",
         },
         dishName: { $first: "$dishes.dishId.name" },
@@ -254,7 +256,7 @@ exports.getTop3ItemsofTenantsHourlyWise = function (req, res, next) {
     },
     {
       $group: {
-        _id: { tenantId: "$_id.tenantId", orderDate: "$_id.orderDate" },
+        _id: { outletId: "$_id.outletId", orderDate: "$_id.orderDate" },
         dishes: {
           $push: {
             dishName: "$dishName",
@@ -268,13 +270,13 @@ exports.getTop3ItemsofTenantsHourlyWise = function (req, res, next) {
     {
       $project: {
         orderDate: "$_id.orderDate",
-        tenantId: "$_id.tenantId",
+        outletId: "$_id.outletId",
         dishes: { $slice: ["$dishes", 3] },
       },
     },
     {
       $group: {
-        _id: "$tenantId",
+        _id: "$outletId",
         dishes: {
           $push: {
             orderDate: "$orderDate",
@@ -285,7 +287,7 @@ exports.getTop3ItemsofTenantsHourlyWise = function (req, res, next) {
     },
     {
       $project: {
-        tenantId: "$_id",
+        outletId: "$_id",
         dishes: 1
       }
     }
@@ -303,7 +305,7 @@ exports.getTop3ItemsofTenantsHourlyWise = function (req, res, next) {
   });
   cursor.on("end", () => {
     res.status(200).json({
-      message: "Tenants Report",
+      message: "Brands Report",
       report: result,
     });
   });

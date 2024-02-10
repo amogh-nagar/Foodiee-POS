@@ -55,6 +55,7 @@ const Brands = () => {
         );
       }
       formData.append("tenantId", selectedTenant.value);
+      formData.append("tenantName", selectedTenant.label);
       await createBrand(formData).unwrap();
       showToast("Brand Created Successfully", "success");
     } catch (err) {

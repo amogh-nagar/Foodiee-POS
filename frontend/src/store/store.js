@@ -13,6 +13,7 @@ import { dishApi } from "../services/dish";
 import { superCategoryApi } from "../services/superCategory";
 import { categoryApi } from "../services/category";
 import { orderApi } from "../services/order";
+import { analysisApi } from "../services/analysis";
 const appStore = configureStore({
   reducer: {
     auth: authReducer,
@@ -28,6 +29,7 @@ const appStore = configureStore({
     [superCategoryApi.reducerPath]: superCategoryApi.reducer,
     [categoryApi.reducerPath]: categoryApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
+    [analysisApi.reducerPath]: analysisApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
@@ -41,6 +43,7 @@ const appStore = configureStore({
       superCategoryApi.middleware,
       categoryApi.middleware,
       orderApi.middleware,
+      analysisApi.middleware,
       redirectMiddleware,
     ]),
 });

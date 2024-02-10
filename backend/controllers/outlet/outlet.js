@@ -126,7 +126,7 @@ exports.getOutlet = function (req, res, next) {
 };
 
 exports.createOutlet = function (req, res, next) {
-  var { name, address, brandId, tenantId } = req.body;
+  var { name, address, brandId, tenantId, brandName, tenantName } = req.body;
   Outlet.findOne({
     "brandDetails.id": brandId,
     name: name,
@@ -155,9 +155,11 @@ exports.createOutlet = function (req, res, next) {
         address: address,
         brandDetails: {
           id: brandId,
+          name: brandName,
         },
         tenantDetails: {
           id: tenantId,
+          name: tenantName,
         },
       });
       newoutlet

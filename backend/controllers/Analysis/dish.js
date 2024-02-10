@@ -1,3 +1,8 @@
+exports.getTop3Dishes = async (req, res, next) => {};
+
+exports.getAllDishesTotalSales = async (req, res, next) => {};
+
+exports.getDishHourlySales = async (req, res, next) => {};
 var mongoose = require("mongoose");
 var Outlet = require("../../models/outlet");
 var Order = require("../../models/order");

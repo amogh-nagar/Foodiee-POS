@@ -3,7 +3,6 @@ var s3 = require("./aws-services/aws");
 const { default: mongoose } = require("mongoose");
 const crypto = require("crypto");
 require("dotenv").config();
-let async = require("async");
 exports.handleError = (res, err) => {
   return res
     .status(500)
@@ -237,13 +236,14 @@ exports.checkAndValidateReq = (req, res, next) => {
       }
     });
     mongooseIdArrayFields.forEach((entry) => {
-      if (req.query[entry]) {
-        if (Array.isArray(req.query[entry])) {
-          req.query[entry] = req.query[entry].map(
-            (ele) => new mongoose.Types.ObjectId(ele)
-          );
+      let ele = req.query[entry];
+      if (ele) {
+        if (Array.isArray(ele)) {
+          req.query[entry] = ele.map((ele) => new mongoose.Types.ObjectId(ele));
+        } else if (ele.length > 0) {
+          req.query[entry] = [new mongoose.Types.ObjectId(ele)];
         } else {
-          req.query[entry] = [new mongoose.Types.ObjectId(req.query[entry])];
+          req.query[entry] = "";
         }
       }
       if (req.body[entry]) {

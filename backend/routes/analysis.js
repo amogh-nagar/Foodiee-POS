@@ -3,30 +3,54 @@ const express = require("express");
 const router = express.Router();
 const { check, query } = require("express-validator");
 var passport = require("passport");
-var checkRole = require("../middleware/check-role");
 var checkPermission = require("../middleware/check-permission");
+const {
+  getTop3Tenants,
+  getTenantHourlySales,
+  getAllTenantsTotalSales,
+  getActiveInactiveRatioForTenants,
+  getTop3ItemsOfTenants,
+  getMonthWiseTop3TenantsSale,
+  getHourWiseTop3TenantsSale,
+} = require("../controllers/Analysis/tenants");
+const {
+  getTop3Outlets,
+  getOutletHourlySales,
+  getAllOutletsTotalSales,
+} = require("../controllers/Analysis/outlets");
+const {
+  getTop3Brands,
+  getBrandHourlySales,
+  getAllBrandsTotalSales,
+} = require("../controllers/Analysis/brands");
+const {
+  getTop3Dishes,
+  getAllDishesTotalSales,
+  getDishHourlySales,
+} = require("../controllers/Analysis/dish");
+const { checkAndValidateReq } = require("../common");
 
 router.get(
   "/getAllTenantsSales",
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["superAdmin", "tenantAdmin"])
+  getAllTenantsTotalSales
 );
 router.get(
   "/getAllBrandsSales",
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["tenantAdmin", "brandAdmin"])
+  getAllBrandsTotalSales
 );
 
 router.get(
-  "/getAllOutletsSales",
+  "/getAllOutletsTotalSales",
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["brandAdmin", "outletAdmin"])
+  getAllOutletsTotalSales
 );
 
 router.get(
@@ -34,7 +58,7 @@ router.get(
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["superAdmin", "tenantAdmin"])
+  getTenantHourlySales
 );
 
 router.get(
@@ -42,7 +66,7 @@ router.get(
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["tenantAdmin", "brandAdmin"])
+  getBrandHourlySales
 );
 
 router.get(
@@ -50,15 +74,23 @@ router.get(
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["brandAdmin", "outletAdmin"])
+  getOutletHourlySales
 );
 
 router.get(
-  "/getDishSales",
+  "/getDishHourlySales",
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["brandAdmin", "outletAdmin"])
+  getDishHourlySales
+);
+
+router.get(
+  "/getAllDishesTotalSales",
+  [],
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isVisitAnalysisPage"),
+  getAllDishesTotalSales
 );
 
 router.get(
@@ -66,7 +98,7 @@ router.get(
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["brandAdmin", "outletAdmin"])
+  getTop3Dishes
 );
 
 router.get(
@@ -74,7 +106,7 @@ router.get(
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["tenantAdmin"])
+  getTop3Brands
 );
 
 router.get(
@@ -82,16 +114,47 @@ router.get(
   [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["brandAdmin"])
+  getTop3Outlets
 );
 
 router.get(
   "/getTop3Tenants",
-  [],
   passport.authenticate("jwt", { session: false }),
   checkPermission("isVisitAnalysisPage"),
-  checkRole(["superAdmin"])
+  checkAndValidateReq,
+  getTop3Tenants
 );
 
+router.get(
+  "/getActiveInactiveRatioForTenants",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isVisitAnalysisPage"),
+  checkAndValidateReq,
+  getActiveInactiveRatioForTenants
+);
+
+router.get(
+  "/getTop3ItemsOfTenants",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isVisitAnalysisPage"),
+  checkAndValidateReq,
+  getTop3ItemsOfTenants
+);
+
+router.get(
+  "/getMonthWiseTop3TenantsSale",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isVisitAnalysisPage"),
+  checkAndValidateReq,
+  getMonthWiseTop3TenantsSale
+);
+
+router.get(
+  "/getHourWiseTop3TenantsSale",
+  passport.authenticate("jwt", { session: false }),
+  checkPermission("isVisitAnalysisPage"),
+  checkAndValidateReq,
+  getHourWiseTop3TenantsSale
+);
 
 module.exports = router;

@@ -7,6 +7,9 @@ const initialState = {
   tenantIds: [],
   brandIds: [],
   isSuperAdmin: false,
+  isTenantUser: false,
+  isBrandUser: false,
+  isOutletUser: false,
   outletIds: [],
   isAuthenticated: false,
   tenantsQuery: {},
@@ -61,6 +64,7 @@ const authSlice = createSlice({
         ];
       }
       if (state.tenantIds && state.tenantIds.length) {
+        state.isTenantUser = true;
         state.tenantsQuery.tenantIds = state.tenantIds;
         state.brandsQuery.tenantIds = state.tenantIds;
         state.outletsQuery.tenantIds = state.tenantIds;
@@ -80,6 +84,7 @@ const authSlice = createSlice({
         ];
       }
       if (state.brandIds && state.brandIds.length) {
+        state.isBrandUser = true;
         state.brandsQuery.brandIds = state.brandIds;
         state.outletsQuery.brandIds = state.brandIds;
         state.accessibleEntities = [
@@ -94,6 +99,7 @@ const authSlice = createSlice({
         ];
       }
       if (state.outletIds && state.outletIds.length) {
+        state.isOutletUser = true;
         state.outletsQuery.outletIds = state.outletIds;
         state.accessibleEntities = [
           {

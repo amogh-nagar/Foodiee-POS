@@ -4,28 +4,28 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
-.active-class .outer-div{
-  background-color: #EA7C69;
+.active-class .outer-div {
+  background-color: #ea7c69;
 }
-.active-class .outer-div .icon{
+.active-class .outer-div .icon {
   color: white;
 }
-.icon{
-  color: #EA7C69;
+.icon {
+  color: #ea7c69;
 }
-.nonScrollable-div{
+.nonScrollable-div {
   overflow: hidden !important;
 }
 .hide-scrollbar::-webkit-scrollbar {
@@ -33,40 +33,56 @@ code {
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-.active-dish-btn{
+.active-dish-btn {
   border-bottom: 1px solid #f0563c;
   color: #d98677;
 }
 
-.customField{
+.customField {
   display: inline-block;
   background-color: red;
 }
 
-.CalendarDay__selected, .CalendarDay__selected:active, .CalendarDay__selected:hover, .CalendarDay__selected_span, .CalendarDay__hovered_span, .CalendarDay__hovered_span:hover{
+.react-daterange-picker__wrapper {
   background-color: #e66c57 !important;
-  color:white !important;
+  color: white !important;
   border: 1px solid #e66c57 !important;
 }
-.DateInput_input__focused{
+.react-calendar__month-view__days__day--weekend {
+  color: rgb(230 108 87) !important;
+}
+.react-calendar__tile--active,
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus,
+.react-calendar--selectRange .react-calendar__tile--hover {
+  background-color: #e66c57 !important;
+  color: white !important;
+  border: 1px solid #e66c57 !important;
+}
+.DateInput_input__focused {
   border-bottom: 2px solid #e66c57 !important;
 }
-.DateInput_input, .DateRangePickerInput__withBorder{
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus,
+.react-calendar button:enabled:hover {
   background-color: rgb(105 78 73) !important;
   border: 1px solid rgb(105 78 73) !important;
 }
-.DateInput_input::placeholder, .DateInput_input__focused::placeholder, .DateInput_input, .DateRangePickerInput_arrow{
-  color:white !important;
+.DateInput_input::placeholder,
+.DateInput_input__focused::placeholder,
+.DateInput_input,
+.DateRangePickerInput_arrow {
+  color: white !important;
 }
-.DateRangePickerInput_arrow_svg{
+.DateRangePickerInput_arrow_svg {
   fill: white !important;
 }
 
-.disableEntity{
-    pointer-events: none;
-    opacity: 0.4;
+.disableEntity {
+  pointer-events: none;
+  opacity: 0.4;
 }

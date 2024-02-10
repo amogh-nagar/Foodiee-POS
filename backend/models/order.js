@@ -44,5 +44,5 @@ var order = new mongoose.Schema(
 );
 
 order.index({ name: "text", "dishes.dishId._id": 1 });
-
+order.index({ date: 1 });
 module.exports = mongoose.model("Order", order);

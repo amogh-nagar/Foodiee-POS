@@ -49,12 +49,9 @@ export function truncate(input, length) {
   return input;
 }
 
-export const getRandomColors = function getRandomLightColor() {
-  const red = Math.floor(Math.random() * 155) + 100;
-  const green = Math.floor(Math.random() * 155) + 100;
-  const blue = Math.floor(Math.random() * 155) + 100;
-  const color = `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`;
-  return color;
+export const getColorBasedOnName = function (name, opacity) {
+  const hash = stringToHash(name);
+  return hashToRGBA(hash, null, opacity);
 };
 
 function stringToHash(str) {
@@ -67,11 +64,11 @@ function stringToHash(str) {
   return hash;
 }
 
-function hashToRGBA(hash, isDisabled) {
+function hashToRGBA(hash, isDisabled, opacity) {
   const red = (hash & 0xff0000) >> 16;
   const green = (hash & 0x00ff00) >> 8;
   const blue = hash & 0x0000ff;
-  const alpha = ((hash & 0xff) / 255).toFixed(2);
+  const alpha = opacity || ((hash & 0xff) / 255).toFixed(2);
 
   return isDisabled
     ? "rgba(0,0,0,0.9)"
@@ -295,3 +292,52 @@ export const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
+
+let allMonths = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+let allHours = [
+  "0 AM",
+  "1 AM",
+  "2 AM",
+  "3 AM",
+  "4 AM",
+  "5 AM",
+  "6 AM",
+  "7 AM",
+  "8 AM",
+  "9 AM",
+  "10 AM",
+  "11 AM",
+  "12 PM",
+  "13 PM",
+  "14 PM",
+  "15 PM",
+  "16 PM",
+  "17 PM",
+  "18 PM",
+  "19 PM",
+  "20 PM",
+  "21 PM",
+  "22 PM",
+  "23 PM",
+];
+let currMonth = new Date().getMonth();
+export const getPas12MonthsList = allMonths
+  .slice(currMonth + 1)
+  .concat(allMonths.slice(0, currMonth + 1));
+let currHour = new Date().getHours();
+export const getPas24HoursList = allHours
+  .slice(currHour + 1)
+  .concat(allHours.slice(0, currHour + 1));

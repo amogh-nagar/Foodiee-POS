@@ -57,8 +57,11 @@ const Outlets = () => {
         );
       }
       selectedBrand.value && formData.append("brandId", selectedBrand.value);
+      selectedBrand.label && formData.append("brandName", selectedBrand.label);
       selectedBrand.tenantId &&
         formData.append("tenantId", selectedBrand.tenantId);
+      selectedBrand.tenantName &&
+        formData.append("tenantName", selectedBrand.tenantId);
       await createOutlet(formData).unwrap();
       showToast("Outlet Created Successfully", "success");
     } catch (err) {
@@ -119,7 +122,7 @@ const Outlets = () => {
         skip={!auth.isSuperAdmin && !auth.tenantIds && !auth.brandIds}
         inputQuery={auth.brandsQuery}
         field={"brands"}
-        customField={["tenantId"]}
+        customField={["tenantId", "tenantName"]}
       />
       <div>
         <>
