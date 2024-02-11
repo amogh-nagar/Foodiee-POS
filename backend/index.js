@@ -3,12 +3,23 @@ var express = require("express");
 var app = express();
 var mongoose = require("mongoose");
 const redis = require("redis");
-const publisher = redis.createClient();
-const subscriber = redis.createClient();
+const publisher = redis.createClient({
+  url: 'redis://redis:6379'
+});
+const subscriber = redis.createClient({
+  url: 'redis://redis:6379'
+});
 const path = require("path");
 const fileUpload = require("express-fileupload");
 var mongoose = require("mongoose");
-var url = "mongodb://0.0.0.0:27017/foodOrdering";
+const {
+  DB_USER,
+  DB_PASSWORD,
+  DB_HOST,
+  DB_PORT,
+  DB_NAME,
+} = process.env;
+var url = `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?authSource=admin`;
 const passport = require("passport");
 const HttpError = require("./models/http-error");
 const morgan = require("morgan")
@@ -72,7 +83,7 @@ mongoose
     });
   })
   .catch(function (err) {
-    cb(err);
+    console.log("Error connecting to MongoDB, url is ", url, err)
   });
 
 Object.values(redis_channels).forEach((channel) => {

@@ -4,7 +4,9 @@ const sendGridMail = require("@sendgrid/mail");
 const HttpError = require("../../models/http-error");
 const { addToQueue } = require("../../aws-services/email-service/aws-sqs");
 const redis = require("redis");
-const client = redis.createClient();
+const client = redis.createClient({
+  url: 'redis://redis:6379'
+});
 sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 var itemsPerPage = 9;
 var async = require("async");

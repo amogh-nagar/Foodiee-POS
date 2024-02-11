@@ -7,8 +7,8 @@
     "start-email-svc": "nodemon ./config/email-service/aws-consumer.js",
     "start-s3-svc": "nodemon ./config/s3-service/aws-consumer.js",
     "start-order-svc": "nodemon ./config/order-service/aws-consumer.js",
-    "start-server": "nodemon index.js",
-    "start": "npm-run-all -p -r start-email-svc start-s3-svc start-server ",
+    "start-prod": "NODE_ENV=production node index.js",
+    "start": "NODE_ENV=development && nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

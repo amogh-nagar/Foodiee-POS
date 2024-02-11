@@ -1,0 +1,50 @@
+version: "1.0"
+services:
+  mongodb:
+    image: "mongo"
+    volumes:
+      - data:/data/db
+    networks:
+      - foodiee-network
+  redis:
+    image: redis
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+    command: ["redis-server"]
+    networks:
+      - foodiee-network
+  backend:
+    build: ./backend
+    ports:
+      - 3030:3030
+    volumes:
+      - logs:/app/logs
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - foodiee-network
+  frontend:
+    build: ./frontend
+    ports:
+      - 80:80
+    volumes:
+      - ./frontend/src:/app/src
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+    networks:
+      - foodiee-network
+volumes:
+  data:
+  logs:
+networks:
+    foodiee-network:
+      driver: bridge

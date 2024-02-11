@@ -1,7 +1,5 @@
 import { Pie, Bar, Line } from "react-chartjs-2";
-import DateRangePicker from "@wojtekmaj/react-daterange-picker";
 import "chart.js/auto";
-import { useState } from "react";
 import "@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css";
 import "react-calendar/dist/Calendar.css";
 import ChartWrapper from "../../Charts/ChartWrapper";
@@ -20,8 +18,6 @@ import {
 } from "../../../utils/constants";
 
 const SuperAdminAnalysis = () => {
-  const [value, onChange] = useState([new Date(), new Date()]);
-
   const { data: top3Tenants } = useRTKQuery(useGetTop3TenantsQuery);
   const { data: inactiveActive } = useRTKQuery(
     useGetActiveInactiveRatioForTenantsQuery
