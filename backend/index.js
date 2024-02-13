@@ -53,7 +53,8 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/api", require("./routes"));
-app.use(() => {
+app.use((req) => {
+  console.log("req is", req)
   const error = new HttpError("Could not find this route.", 404);
   throw error;
 });

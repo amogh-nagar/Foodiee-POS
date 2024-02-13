@@ -1,11 +1,14 @@
-#  Dockerfile for Node Express Backend
+FROM node:latest
 
-FROM node:20.11-alpine
-LABEL version="1.0"
-LABEL description="Docker Image for Foodiee-Backend"
 WORKDIR /app
-COPY ["package.json", "package-lock.json*", "./"]
-RUN npm install && npm cache clean --force
+
+COPY package.json .
+COPY package-lock.json .
+
+RUN npm install
+
 COPY . .
+
 EXPOSE 3030
-CMD ["npm","start"]
+
+CMD ["npm", "start"]
