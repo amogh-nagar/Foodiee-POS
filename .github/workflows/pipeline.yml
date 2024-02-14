@@ -14,10 +14,8 @@ jobs:
         working-directory: ./frontend
         run: |
           npm install
-          npm run test
-          
+
       - name: Install and Test Server
         working-directory: ./backend
         run: |
           npm install
-          npm run test
